@@ -13,6 +13,10 @@ import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import LogoutPage from "./pages/auth/LogoutPage";
 import AuthIndex from "./pages/auth/index";
 import Dashboard from "./pages/Dashboard";
+import CoursesPage from "./pages/CoursesPage";
+import CourseDetailsPage from "./pages/CourseDetailsPage";
+import NotesPage from "./pages/NotesPage";
+import BooksPage from "./pages/BooksPage";
 import "./App.css";
 
 function App() {
@@ -54,7 +58,10 @@ function App() {
           </Route>
 
           <Route path="/dashboard" element={<Dashboard />} />
-          {/* Add more routes here as needed */}
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/courses/:id" element={<CourseDetailsPage />} />
+          <Route path="/notes" element={<NotesPage />} />
+          <Route path="/books" element={<BooksPage />} />
         </Routes>
       </Router>
     </AuthProvider>
