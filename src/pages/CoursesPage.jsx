@@ -13,6 +13,52 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+// Dummy data for UI testing
+const DUMMY_COURSES = [
+  {
+    id: 1,
+    course_title: "Physics Complete Course - HSC 27",
+    price: 2500,
+    thumbnail: null,
+    batch: "HSC 27",
+  },
+  {
+    id: 2,
+    course_title: "Chemistry Crash Course - HSC 27",
+    price: 2200,
+    thumbnail: null,
+    batch: "HSC 27",
+  },
+  {
+    id: 3,
+    course_title: "Mathematics Advanced - HSC 27",
+    price: 2800,
+    thumbnail: null,
+    batch: "HSC 27",
+  },
+  {
+    id: 4,
+    course_title: "Biology Complete Guide - HSC 27",
+    price: 2400,
+    thumbnail: null,
+    batch: "HSC 27",
+  },
+  {
+    id: 5,
+    course_title: "Physics Revision Course - HSC 26",
+    price: 1800,
+    thumbnail: null,
+    batch: "HSC 26",
+  },
+  {
+    id: 6,
+    course_title: "Mathematics Problem Solving - HSC 26",
+    price: 2000,
+    thumbnail: null,
+    batch: "HSC 26",
+  },
+];
+
 export default function CoursesPage() {
   const [courses, setCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,15 +69,22 @@ export default function CoursesPage() {
   }, []);
 
   const fetchCourses = async () => {
-    try {
-      const response = await axiosInstance.get("/courses");
-      setCourses(response.data);
-    } catch (error) {
-      toast.error("Failed to load courses");
-      console.error("Error fetching courses:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    // Simulate API loading delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Using dummy data for UI testing
+    setCourses(DUMMY_COURSES);
+    setIsLoading(false);
+    // Comment out actual API call for now
+    // try {
+    //   const response = await axiosInstance.get("/courses");
+    //   setCourses(response.data);
+    // } catch (error) {
+    //   toast.error("Failed to load courses");
+    //   console.error("Error fetching courses:", error);
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   const handleEnroll = (courseId) => {

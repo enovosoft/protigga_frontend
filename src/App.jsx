@@ -18,37 +18,38 @@ import CourseDetailsPage from "./pages/CourseDetailsPage";
 import NotesPage from "./pages/NotesPage";
 import BooksPage from "./pages/BooksPage";
 import "./App.css";
+import CheckoutPage from "./pages/CheckoutPage";
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: "var(--card)",
-            color: "var(--foreground)",
-            border: "1px solid var(--border)",
-          },
-          success: {
-            iconTheme: {
-              primary: "var(--success)",
-              secondary: "var(--success-foreground)",
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: "var(--card)",
+              color: "var(--foreground)",
+              border: "1px solid var(--border)",
             },
-          },
-          error: {
-            iconTheme: {
-              primary: "var(--destructive)",
-              secondary: "var(--destructive-foreground)",
+            success: {
+              iconTheme: {
+                primary: "var(--success)",
+                secondary: "var(--success-foreground)",
+              },
             },
-          },
-        }}
-      />
+            error: {
+              iconTheme: {
+                primary: "var(--destructive)",
+                secondary: "var(--destructive-foreground)",
+              },
+            },
+          }}
+        />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          
+
           <Route path="/auth">
             <Route index element={<AuthIndex />} />
             <Route path="register" element={<RegisterPage />} />
@@ -62,6 +63,7 @@ function App() {
           <Route path="/courses/:id" element={<CourseDetailsPage />} />
           <Route path="/notes" element={<NotesPage />} />
           <Route path="/books" element={<BooksPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>
       </Router>
     </AuthProvider>
