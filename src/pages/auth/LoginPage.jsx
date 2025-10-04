@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import axiosInstance from '@/lib/axios';
+import { useAuth } from '@/contexts/AuthContext';
 
 const loginSchema = z.object({
   phone: z.string().regex(/^01[3-9]\d{8}$/, 'Invalid phone number'),
@@ -20,6 +21,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -36,7 +38,7 @@ export default function LoginPage() {
         phone: data.phone,
         password: data.password,
       });
-      localStorage.setItem('token', response.data.token);
+      login(response.data.token, response.data.user);
       toast.success('Login successful!');
       navigate('/dashboard');
     } catch (error) {

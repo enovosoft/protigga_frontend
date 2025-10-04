@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import axiosInstance from '@/lib/axios';
+import { useAuth } from '@/contexts/AuthContext';
 
 const registerSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
@@ -32,6 +33,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const registerForm = useForm({
     resolver: zodResolver(registerSchema),
@@ -75,7 +77,7 @@ export default function RegisterPage() {
         phone: phoneNumber,
         otp: data.otp,
       });
-      localStorage.setItem('token', response.data.token);
+      login(response.data.token, response.data.user);
       toast.success('Registration successful!');
       navigate('/dashboard');
     } catch (error) {

@@ -3,14 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Loader2, LogOut } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LogoutPage() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   useEffect(() => {
     const performLogout = () => {
-      // Clear authentication token
-      localStorage.removeItem('token');
+      // Clear authentication
+      logout();
       
       // Show success message
       toast.success('Logged out successfully');
@@ -22,7 +24,7 @@ export default function LogoutPage() {
     };
 
     performLogout();
-  }, [navigate]);
+  }, [navigate, logout]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-accent/20 to-secondary/10 p-4">
