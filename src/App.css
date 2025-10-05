@@ -83,3 +83,57 @@
   font-style: italic;
   font-display: swap;
 }
+
+/* React PDF Styles */
+.react-pdf__Document {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.react-pdf__Page {
+  max-width: calc(100% - 2em);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1em;
+}
+
+.react-pdf__Page__canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+.react-pdf__Page__textContent {
+  display: none;
+}
+
+.react-pdf__Page__annotations {
+  display: none;
+}
+
+/* Custom scrollbar for PDF viewer */
+.react-pdf__Page__canvas::-webkit-scrollbar {
+  width: 8px;
+}
+
+.react-pdf__Page__canvas::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+.react-pdf__Page__canvas::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-radius: 4px;
+}
+
+.react-pdf__Page__canvas::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground);
+}
+
+/* Loading animation */
+@keyframes pdf-loading {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.pdf-loading {
+  animation: pdf-loading 1s linear infinite;
+}

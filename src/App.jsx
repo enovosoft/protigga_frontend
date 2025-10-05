@@ -16,10 +16,11 @@ import Dashboard from "./pages/Dashboard";
 import CoursesPage from "./pages/CoursesPage";
 import CourseDetailsPage from "./pages/CourseDetailsPage";
 import NotesPage from "./pages/NotesPage";
-import BooksPage from "./pages/BooksPage";
-import "./App.css";
-import CheckoutPage from "./pages/CheckoutPage";
+import NotesViewPage from "./pages/NotesViewPage";
 import { CookiesProvider } from "react-cookie";
+import BooksPage from "./pages/BooksPage";
+import CheckoutPage from "./pages/CheckoutPage";
+
 function App() {
   return (
     <CookiesProvider>
@@ -63,6 +64,7 @@ function App() {
             <Route path="/courses" element={<CoursesPage />} />
             <Route path="/courses/:id" element={<CourseDetailsPage />} />
             <Route path="/notes" element={<NotesPage />} />
+            <Route path="/notes/view" element={<NotesViewPage />} />
             <Route path="/books" element={<BooksPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
           </Routes>
