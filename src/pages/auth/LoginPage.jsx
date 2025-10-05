@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import axiosInstance from "@/lib/axios";
+import apiInstance from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
 const loginSchema = z.object({
@@ -28,8 +28,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
 
+  const { login } = useAuth();
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -41,13 +41,17 @@ export default function LoginPage() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.post("/auth/login", {
+      const response = await apiInstance.post("/auth/login", {
         phone: `+880${data.phone}`,
         password: data.password,
       });
-      login(response.data.token, response.data.user);
-      toast.success("Login successful!");
-      navigate("/dashboard");
+      if (response.status === 200) {
+        toast.success(response?.data?.message || "Login successful!");
+        navigate("/dashboard");
+        login(); // Call login without parameters - it will read cookies
+      } else {
+        toast.error(response?.data?.message || "Login failed");
+      }
     } catch (error) {
       toast.error(
         error.response?.data?.errors?.[0]?.message ||

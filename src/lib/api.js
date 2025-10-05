@@ -2,21 +2,19 @@ import axios from "axios";
 
 // Base URL configuration - easily changeable
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:4000/api/v1";
 
-console.log(API_BASE_URL);
-const axiosInstance = axios.create({
+const apiInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 60000,
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
-  credentials: "include",
-  redirect: "follow",
+  withCredentials: true,
 });
 
 // Request interceptor
-axiosInstance.interceptors.request.use(
+apiInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -30,11 +28,11 @@ axiosInstance.interceptors.request.use(
 );
 
 // Response interceptor
-axiosInstance.interceptors.response.use(
+apiInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     return Promise.reject(error);
   }
 );
 
-export default axiosInstance;
+export default apiInstance;

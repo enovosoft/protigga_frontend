@@ -23,7 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import axiosInstance from "@/lib/axios";
+import apiInstance from "@/lib/api";
 
 const phoneSchema = z.object({
   phone: z.string().regex(/^1[3-9]\d{8}$/, "Invalid Bangladeshi phone number"),
@@ -67,12 +67,9 @@ export default function ResetPasswordPage() {
   const onPhoneSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.post(
-        "/auth/reset-password/send-otp",
-        {
-          phone: `+880${data.phone}`,
-        }
-      );
+      const response = await apiInstance.post("/auth/reset-password/send-otp", {
+        phone: `+880${data.phone}`,
+      });
       setPhoneNumber(data.phone);
       setStep("otp");
       toast.success(response.data.message || "OTP sent to your phone number");
@@ -87,7 +84,7 @@ export default function ResetPasswordPage() {
     setIsLoading(true);
     try {
       // Send OTP, phone, and password to complete reset
-      await axiosInstance.post("/auth/reset-password", {
+      await apiInstance.post("/auth/reset-password", {
         phone: `+880${phoneNumber}`,
         otp: data.otp,
         password: data.password,

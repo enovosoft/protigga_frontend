@@ -23,7 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import axiosInstance from "@/lib/axios";
+import apiInstance from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
 const registerSchema = z
@@ -73,7 +73,7 @@ export default function RegisterPage() {
   const onRegisterSubmit = async (data) => {
     setIsLoading(true);
     try {
-      await axiosInstance.post("/auth/registration", {
+      await apiInstance.post("/auth/registration", {
         name: data.fullName,
         phone: `+880${data.phone}`,
         password: data.password,
@@ -95,7 +95,7 @@ export default function RegisterPage() {
   const onOtpSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.post("/auth/verify/otp", {
+      const response = await apiInstance.post("/auth/verify/otp", {
         phone: `+880${phoneNumber}`,
         otp: data.otp,
         otp_type: "registration",
@@ -112,7 +112,7 @@ export default function RegisterPage() {
   const resendOtp = async () => {
     setIsLoading(true);
     try {
-      await axiosInstance.post("/auth/resend-otp", { phone: phoneNumber });
+      await apiInstance.post("/auth/resend-otp", { phone: phoneNumber });
       toast.success("OTP resent successfully");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to resend OTP");

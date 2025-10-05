@@ -19,54 +19,56 @@ import NotesPage from "./pages/NotesPage";
 import BooksPage from "./pages/BooksPage";
 import "./App.css";
 import CheckoutPage from "./pages/CheckoutPage";
-
+import { CookiesProvider } from "react-cookie";
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: "var(--card)",
-              color: "var(--foreground)",
-              border: "1px solid var(--border)",
-            },
-            success: {
-              iconTheme: {
-                primary: "var(--success)",
-                secondary: "var(--success-foreground)",
+    <CookiesProvider>
+      <AuthProvider>
+        <Router>
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: "var(--card)",
+                color: "var(--foreground)",
+                border: "1px solid var(--border)",
               },
-            },
-            error: {
-              iconTheme: {
-                primary: "var(--destructive)",
-                secondary: "var(--destructive-foreground)",
+              success: {
+                iconTheme: {
+                  primary: "var(--success)",
+                  secondary: "var(--success-foreground)",
+                },
               },
-            },
-          }}
-        />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
+              error: {
+                iconTheme: {
+                  primary: "var(--destructive)",
+                  secondary: "var(--destructive-foreground)",
+                },
+              },
+            }}
+          />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
 
-          <Route path="/auth">
-            <Route index element={<AuthIndex />} />
-            <Route path="register" element={<RegisterPage />} />
-            <Route path="login" element={<LoginPage />} />
-            <Route path="reset-password" element={<ResetPasswordPage />} />
-            <Route path="logout" element={<LogoutPage />} />
-          </Route>
+            <Route path="/auth">
+              <Route index element={<AuthIndex />} />
+              <Route path="register" element={<RegisterPage />} />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="reset-password" element={<ResetPasswordPage />} />
+              <Route path="logout" element={<LogoutPage />} />
+            </Route>
 
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/courses/:id" element={<CourseDetailsPage />} />
-          <Route path="/notes" element={<NotesPage />} />
-          <Route path="/books" element={<BooksPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/courses" element={<CoursesPage />} />
+            <Route path="/courses/:id" element={<CourseDetailsPage />} />
+            <Route path="/notes" element={<NotesPage />} />
+            <Route path="/books" element={<BooksPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </CookiesProvider>
   );
 }
 

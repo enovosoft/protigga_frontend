@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, Loader2, Tag } from "lucide-react";
 import toast from "react-hot-toast";
-import axiosInstance from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,

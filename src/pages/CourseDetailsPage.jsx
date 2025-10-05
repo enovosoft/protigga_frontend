@@ -13,7 +13,6 @@ import {
   Book,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import axiosInstance from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -199,8 +198,7 @@ export default function CourseDetailsPage() {
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 <span>
-                  Created:{" "}
-                  {new Date(course.created_at).toLocaleDateString()}
+                  Created: {new Date(course.created_at).toLocaleDateString()}
                 </span>
               </div>
             </div>

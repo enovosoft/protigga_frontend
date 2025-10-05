@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { FileText, Loader2, Eye } from "lucide-react";
 import toast from "react-hot-toast";
-import axiosInstance from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,
