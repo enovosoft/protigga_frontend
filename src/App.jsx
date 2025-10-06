@@ -1,25 +1,21 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-import { Toaster } from "react-hot-toast";
-import { AuthProvider } from "./contexts/AuthContext";
-import HomePage from "./pages/HomePage";
-import RegisterPage from "./pages/auth/RegisterPage";
-import LoginPage from "./pages/auth/LoginPage";
-import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
-import LogoutPage from "./pages/auth/LogoutPage";
-import AuthIndex from "./pages/auth/index";
-import Dashboard from "./pages/Dashboard";
-import CoursesPage from "./pages/CoursesPage";
-import CourseDetailsPage from "./pages/CourseDetailsPage";
-import NotesPage from "./pages/NotesPage";
-import NotesViewPage from "./pages/NotesViewPage";
 import { CookiesProvider } from "react-cookie";
+import { Toaster } from "react-hot-toast";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
 import BooksPage from "./pages/BooksPage";
 import CheckoutPage from "./pages/CheckoutPage";
+import CourseDetailsPage from "./pages/CourseDetailsPage";
+import CoursesPage from "./pages/CoursesPage";
+import Dashboard from "./pages/Dashboard";
+import HomePage from "./pages/HomePage";
+import NotesPage from "./pages/NotesPage";
+import NotesViewPage from "./pages/NotesViewPage";
+import LoginPage from "./pages/auth/LoginPage";
+import LogoutPage from "./pages/auth/LogoutPage";
+import RegisterPage from "./pages/auth/RegisterPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+import VerifyAccountPage from "./pages/auth/VerifyAccountPage";
+import AuthIndex from "./pages/auth/index";
 
 function App() {
   return (
@@ -56,6 +52,7 @@ function App() {
               <Route index element={<AuthIndex />} />
               <Route path="register" element={<RegisterPage />} />
               <Route path="login" element={<LoginPage />} />
+              <Route path="verify-account" element={<VerifyAccountPage />} />
               <Route path="reset-password" element={<ResetPasswordPage />} />
               <Route path="logout" element={<LogoutPage />} />
             </Route>

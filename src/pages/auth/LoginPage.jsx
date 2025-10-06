@@ -1,13 +1,4 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useNavigate, Link } from "react-router-dom";
-import toast from "react-hot-toast";
-import { Eye, EyeOff, Loader2, Phone, Lock, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -15,8 +6,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import apiInstance from "@/lib/api";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
+import apiInstance from "@/lib/api";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff, Loader2, Lock, LogIn, Phone } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { Link, useNavigate } from "react-router-dom";
+import { z } from "zod";
 
 const loginSchema = z.object({
   phone: z.string().regex(/^1[3-9]\d{8}$/, "Invalid Bangladeshi phone number"),
@@ -53,11 +53,16 @@ export default function LoginPage() {
         toast.error(response?.data?.message || "Login failed");
       }
     } catch (error) {
-      toast.error(
-        error.response?.data?.errors?.[0]?.message ||
-          error.response?.data?.message ||
-          "Login failed"
-      );
+      if (error.response?.status === 403) {
+        // User not verified, redirect to verify account
+        navigate("/auth/verify-account", { state: { phone: data.phone } });
+      } else {
+        toast.error(
+          error.response?.data?.errors?.[0]?.message ||
+            error.response?.data?.message ||
+            "Login failed"
+        );
+      }
     } finally {
       setIsLoading(false);
     }
