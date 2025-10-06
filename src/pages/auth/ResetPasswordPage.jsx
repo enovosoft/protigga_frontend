@@ -1,21 +1,4 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useNavigate, Link } from "react-router-dom";
-import toast from "react-hot-toast";
-import {
-  Eye,
-  EyeOff,
-  Loader2,
-  Phone,
-  Lock,
-  ArrowRight,
-  KeyRound,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -23,7 +6,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import apiInstance from "@/lib/api";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  KeyRound,
+  Loader2,
+  Lock,
+  Phone,
+} from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { Link, useNavigate } from "react-router-dom";
+import { z } from "zod";
 
 const phoneSchema = z.object({
   phone: z.string().regex(/^1[3-9]\d{8}$/, "Invalid Bangladeshi phone number"),
@@ -108,6 +109,17 @@ export default function ResetPasswordPage() {
   if (step === "otp") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-accent/20 to-secondary/10 p-4">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="fixed top-4 left-4 z-10 gap-2"
+          onClick={() => navigate("/")}
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
+
         <Card className="w-full max-w-md shadow-xl border-border/50">
           <CardHeader className="space-y-3 text-center">
             <div className="mx-auto w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center">
@@ -253,6 +265,17 @@ export default function ResetPasswordPage() {
   // Phone Number Step (Default)
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-accent/20 to-secondary/10 p-4">
+      {/* Back Button */}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="fixed top-4 left-4 z-10 gap-2"
+        onClick={() => navigate("/")}
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back
+      </Button>
+
       <Card className="w-full max-w-md shadow-xl border-border/50">
         <CardHeader className="space-y-3 text-center">
           <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">

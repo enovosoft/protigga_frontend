@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import apiInstance from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, Loader2, Phone } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Phone } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -74,6 +74,17 @@ export default function OtpVerification({
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-accent/20 to-secondary/10 p-4">
+      {/* Back Button */}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="fixed top-4 left-4 z-10 gap-2"
+        onClick={() => navigate("/")}
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back
+      </Button>
+
       <Card className="w-full max-w-md shadow-xl border-border/50">
         <CardHeader className="space-y-3 text-center">
           <div className="mx-auto w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center">

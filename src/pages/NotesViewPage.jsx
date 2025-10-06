@@ -1,21 +1,21 @@
-import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Document, Page, pdfjs } from "react-pdf";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
+  ArrowLeft,
   ChevronLeft,
   ChevronRight,
+  LayoutGrid,
+  RotateCw,
   ZoomIn,
   ZoomOut,
-  RotateCw,
-  ArrowLeft,
-  LayoutGrid,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import toast from "react-hot-toast";
-import { Skeleton } from "@/components/ui/skeleton";
 import pdfWorker from "pdfjs-dist/build/pdf.worker?url";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { Document, Page, pdfjs } from "react-pdf";
+import { useLocation, useNavigate } from "react-router-dom";
 // Set up PDF.js worker with CDN - matching react-pdf version
 pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -154,7 +154,7 @@ export default function NotesViewPage() {
             {" "}
             {/* PDF Controls */}
             <div className="bg-card p-4 rounded-lg border mb-6">
-              <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 {/* Page Navigation */}
                 <div className="flex items-center gap-2">
                   <Button
@@ -163,7 +163,9 @@ export default function NotesViewPage() {
                     disabled={pageNumber <= 1}
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    {sideBySide ? "Prev 2" : "Prev"}
+                    <span className="hidden sm:inline">
+                      {sideBySide ? "Prev 2" : "Prev"}
+                    </span>
                   </Button>
 
                   <span className="text-sm px-3">
@@ -176,13 +178,15 @@ export default function NotesViewPage() {
                     onClick={goToNextPage}
                     disabled={pageNumber >= numPages}
                   >
-                    {sideBySide ? "Next 2" : "Next"}
+                    <span className="hidden sm:inline">
+                      {sideBySide ? "Next 2" : "Next"}
+                    </span>
                     <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
 
                 {/* Zoom / Rotate / Dual Controls */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap justify-center">
                   <Button
                     variant="outline"
                     size="sm"
@@ -212,14 +216,14 @@ export default function NotesViewPage() {
                     className="gap-2"
                   >
                     <RotateCw className="w-4 h-4" />
-                    Rotate
+                    <span className="hidden sm:inline">Rotate</span>
                   </Button>
 
                   <Button
                     variant={sideBySide ? "default" : "outline"}
                     size="sm"
                     onClick={toggleSideBySide}
-                    className={`gap-2 ${sideBySide ? "" : ""}`}
+                    className="gap-2 hidden lg:inline"
                   >
                     <LayoutGrid className="w-4 h-4" />
                     <span className="hidden xl:inline">
@@ -234,96 +238,100 @@ export default function NotesViewPage() {
             <div className="bg-card p-4 rounded-lg border overflow-hidden">
               <div className="flex justify-center">
                 <div
-                  className={`flex gap-4 w-full max-w-full ${
+                  className={`flex gap-4 w-full max-w-full overflow-x-auto ${
                     sideBySide && numPages > 1
                       ? "xl:flex-row flex-col"
                       : "flex-col"
                   }`}
                 >
                   <div
-                    className={`flex-1 w-full ${
+                    className={`flex-1 w-full min-w-0 ${
                       sideBySide
                         ? "xl:border-r xl:border-border xl:pr-4 border-none pr-0"
                         : ""
                     }`}
                   >
                     <div className="flex justify-center">
-                      <Document
-                        file={note.note_file_link}
-                        onLoadSuccess={onDocumentLoadSuccess}
-                        onLoadError={onDocumentLoadError}
-                        loading={
-                          <div className="flex justify-center items-center h-64">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                          </div>
-                        }
-                        error={
-                          <div className="text-center py-8 h-64 flex items-center justify-center">
-                            <div>
-                              <p className="text-destructive mb-2">
-                                Failed to load Note
-                              </p>
-                              <p className="text-sm text-muted-foreground">
-                                The Note file could not be loaded. Please try
-                                again later.
-                              </p>
-                            </div>
-                          </div>
-                        }
-                      >
-                        <Page
-                          pageNumber={pageNumber}
-                          scale={scale}
-                          rotate={rotation}
+                      <div className="max-w-full overflow-x-auto">
+                        <Document
+                          file={note.note_file_link}
+                          onLoadSuccess={onDocumentLoadSuccess}
+                          onLoadError={onDocumentLoadError}
                           loading={
                             <div className="flex justify-center items-center h-64">
-                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                             </div>
                           }
-                          renderTextLayer={false}
-                          renderAnnotationLayer={false}
-                        />
-                      </Document>
+                          error={
+                            <div className="text-center py-8 h-64 flex items-center justify-center">
+                              <div>
+                                <p className="text-destructive mb-2">
+                                  Failed to load Note
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  The Note file could not be loaded. Please try
+                                  again later.
+                                </p>
+                              </div>
+                            </div>
+                          }
+                        >
+                          <Page
+                            pageNumber={pageNumber}
+                            scale={scale}
+                            rotate={rotation}
+                            loading={
+                              <div className="flex justify-center items-center h-64">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                              </div>
+                            }
+                            renderTextLayer={false}
+                            renderAnnotationLayer={false}
+                          />
+                        </Document>
+                      </div>
                     </div>
                   </div>
                   {sideBySide && numPages > pageNumber && (
-                    <div className="flex-1">
-                      <Document
-                        onLoadSuccess={() => {}}
-                        onLoadError={() => {}}
-                        file={note.note_file_link}
-                        loading={
-                          <div className="flex justify-center items-center h-64">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                          </div>
-                        }
-                        error={
-                          <div className="text-center py-8 h-64 flex items-center justify-center">
-                            <div>
-                              <p className="text-destructive mb-2">
-                                Failed to load Note
-                              </p>
-                              <p className="text-sm text-muted-foreground">
-                                The Note file could not be loaded. Please try
-                                again later.
-                              </p>
-                            </div>
-                          </div>
-                        }
-                      >
-                        <Page
-                          pageNumber={pageNumber + 1}
-                          scale={scale}
-                          rotate={rotation}
+                    <div className="flex-1 min-w-0">
+                      <div className="max-w-full overflow-x-auto">
+                        <Document
+                          onLoadSuccess={() => {}}
+                          onLoadError={() => {}}
+                          file={note.note_file_link}
                           loading={
                             <div className="flex justify-center items-center h-64">
-                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                             </div>
                           }
-                          renderTextLayer={false}
-                          renderAnnotationLayer={false}
-                        />
-                      </Document>
+                          error={
+                            <div className="text-center py-8 h-64 flex items-center justify-center">
+                              <div>
+                                <p className="text-destructive mb-2">
+                                  Failed to load Note
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  The Note file could not be loaded. Please try
+                                  again later.
+                                </p>
+                              </div>
+                            </div>
+                          }
+                        >
+                          <Page
+                            pageNumber={pageNumber + 1}
+                            scale={scale}
+                            rotate={rotation}
+                            loading={
+                              <div className="flex justify-center items-center h-64">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                              </div>
+                            }
+                            renderTextLayer={false}
+                            renderAnnotationLayer={false}
+                          />
+                        </Document>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -331,27 +339,29 @@ export default function NotesViewPage() {
             </div>
             {/* Page Input */}
             <div className="mt-6 text-center">
-              <div className="inline-flex items-center gap-2">
+              <div className="inline-flex flex-col sm:flex-row items-center gap-2">
                 <label htmlFor="page-input" className="text-sm">
                   Go to page:
                 </label>
-                <input
-                  id="page-input"
-                  type="number"
-                  min={1}
-                  max={numPages}
-                  value={pageNumber}
-                  onChange={(e) => {
-                    const page = parseInt(e.target.value);
-                    if (page >= 1 && page <= numPages) {
-                      setPageNumber(page);
-                    }
-                  }}
-                  className="w-16 px-2 py-1 text-sm border rounded"
-                />
-                <span className="text-sm text-muted-foreground">
-                  of {numPages}
-                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    id="page-input"
+                    type="number"
+                    min={1}
+                    max={numPages}
+                    value={pageNumber}
+                    onChange={(e) => {
+                      const page = parseInt(e.target.value);
+                      if (page >= 1 && page <= numPages) {
+                        setPageNumber(page);
+                      }
+                    }}
+                    className="w-16 px-2 py-1 text-sm border rounded"
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    of {numPages}
+                  </span>
+                </div>
               </div>
             </div>
           </>
