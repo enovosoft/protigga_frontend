@@ -1,6 +1,11 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 import { useCookies } from "react-cookie";
 
@@ -11,20 +16,16 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [cookies, setCookie, removeCookie] = useCookies([
+  const [cookies, , removeCookie] = useCookies([
     "access_token",
     "refresh_token",
   ]);
 
-  useEffect(() => {
-    // Check if user is authenticated by reading access_token cookie
-    checkAuthStatus();
-  }, [cookies]);
-
-  const checkAuthStatus = () => {
+  const checkAuthStatus = useCallback(() => {
     try {
       // Read access_token from cookies using js-cookie
       const accessToken = cookies.access_token;
+
       if (accessToken) {
         // Decode the JWT token to get user data
         const decodedToken = jwtDecode(accessToken);
@@ -42,9 +43,14 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [cookies.access_token]);
 
-  const login = (token, userData) => {
+  useEffect(() => {
+    // Check if user is authenticated by reading access_token cookie
+    checkAuthStatus();
+  }, [checkAuthStatus]);
+
+  const login = () => {
     // The login function is called after successful login
     // The cookies are already set by the backend
     // Just refresh the auth status to read the new cookies
@@ -66,10 +72,9 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         isAuthenticated,
-        isLoading,
+        isAuthLoading: isLoading,
         login,
         logout,
-        checkAuthStatus, // Expose this for manual refresh if needed
       }}
     >
       {children}

@@ -1,52 +1,30 @@
-import React, { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Settings } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { LogOut, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const UserDashboardLayout = ({ children }) => {
-  const [activeView, setActiveView] = useState("dashboard");
-  const { user, logout, isAuthenticated } = useAuth();
-  const location = useLocation();
+  const { user, logout, isAuthenticated, isAuthLoading } = useAuth();
+  const navigate = useNavigate();
 
-  // Set active view based on current route
-  React.useEffect(() => {
-    if (location.pathname.includes("/user-dashboard")) {
-      setActiveView("profile");
-    } else {
-      setActiveView("dashboard");
-    }
-  }, [location]);
-
-  if (!isAuthenticated) {
+  if (!isAuthLoading && !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">
             Please log in to access the dashboard
           </h2>
-          <Button onClick={() => (window.location.href = "/auth")}>
-            Go to Login
+          <Button onClick={() => navigate("/")} className="mt-4">
+            Go to home
           </Button>
         </div>
       </div>
     );
   }
 
-  const handleProfileClick = () => {
-    setActiveView("profile");
-    window.location.href = "/user-dashboard";
-  };
-
-  const handleDashboardClick = () => {
-    setActiveView("dashboard");
-    window.location.href = "/dashboard";
-  };
-
   const handleLogout = () => {
-    logout();
-    window.location.href = "/";
+    navigate("/auth/logout");
   };
 
   return (

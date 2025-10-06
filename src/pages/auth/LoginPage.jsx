@@ -37,7 +37,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -55,8 +55,9 @@ export default function LoginPage() {
       });
       if (response.status === 200) {
         toast.success(response?.data?.message || "Login successful!");
-        navigate("/dashboard");
-        login(); // Call login without parameters - it will read cookies
+        login();
+
+        window.location.href = "/dashboard";
       } else {
         toast.error(response?.data?.message || "Login failed");
       }
