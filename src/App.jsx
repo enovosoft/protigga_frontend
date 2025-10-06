@@ -1,7 +1,13 @@
 import { CookiesProvider } from "react-cookie";
 import { Toaster } from "react-hot-toast";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from "react-router-dom";
+import NotesManagement from "./components/Admin/Notes/NotesManagement";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import BooksPage from "./pages/BooksPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import CourseDetailsPage from "./pages/CourseDetailsPage";
@@ -16,6 +22,42 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import VerifyAccountPage from "./pages/auth/VerifyAccountPage";
 import AuthIndex from "./pages/auth/index";
+
+// Protected Route Component - Redirects to home if not authenticated
+function ProtectedRoute({ children }) {
+  const { isAuthenticated, isAuthLoading } = useAuth();
+
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <h2 className="text-2xl font-bold mt-4">Loading...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  return isAuthenticated ? children : <Navigate to="/" replace />;
+}
+
+// Auth Route Component - Redirects to dashboard if already authenticated
+function AuthRoute({ children }) {
+  const { isAuthenticated, isAuthLoading } = useAuth();
+
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <h2 className="text-2xl font-bold mt-4">Loading...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : children;
+}
 
 function App() {
   return (
@@ -49,15 +91,65 @@ function App() {
             <Route path="/" element={<HomePage />} />
 
             <Route path="/auth">
-              <Route index element={<AuthIndex />} />
-              <Route path="register" element={<RegisterPage />} />
-              <Route path="login" element={<LoginPage />} />
-              <Route path="verify-account" element={<VerifyAccountPage />} />
-              <Route path="reset-password" element={<ResetPasswordPage />} />
+              <Route
+                index
+                element={
+                  <AuthRoute>
+                    <AuthIndex />
+                  </AuthRoute>
+                }
+              />
+              <Route
+                path="register"
+                element={
+                  <AuthRoute>
+                    <RegisterPage />
+                  </AuthRoute>
+                }
+              />
+              <Route
+                path="login"
+                element={
+                  <AuthRoute>
+                    <LoginPage />
+                  </AuthRoute>
+                }
+              />
+              <Route
+                path="verify-account"
+                element={
+                  <AuthRoute>
+                    <VerifyAccountPage />
+                  </AuthRoute>
+                }
+              />
+              <Route
+                path="reset-password"
+                element={
+                  <AuthRoute>
+                    <ResetPasswordPage />
+                  </AuthRoute>
+                }
+              />
               <Route path="logout" element={<LogoutPage />} />
             </Route>
 
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/notes"
+              element={
+                <ProtectedRoute>
+                  <NotesManagement />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/courses" element={<CoursesPage />} />
             <Route path="/courses/:id" element={<CourseDetailsPage />} />
             <Route path="/notes" element={<NotesPage />} />

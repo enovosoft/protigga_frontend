@@ -67,6 +67,27 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
+  // Helper function to check if user has a specific role
+  const hasRole = (roleName) => {
+    if (!user || !user.roles || !Array.isArray(user.roles)) {
+      return false;
+    }
+    return user.roles.some((roleObj) => roleObj.role === roleName);
+  };
+
+  // Helper function to get user's primary role (first role in the array)
+  const getPrimaryRole = () => {
+    if (
+      !user ||
+      !user.roles ||
+      !Array.isArray(user.roles) ||
+      user.roles.length === 0
+    ) {
+      return null;
+    }
+    return user.roles[0].role;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -75,6 +96,8 @@ export const AuthProvider = ({ children }) => {
         isAuthLoading: isLoading,
         login,
         logout,
+        hasRole,
+        getPrimaryRole,
       }}
     >
       {children}

@@ -1,11 +1,12 @@
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut, User } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+import { Link } from "react-router-dom";
 const UserDashboardLayout = ({ children }) => {
-  const { user, logout, isAuthenticated, isAuthLoading } = useAuth();
+  const { isAuthenticated, isAuthLoading } = useAuth();
   const navigate = useNavigate();
 
   if (!isAuthLoading && !isAuthenticated) {
@@ -34,19 +35,11 @@ const UserDashboardLayout = ({ children }) => {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                  <User className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold">
-                    Welcome, {user?.name || user?.fullName || "User"}
-                  </h1>
-                  <p className="text-muted-foreground">
-                    {user?.phone || "No phone number"}
-                  </p>
-                </div>
-              </div>
+              <Link to="/" className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold text-primary font-primary">
+                  প্রতিজ্ঞা
+                </h1>
+              </Link>
             </div>
 
             <div className="flex items-center gap-2">
@@ -56,7 +49,7 @@ const UserDashboardLayout = ({ children }) => {
                 className="flex items-center gap-2"
               >
                 <LogOut className="w-4 h-4" />
-                Logout
+                <span className="hidden sm:inline">Logout</span>
               </Button>
             </div>
           </div>
