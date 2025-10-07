@@ -115,8 +115,8 @@ export default function NoteDialog({ open, onOpenChange, note, onSuccess }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] w-[calc(100vw-1.5rem)] sm:w-full mx-auto p-0 gap-0 overflow-hidden">
-        <div className="overflow-y-auto max-h-[85vh] px-6 py-6">
+      <DialogContent className="max-w-2xl max-h-[90vh] w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] md:w-full mx-auto p-0 gap-0 overflow-hidden">
+        <div className="overflow-y-auto max-h-[90vh] px-4 py-4 sm:px-6 sm:py-6">
           <DialogHeader>
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -137,12 +137,12 @@ export default function NoteDialog({ open, onOpenChange, note, onSuccess }) {
 
           <form
             onSubmit={handleSubmit}
-            className="space-y-4 sm:space-y-5 mt-4 overflow-x-hidden"
+            className="space-y-3 sm:space-y-4 md:space-y-5 mt-3 sm:mt-4 overflow-x-hidden"
           >
             {/* Show existing PDF link when editing */}
             {note && note.note_file_link && (
-              <div className="p-3 sm:p-4 bg-primary/5 border border-primary/20 rounded-lg overflow-hidden w-full">
-                <Label className="text-xs sm:text-sm font-medium text-foreground mb-2 block">
+              <div className="p-2.5 sm:p-3 md:p-4 bg-primary/5 border border-primary/20 rounded-lg overflow-hidden w-full">
+                <Label className="text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2 block">
                   Current PDF File:
                 </Label>
                 <div className="overflow-hidden w-full">
@@ -159,13 +159,13 @@ export default function NoteDialog({ open, onOpenChange, note, onSuccess }) {
                     {note.note_file_link}
                   </a>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className="text-xs text-muted-foreground mt-1.5 sm:mt-2">
                   Upload a new file below to replace the current one
                 </p>
               </div>
             )}
 
-            <div className="space-y-2 overflow-hidden">
+            <div className="space-y-1.5 sm:space-y-2 overflow-hidden p-1">
               <Label htmlFor="note_name" className="text-sm font-medium">
                 Note Name <span className="text-destructive">*</span>
               </Label>
@@ -176,11 +176,11 @@ export default function NoteDialog({ open, onOpenChange, note, onSuccess }) {
                 onChange={handleChange}
                 placeholder="HSC Physics"
                 required
-                className="w-full"
+                className="w-full h-10 sm:h-11"
               />
             </div>
 
-            <div className="space-y-2 overflow-hidden">
+            <div className="space-y-1.5 sm:space-y-2 overflow-hidden p-1">
               <Label htmlFor="note_desc" className="text-sm font-medium">
                 Description <span className="text-destructive">*</span>
               </Label>
@@ -196,12 +196,12 @@ export default function NoteDialog({ open, onOpenChange, note, onSuccess }) {
                 - অধ্যায় ৪: কাজ, শক্তি ও শক্তির সংরক্ষণ
                 - অধ্যায় ৫: তরঙ্গ`}
                 required
-                rows={6}
-                className="w-full px-3 py-2 text-sm rounded-md border border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                rows={4}
+                className="w-full px-3 py-2 text-sm rounded-md border border-solid border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none min-h-[80px] sm:min-h-[100px]"
               />
             </div>
 
-            <div className="overflow-hidden">
+            <div className="overflow-hidden p-1">
               <FileUpload
                 label={
                   <span>
@@ -225,23 +225,28 @@ export default function NoteDialog({ open, onOpenChange, note, onSuccess }) {
               />
             )}
 
-            <div className="p-3 bg-muted rounded-lg overflow-hidden">
-              <p className="text-xs text-muted-foreground">
+            <div className="p-2.5 sm:p-3 bg-muted rounded-lg overflow-hidden p-1">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 <span className="font-medium">Shared by:</span>{" "}
                 {user?.name || "Admin"}
               </p>
             </div>
 
-            <DialogFooter className="gap-2 sm:gap-0 flex-col sm:flex-row">
+            <DialogFooter className="gap-2 sm:gap-3 flex-col sm:flex-row pt-2 sm:pt-0">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={loading}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading}>
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full sm:w-auto"
+              >
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />

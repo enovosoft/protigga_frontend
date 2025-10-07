@@ -1,13 +1,24 @@
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut } from "lucide-react";
+import { LogOut, Shield, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { Link } from "react-router-dom";
 const UserDashboardLayout = ({ children }) => {
-  const { isAuthenticated, isAuthLoading } = useAuth();
+  const { user, isAuthenticated, isAuthLoading, getPrimaryRole } = useAuth();
   const navigate = useNavigate();
+  const primaryRole = getPrimaryRole();
+
+  // Get role-based icon
+  const getRoleIcon = () => {
+    if (primaryRole === "admin") {
+      return <Shield className="w-5 h-5 text-primary" />;
+    } else if (primaryRole === "student") {
+      return <User className="w-5 h-5 text-primary" />;
+    }
+    return <User className="w-5 h-5 text-primary" />;
+  };
 
   if (!isAuthLoading && !isAuthenticated) {
     return (
@@ -42,7 +53,20 @@ const UserDashboardLayout = ({ children }) => {
               </Link>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              {user?.name && (
+                <div className="hidden sm:flex items-center gap-2">
+                  {getRoleIcon()}
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-foreground">
+                      {user.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground capitalize">
+                      {primaryRole?.replace(/_/g, " ") || "User"}
+                    </p>
+                  </div>
+                </div>
+              )}
               <Button
                 variant="destructive"
                 onClick={handleLogout}

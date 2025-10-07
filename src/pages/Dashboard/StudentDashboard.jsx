@@ -1,5 +1,5 @@
 import UserDashboardLayout from "@/components/shared/DashboardLayout";
-import { Book, FileText, GraduationCap } from "lucide-react";
+import { Book, CreditCard, FileText, GraduationCap, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function StudentDashboard() {
@@ -23,6 +23,18 @@ export default function StudentDashboard() {
       description: "Browse and purchase educational books.",
       icon: Book,
       onClick: () => navigate("/books"),
+    },
+    {
+      title: "Payment History",
+      description: "View your payment history and receipts.",
+      icon: CreditCard,
+      onClick: () => navigate("/dashboard/payment"),
+    },
+    {
+      title: "My Profile",
+      description: "Update your personal information and preferences.",
+      icon: User,
+      onClick: () => navigate("/dashboard/profile"),
     },
   ];
 

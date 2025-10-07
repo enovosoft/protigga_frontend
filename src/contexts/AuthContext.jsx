@@ -85,7 +85,12 @@ export const AuthProvider = ({ children }) => {
     ) {
       return null;
     }
-    return user.roles[0].role;
+
+    const primaryRole = user.roles.reduce((prev, current) => {
+      return prev.role_code < current.role_code ? prev : current;
+    }, user.roles[0].role);
+
+    return primaryRole.role;
   };
 
   return (

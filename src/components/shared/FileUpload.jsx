@@ -19,13 +19,29 @@ export default function FileUpload({
   const [isDragging, setIsDragging] = useState(false);
 
   const validateFile = (selectedFile) => {
-    const acceptedExtensions = accept
+    const acceptedTypes = accept
       .split(",")
       .map((ext) => ext.trim().toLowerCase());
     const fileExtension =
       "." + selectedFile.name.split(".").pop().toLowerCase();
 
-    if (!acceptedExtensions.includes(fileExtension)) {
+    // Check if any accepted type matches
+    const isAccepted = acceptedTypes.some((type) => {
+      if (type === "image/*") {
+        // Accept common image formats
+        return [".jpg", ".jpeg", ".png", ".webp", ".svg"].includes(
+          fileExtension
+        );
+      } else if (type === "*/*" || type === "*") {
+        // Accept all files
+        return true;
+      } else {
+        // Check exact extension match
+        return type === fileExtension;
+      }
+    });
+
+    if (!isAccepted) {
       toast.error(`Only ${supportedTypes} files are supported`);
       return false;
     }
