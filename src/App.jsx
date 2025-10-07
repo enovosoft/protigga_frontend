@@ -9,6 +9,7 @@ import {
 import NotesManagement from "./components/Admin/Notes/NotesManagement";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import BooksPage from "./pages/BooksPage";
+import BookDetailsPage from "./pages/BookDetailsPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import CourseDetailsPage from "./pages/CourseDetailsPage";
 import CoursesPage from "./pages/CoursesPage";
@@ -155,6 +156,7 @@ function App() {
             <Route path="/notes" element={<NotesPage />} />
             <Route path="/notes/view" element={<NotesViewPage />} />
             <Route path="/books" element={<BooksPage />} />
+            <Route path="/books/:slug" element={<BookDetailsPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
           </Routes>
         </Router>

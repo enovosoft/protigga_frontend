@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import PinMessage from "@/components/shared/PinMessage";
 import { useAuth } from "@/contexts/AuthContext";
 import apiInstance from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,11 +21,12 @@ import {
   LogIn,
   Phone,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { z } from "zod";
+import { useState } from "react";
 
 const loginSchema = z.object({
   phone: z.string().regex(/^1[3-9]\d{8}$/, "Invalid Bangladeshi phone number"),
@@ -35,7 +37,10 @@ const loginSchema = z.object({
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [successRedirect, setSuccessRedirect] = useState("/dashboard");
 
   const { login, isAuthenticated } = useAuth();
   const form = useForm({
@@ -45,6 +50,19 @@ export default function LoginPage() {
       password: "",
     },
   });
+
+  useEffect(() => {
+    // Check for message in location state
+    if (location.state?.message) {
+      setMessage({
+        variant: location.state.variant || "warning",
+        text: location.state.message,
+      });
+    }
+    if (location.state?.successRedirect) {
+      setSuccessRedirect(location.state.successRedirect);
+    }
+  }, [location.state]);
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -57,7 +75,7 @@ export default function LoginPage() {
         toast.success(response?.data?.message || "Login successful!");
         login();
 
-        window.location.href = "/dashboard";
+        window.location.href = successRedirect;
       } else {
         toast.error(response?.data?.message || "Login failed");
       }
@@ -92,6 +110,13 @@ export default function LoginPage() {
 
       <Card className="w-full max-w-md shadow-xl border-border/50">
         <CardHeader className="space-y-3 text-center">
+          {message && (
+            <PinMessage
+              variant={message.variant}
+              message={message.text}
+              className="mb-4"
+            />
+          )}
           <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
             <LogIn className="w-8 h-8 text-primary" />
           </div>

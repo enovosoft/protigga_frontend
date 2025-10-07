@@ -51,6 +51,16 @@ Design Rationale:
 @theme {
   --font-primary: "Li Ador Noirrit", ui-sans-serif, system-ui, sans-serif;
   --font-secondary: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
 }
 :root {
   --background: oklch(0.98 0.003 250);
@@ -67,12 +77,16 @@ Design Rationale:
   --muted-foreground: oklch(0.45 0.02 250);
   --accent: oklch(0.94 0.03 180);
   --accent-foreground: oklch(0.22 0.03 260);
-  --destructive: oklch(0.65 0.18 25);
-  --destructive-foreground: oklch(1 0 0);
-  --success: oklch(0.7 0.15 145);
-  --success-foreground: oklch(1 0 0);
-  --warning: oklch(0.9 0.12 95);
-  --warning-foreground: oklch(0.22 0.03 260);
+  --destructive: oklch(0.63 0.22 25); /* a strong red */
+  --destructive-foreground: oklch(
+    0.98 0.02 20
+  ); /* near-white red tint for text */
+
+  --success: oklch(0.72 0.18 145); /* vivid green */
+  --success-foreground: oklch(0.98 0.02 145); /* light greenish text */
+
+  --warning: oklch(0.86 0.14 90); /* warm yellow-orange */
+  --warning-foreground: oklch(0.24 0.05 260); /* dark text for contrast */
   --border: oklch(0.9 0.01 250);
   --input: oklch(0.95 0.01 250);
   --ring: oklch(0.72 0.09 190);
