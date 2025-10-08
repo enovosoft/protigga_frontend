@@ -1,6 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
 import apiInstance from "@/lib/api";
-import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
@@ -8,6 +7,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import CustomerInformation from "./CustomerInformation";
 import OrderSummary from "./OrderSummary";
 
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   DELIVERY_OPTIONS,
   PAYMENT_DELIVERY_OPTIONS,
@@ -310,8 +310,7 @@ export default function CheckoutForm() {
       // Prepare data in the format specified by user
       const orderData = {
         meterial_type: product.title ? "book" : "course",
-        delevery_type:
-          paymentType === "cod" ? "COD" : paymentType.toUpperCase(),
+        delevery_type: paymentType === "cod" ? "COD" : "Prepaid",
         inside_dhaka:
           paymentType === "cod" && formData.deliveryMethod === "inside_dhaka",
         outside_dhaka:
@@ -330,16 +329,25 @@ export default function CheckoutForm() {
             productType === "book" ? product.book_id : product.course_id,
           user_id: user?.user_id || "",
           quantity: quantity,
-          promo_code_id: promoApplied ? promoData?.id : null,
           address: `${formData.address}, ${formData.city}, ${formData.district}, ${formData.division}, ${formData.zipCode}`,
           alternative_phone: formData.phone,
         },
       };
 
+      if (promoApplied) {
+        orderData.meterial_details.promo_code_id = promoData?.promo_code_id;
+      }
+
+      setIsLoading(true);
       const response = await apiInstance.post("/payment/init", orderData);
       if (response.data.success) {
         toast.success(response.data?.message || "Order placed successfully!");
-        console.log(response.data);
+
+        // Check if payment_url exists and redirect
+        if (response.data.payment_url) {
+          window.location.href = response.data.payment_url;
+          return;
+        }
       } else {
         toast.error(response.data.message || "Failed to place order");
       }
@@ -361,14 +369,131 @@ export default function CheckoutForm() {
             "An unexpected error occurred"
         );
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      <main className="flex-1 container mx-auto px-4 py-8 lg:py-12">
+        <div className="max-w-6xl mx-auto">
+          {/* Header Skeleton */}
+          <div className="text-center mb-8 lg:mb-12">
+            <Skeleton className="h-10 w-48 mx-auto mb-4" />
+            <Skeleton className="h-6 w-96 mx-auto" />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Customer Information Skeleton */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-card rounded-lg border p-6 space-y-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Skeleton className="w-5 h-5" />
+                  <Skeleton className="h-6 w-48" />
+                </div>
+
+                {/* Form Fields Skeleton */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+
+                {/* Payment Options Skeleton */}
+                <div className="space-y-4">
+                  <Skeleton className="h-6 w-32" />
+                  <div className="space-y-3">
+                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-16 w-full" />
+                  </div>
+                </div>
+
+                <Skeleton className="h-12 w-full" />
+              </div>
+            </div>
+
+            {/* Order Summary Skeleton */}
+            <div className="lg:col-span-1">
+              <div className="bg-card rounded-lg border p-6 space-y-6 sticky top-6">
+                <Skeleton className="h-6 w-32" />
+
+                <div className="space-y-4">
+                  <div className="flex gap-4">
+                    <Skeleton className="w-16 h-20 flex-shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4 space-y-3">
+                  <div className="flex justify-between">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
+                  <div className="flex justify-between">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-4 w-14" />
+                  </div>
+                  <div className="flex justify-between">
+                    <Skeleton className="h-4 w-18" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                </div>
+
+                <div className="border-t pt-4">
+                  <div className="flex justify-between text-lg font-semibold">
+                    <Skeleton className="h-5 w-12" />
+                    <Skeleton className="h-5 w-16" />
+                  </div>
+                </div>
+
+                <Skeleton className="h-12 w-full" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     );
   }
 

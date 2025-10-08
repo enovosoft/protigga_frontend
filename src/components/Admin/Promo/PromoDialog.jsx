@@ -166,7 +166,6 @@ export default function PromoDialog({
         ).toISOString();
       }
 
-      console.log("Processed data:", data);
       await onSave(data);
       onOpenChange(false);
       // Reset form to initial state after successful creation
@@ -208,7 +207,6 @@ export default function PromoDialog({
 
         <form
           onSubmit={handleSubmit(onSubmit, (errors) => {
-            console.log("Form validation errors:", errors);
             toast.error("Please fix the form errors before submitting");
           })}
           className="space-y-4"
@@ -438,11 +436,7 @@ export default function PromoDialog({
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={isLoading}
-              onClick={() => console.log("Submit button clicked")}
-            >
+            <Button type="submit" disabled={isLoading}>
               {isLoading
                 ? "Saving..."
                 : promo

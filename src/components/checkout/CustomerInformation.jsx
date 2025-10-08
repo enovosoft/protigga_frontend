@@ -224,7 +224,7 @@ export default function CustomerInformation({
               )}
             </div>
 
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2">
               <Label
                 htmlFor="division"
                 className="text-sm font-medium text-foreground"
