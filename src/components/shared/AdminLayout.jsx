@@ -99,10 +99,10 @@ const AdminLayout = ({ children }) => {
         />
       )}
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="mx-auto">
         {/* Admin Dashboard Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="px-4 py-4   bg-card border ">
+          <div className="flex items-center justify-between container mx-auto">
             <div className="flex items-center gap-4">
               {/* Mobile menu button in header */}
               <Button
@@ -113,7 +113,7 @@ const AdminLayout = ({ children }) => {
               >
                 <Menu className="w-4 h-4" />
               </Button>
-              <Link to="/" className="flex items-center gap-2">
+              <Link to="/" className="flex items-center gap-2 ">
                 <h1 className="text-2xl font-bold text-primary font-primary">
                   প্রতিজ্ঞা
                 </h1>
@@ -200,7 +200,7 @@ const AdminLayout = ({ children }) => {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 md:ml-0 min-h-[calc(100vh-200px)]">
+          <div className="flex-1 md:ml-0 min-h-[calc(100vh-200px)] p-4 lg:p-6">
             {children(activeSection)}
           </div>
         </div>

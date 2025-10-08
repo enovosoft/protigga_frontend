@@ -1,6 +1,7 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowLeft,
@@ -12,7 +13,7 @@ import {
   ZoomOut,
 } from "lucide-react";
 import pdfWorker from "pdfjs-dist/build/pdf.worker?url";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Document, Page, pdfjs } from "react-pdf";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -26,11 +27,27 @@ export default function NotesViewPage() {
 
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const [scale, setScale] = useState(1.0);
+  const [scale, setScale] = useState(1.2); // Start with a better default scale
   const [rotation, setRotation] = useState(0);
   const [loading, setLoading] = useState(true);
   const [sideBySide, setSideBySide] = useState(false);
+  const [pageDimensions, setPageDimensions] = useState(null);
 
+  const goToPrevPage = useCallback(() => {
+    if (sideBySide) {
+      setPageNumber((prev) => Math.max(1, prev - 2));
+    } else {
+      setPageNumber((prev) => Math.max(1, prev - 1));
+    }
+  }, [sideBySide]);
+
+  const goToNextPage = () => {
+    if (sideBySide) {
+      setPageNumber((prev) => Math.min(numPages - 1, prev + 2));
+    } else {
+      setPageNumber((prev) => Math.min(numPages, prev + 1));
+    }
+  };
   useEffect(() => {
     if (!note) {
       toast.error("Note not found");
@@ -63,19 +80,25 @@ export default function NotesViewPage() {
     setLoading(false);
   };
 
-  const goToPrevPage = () => {
-    if (sideBySide) {
-      setPageNumber((prev) => Math.max(1, prev - 2));
-    } else {
-      setPageNumber((prev) => Math.max(1, prev - 1));
-    }
+  const onPageLoadSuccess = (page) => {
+    // Store the actual page dimensions
+    setPageDimensions({
+      width: page.width,
+      height: page.height,
+      originalWidth: page.originalWidth,
+      originalHeight: page.originalHeight,
+    });
   };
 
-  const goToNextPage = () => {
-    if (sideBySide) {
-      setPageNumber((prev) => Math.min(numPages - 1, prev + 2));
-    } else {
-      setPageNumber((prev) => Math.min(numPages, prev + 1));
+  const fitToScreen = () => {
+    const container = document.querySelector(".pdf-container");
+    if (container && pageDimensions) {
+      const containerWidth = container.clientWidth - 32;
+      const pageWidth = pageDimensions.width;
+      const autoScale = containerWidth / pageWidth;
+      // Limit scale between 0.5 and 1.5 for readability
+      const clampedScale = Math.min(1.5, Math.max(0.5, autoScale));
+      setScale(clampedScale);
     }
   };
 
@@ -119,7 +142,9 @@ export default function NotesViewPage() {
 
           <div className="bg-card p-6 rounded-lg border">
             <h1 className="text-2xl font-bold mb-2">{note.note_name}</h1>
-            <p className="text-muted-foreground">{note.note_desc}</p>
+            <p className="text-muted-foreground whitespace-pre-wrap text-sm md:text-base">
+              {note.note_desc}
+            </p>
           </div>
         </div>
 
@@ -212,6 +237,15 @@ export default function NotesViewPage() {
                   <Button
                     variant="outline"
                     size="sm"
+                    onClick={fitToScreen}
+                    title="Fit to screen"
+                  >
+                    Fit
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={rotate}
                     className="gap-2"
                   >
@@ -238,7 +272,7 @@ export default function NotesViewPage() {
             <div className="bg-card p-4 rounded-lg border overflow-hidden">
               <div className="flex justify-center">
                 <div
-                  className={`flex gap-4 w-full max-w-full overflow-x-auto ${
+                  className={`pdf-container flex gap-4 w-full max-w-full overflow-x-auto ${
                     sideBySide && numPages > 1
                       ? "xl:flex-row flex-col"
                       : "flex-col"
@@ -280,6 +314,7 @@ export default function NotesViewPage() {
                             pageNumber={pageNumber}
                             scale={scale}
                             rotate={rotation}
+                            onLoadSuccess={onPageLoadSuccess}
                             loading={
                               <div className="flex justify-center items-center h-64">
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -322,6 +357,7 @@ export default function NotesViewPage() {
                             pageNumber={pageNumber + 1}
                             scale={scale}
                             rotate={rotation}
+                            onLoadSuccess={onPageLoadSuccess}
                             loading={
                               <div className="flex justify-center items-center h-64">
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

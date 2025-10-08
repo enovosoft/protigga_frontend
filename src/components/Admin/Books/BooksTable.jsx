@@ -67,6 +67,7 @@ export default function BooksTable({
   onView,
   onEdit,
   onDelete,
+  deleting = false,
 }) {
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -152,6 +153,7 @@ export default function BooksTable({
                       variant="ghost"
                       size="sm"
                       onClick={() => onDelete(book)}
+                      disabled={deleting}
                       className="hover:bg-destructive/10 hover:text-destructive transition-colors h-8 w-8 p-0"
                       title="Delete Book"
                     >

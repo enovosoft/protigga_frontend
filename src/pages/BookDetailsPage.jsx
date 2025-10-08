@@ -1,13 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Book,
-  BookOpen,
-  Calendar,
-  DollarSign,
-  ShoppingCart,
-} from "lucide-react";
+import { Book, ShoppingCart } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
@@ -22,6 +16,7 @@ export default function BookDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
+  const [imageAspectRatio, setImageAspectRatio] = useState("square");
 
   const fetchBookDetails = useCallback(async () => {
     try {
@@ -30,7 +25,7 @@ export default function BookDetailsPage() {
         const bookData = response.data.book;
         setBook(bookData);
 
-        // Fetch image as blob to bypass CORS
+        // Fetch image as blob to bypass CORS and detect dimensions
         if (bookData.book_image) {
           try {
             const imageResponse = await fetch(bookData.book_image);
@@ -38,6 +33,21 @@ export default function BookDetailsPage() {
               const blob = await imageResponse.blob();
               const objectUrl = URL.createObjectURL(blob);
               setImageUrl(objectUrl);
+
+              // Detect image dimensions for aspect ratio
+              const img = new Image();
+              img.onload = () => {
+                const aspectRatio = img.width / img.height;
+                if (aspectRatio > 1.2) {
+                  setImageAspectRatio("video"); // Landscape
+                } else if (aspectRatio < 0.8) {
+                  setImageAspectRatio("portrait"); // Portrait
+                } else {
+                  setImageAspectRatio("square"); // Square
+                }
+                URL.revokeObjectURL(objectUrl);
+              };
+              img.src = objectUrl;
             }
           } catch (error) {
             console.error(
@@ -89,32 +99,45 @@ export default function BookDetailsPage() {
             </div>
 
             {/* Responsive Layout Skeleton */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {/* Desktop: Book Card on Left - Centered */}
-              <div className="lg:col-span-1 lg:col-start-2 order-2 lg:order-1">
-                <div className="sticky top-6">
-                  <Card className="overflow-hidden">
-                    <CardHeader className="p-0">
-                      <Skeleton className="w-full aspect-square" />
-                    </CardHeader>
-                    <CardContent className="p-6 space-y-4">
-                      <Skeleton className="h-12 w-32 mx-auto" />
-                      <Skeleton className="h-10 w-full" />
-                      <div className="border-t border-border pt-4 space-y-3">
-                        <Skeleton className="h-6 w-32" />
-                        <div className="space-y-2">
-                          <Skeleton className="h-4 w-full" />
-                          <Skeleton className="h-4 w-3/4" />
-                          <Skeleton className="h-4 w-5/6" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+              {/* Left Side - Image Skeleton */}
+              <div className="order-1 lg:order-1">
+                <Card className="overflow-hidden">
+                  <CardHeader className="p-0">
+                    <Skeleton className="w-full aspect-square" />
+                  </CardHeader>
+                </Card>
               </div>
 
-              {/* Main Content - Empty for now as requested */}
-              <div className="lg:col-span-2 order-1 lg:order-2"></div>
+              {/* Right Side - Content Skeleton */}
+              <div className="order-2 lg:order-2 space-y-6">
+                {/* Title Skeleton */}
+                <div>
+                  <Skeleton className="h-8 w-3/4 mb-2" />
+                </div>
+
+                {/* Price and Author Skeleton */}
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-8 w-24" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+
+                {/* Description Skeleton */}
+                <Card>
+                  <CardHeader>
+                    <Skeleton className="h-6 w-32" />
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-5/6" />
+                  </CardContent>
+                </Card>
+
+                {/* Button Skeleton */}
+                <Skeleton className="h-12 w-full" />
+              </div>
             </div>
           </div>
         </main>
@@ -138,34 +161,27 @@ export default function BookDetailsPage() {
 
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-7xl mx-auto">
-          {/* Book Title - At the very top */}
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-              {book.title}
-            </h1>
-            <div className="flex flex-wrap gap-4 mt-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span>
-                  Created: {new Date(book.createdAt).toLocaleDateString()}
-                </span>
-              </div>
-            </div>
-          </div>
-
           {/* Responsive Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Desktop: Book Card on Left - Centered */}
-            <div className="lg:col-span-1 lg:col-start-2 order-2 lg:order-1">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {/* Left Side - Image */}
+            <div className="order-1 lg:order-1">
               <div className="sticky top-6">
                 <Card className="overflow-hidden">
                   <CardHeader className="p-0">
-                    <div className="relative aspect-square overflow-hidden bg-muted">
+                    <div
+                      className={`relative overflow-hidden bg-muted ${
+                        imageAspectRatio === "video"
+                          ? "aspect-video"
+                          : imageAspectRatio === "portrait"
+                          ? "aspect-[3/4]"
+                          : "aspect-square"
+                      }`}
+                    >
                       {book.book_image && !imageError ? (
                         <img
                           src={imageUrl || book.book_image}
                           alt={book.title}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-110 cursor-zoom-in"
                           onError={handleImageError}
                         />
                       ) : (
@@ -175,64 +191,52 @@ export default function BookDetailsPage() {
                       )}
                     </div>
                   </CardHeader>
-
-                  <CardContent className="p-6 space-y-4">
-                    <div className="text-center">
-                      <p className="text-3xl font-bold text-primary mb-2">
-                        ৳{book.price}
-                      </p>
-                      <Button
-                        className="w-full"
-                        size="lg"
-                        onClick={handleOrderNow}
-                      >
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Order Now
-                      </Button>
-                    </div>
-
-                    <div className="border-t border-border pt-4 space-y-3">
-                      <h3 className="font-semibold text-foreground mb-3">
-                        Book Information
-                      </h3>
-
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground flex items-center gap-2">
-                          <DollarSign className="w-4 h-4" />
-                          Price
-                        </span>
-                        <span className="font-medium text-foreground">
-                          ৳{book.price}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground flex items-center gap-2">
-                          <BookOpen className="w-4 h-4" />
-                          Type
-                        </span>
-                        <span className="font-medium text-foreground">
-                          Physical Book
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground flex items-center gap-2">
-                          <Calendar className="w-4 h-4" />
-                          Published
-                        </span>
-                        <span className="font-medium text-foreground">
-                          {new Date(book.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
                 </Card>
               </div>
             </div>
 
-            {/* Main Content - Empty for now as requested */}
-            <div className="lg:col-span-2 order-1 lg:order-2"></div>
+            {/* Right Side - Content */}
+            <div className="order-2 lg:order-2 space-y-6">
+              {/* Title */}
+              <div>
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-2">
+                  {book.title}
+                </h1>
+              </div>
+
+              {/* Price and Author */}
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold text-primary">
+                  ৳{book.price}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  by {book.writter || "Unknown"}
+                </span>
+              </div>
+
+              {/* Description */}
+              <Card>
+                <CardHeader>
+                  <h2 className="text-xl font-semibold text-foreground">
+                    Description
+                  </h2>
+                </CardHeader>
+                <CardContent>
+                  <div className="prose prose-sm max-w-none">
+                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                      {book.description ||
+                        "No description available for this book."}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Order Button */}
+              <Button className="w-full" size="lg" onClick={handleOrderNow}>
+                <ShoppingCart className="w-5 h-5 mr-2" />
+                Order Now
+              </Button>
+            </div>
           </div>
         </div>
       </main>

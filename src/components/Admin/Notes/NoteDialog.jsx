@@ -190,11 +190,11 @@ export default function NoteDialog({ open, onOpenChange, note, onSuccess }) {
                 value={formData.note_desc}
                 onChange={handleChange}
                 placeholder={`এইচএসসি ২৭ ব্যাচের নোটঃ 
-                - অধ্যায় ১: ভেক্টর
-                - অধ্যায় ২: গতিবিদ্যা
-                - অধ্যায় ৩: বল ও গতি
-                - অধ্যায় ৪: কাজ, শক্তি ও শক্তির সংরক্ষণ
-                - অধ্যায় ৫: তরঙ্গ`}
+- অধ্যায় ১: ভেক্টর
+- অধ্যায় ২: গতিবিদ্যা
+- অধ্যায় ৩: বল ও গতি
+- অধ্যায় ৪: কাজ, শক্তি ও শক্তির সংরক্ষণ
+- অধ্যায় ৫: তরঙ্গ`}
                 required
                 rows={4}
                 className="w-full px-3 py-2 text-sm rounded-md border border-solid border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none min-h-[80px] sm:min-h-[100px]"
@@ -211,7 +211,6 @@ export default function NoteDialog({ open, onOpenChange, note, onSuccess }) {
                 }
                 accept=".pdf"
                 supportedTypes="PDF"
-                maxSize={10}
                 autoUpload={true}
                 onUploadSuccess={handleFileUpload}
               />

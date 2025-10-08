@@ -11,7 +11,9 @@ export default function Dashboard() {
   const primaryRole = getPrimaryRole();
 
   useEffect(() => {
-    if (!isAuthLoading && !isAuthenticated) {
+    if (isAuthLoading) return;
+
+    if (!isAuthenticated) {
       navigate("/");
     }
   }, [isAuthenticated, isAuthLoading, navigate]);

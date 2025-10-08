@@ -6,7 +6,6 @@ import {
   BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
-import NotesManagement from "./components/Admin/Notes/NotesManagement";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import BookDetailsPage from "./pages/BookDetailsPage";
 import BooksPage from "./pages/BooksPage";
@@ -143,42 +142,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/dashboard/notes"
-              element={
-                <ProtectedRoute>
-                  <NotesManagement />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/payment"
-              element={
-                <ProtectedRoute>
-                  <div className="min-h-[400px] flex items-center justify-center">
-                    <div className="text-center">
-                      <h2 className="text-2xl font-bold mb-4">
-                        Payment History
-                      </h2>
-                      <p className="text-muted-foreground">Coming Soon</p>
-                    </div>
-                  </div>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/profile"
-              element={
-                <ProtectedRoute>
-                  <div className="min-h-[400px] flex items-center justify-center">
-                    <div className="text-center">
-                      <h2 className="text-2xl font-bold mb-4">My Profile</h2>
-                      <p className="text-muted-foreground">Coming Soon</p>
-                    </div>
-                  </div>
-                </ProtectedRoute>
-              }
-            />
+
             <Route path="/courses" element={<CoursesPage />} />
             <Route path="/courses/:id" element={<CourseDetailsPage />} />
             <Route path="/notes" element={<NotesPage />} />

@@ -21,9 +21,6 @@ export function NotesTableSkeleton() {
               <TableHead className="min-w-[120px] sm:min-w-[150px]">
                 Name
               </TableHead>
-              <TableHead className="min-w-[200px] sm:min-w-[250px] hidden md:table-cell">
-                Description
-              </TableHead>
               <TableHead className="min-w-[100px] hidden lg:table-cell">
                 Shared By
               </TableHead>
@@ -41,10 +38,7 @@ export function NotesTableSkeleton() {
                 </TableCell>
                 <TableCell>
                   <Skeleton className="h-4 w-24 sm:w-32" />
-                  <Skeleton className="h-3 w-32 mt-1 md:hidden" />
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <Skeleton className="h-4 w-full max-w-xs" />
+                  <Skeleton className="h-3 w-32 mt-1" />
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">
                   <Skeleton className="h-6 w-20 rounded-full" />
@@ -118,17 +112,14 @@ export default function NotesTable({
                 <TableCell className="font-medium text-muted-foreground">
                   {startIndex + index + 1}
                 </TableCell>
-                <TableCell>
+                <TableCell className="max-w-[300px]">
                   <div className="font-semibold text-foreground break-words">
                     {note.note_name}
                   </div>
-                  {/* Mobile: Show description inline */}
-                  <p className="line-clamp-1 text-xs text-muted-foreground mt-1 md:hidden">
-                    {note.note_desc}
-                  </p>
                 </TableCell>
-                <TableCell className="max-w-[300px] hidden md:table-cell">
-                  <p className="line-clamp-2 text-sm text-muted-foreground">
+                <TableCell className="max-w-[300px]   hidden md:table-cell">
+                  {/* Show first 2 lines of description, rest truncated */}
+                  <p className="line-clamp-2 text-xs text-muted-foreground mt-1 whitespace-pre-wrap">
                     {note.note_desc}
                   </p>
                 </TableCell>

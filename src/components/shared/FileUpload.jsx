@@ -10,7 +10,7 @@ export default function FileUpload({
   label = "Upload File",
   accept = ".pdf",
   supportedTypes = "PDF",
-  maxSize = 10,
+  maxSize,
   autoUpload = false,
 }) {
   const [file, setFile] = useState(null);
@@ -47,7 +47,7 @@ export default function FileUpload({
     }
 
     const fileSizeMB = selectedFile.size / 1024 / 1024;
-    if (fileSizeMB > maxSize) {
+    if (maxSize && fileSizeMB > maxSize) {
       toast.error(`File size must be less than ${maxSize}MB`);
       return false;
     }
@@ -169,7 +169,8 @@ export default function FileUpload({
                   <span className="text-primary">browse</span>
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Supports: {supportedTypes} • Max size: {maxSize}MB
+                  Supports: {supportedTypes}{" "}
+                  {maxSize && `• Max size: ${maxSize} MB`}
                 </p>
               </div>
             </div>

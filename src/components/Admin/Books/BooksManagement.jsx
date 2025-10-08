@@ -82,7 +82,6 @@ export default function BooksManagement({ useLayout = true }) {
       const response = await api.delete("/book", {
         data: {
           book_id: bookToDelete.book_id,
-          slug: bookToDelete.slug,
         },
       });
 
@@ -149,6 +148,7 @@ export default function BooksManagement({ useLayout = true }) {
             onView={handleView}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
+            deleting={deleting}
           />
 
           <Pagination

@@ -33,16 +33,18 @@ const promoSchema = z
     }),
     Discount: z
       .number({
-        required_error: "Discount amount is required",
-        invalid_type_error: "Discount must be a number",
+        required_error: "Minimum purchase amount is required",
+        invalid_type_error: "Minimum purchase must be a number",
       })
-      .min(0, "Discount cannot be negative"),
+      .min(0, "Minimum purchase cannot be negative"),
     Max_discount_amount: z
-      .number({
-        invalid_type_error: "Max discount must be a number",
-      })
-      .min(0, "Max discount cannot be negative")
-      .optional(),
+      .union([z.string().optional(), z.number().optional()])
+      .optional()
+      .transform((val) => {
+        if (val === "" || val === null || val === undefined) return undefined;
+        const num = typeof val === "string" ? parseFloat(val) : val;
+        return isNaN(num) ? undefined : num;
+      }),
     Min_purchase_amount: z
       .number({
         required_error: "Minimum purchase amount is required",
@@ -57,28 +59,11 @@ const promoSchema = z
         /^[A-Z0-9_-]+$/i,
         "Promo code can only contain letters, numbers, hyphens, and underscores"
       ),
-    expiry_date: z.date({
-      required_error: "Expiry date is required",
-    }),
+    expiry_date: z.string().min(1, "Expiry date is required"),
     status: z.enum(["active", "inactive"], {
       required_error: "Please select status",
     }),
   })
-  .refine(
-    (data) => {
-      if (
-        data.Discount_type === "percentage" &&
-        data.Max_discount_amount === undefined
-      ) {
-        return false;
-      }
-      return true;
-    },
-    {
-      message: "Max discount amount is required for percentage discounts",
-      path: ["Max_discount_amount"],
-    }
-  )
   .refine(
     (data) => {
       if (data.Discount_type === "percentage" && data.Discount > 100) {
@@ -89,6 +74,21 @@ const promoSchema = z
     {
       message: "Percentage discount cannot exceed 100%",
       path: ["Discount"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.Discount_type === "fixed") {
+        // For fixed discounts, Max_discount_amount should be set to the discount value
+        data.Max_discount_amount = parseInt(data.Discount);
+        return true;
+      }
+      // For percentage discounts, Max_discount_amount can be empty
+      return true;
+    },
+    {
+      message: "Max discount amount is required for fixed discounts",
+      path: ["Max_discount_amount"],
     }
   );
 
@@ -115,7 +115,9 @@ export default function PromoDialog({
       Max_discount_amount: "",
       Min_purchase_amount: "",
       promo_code: "",
-      expiry_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
+      expiry_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0], // 1 week from now in YYYY-MM-DD format
       status: "active",
     },
   });
@@ -128,13 +130,15 @@ export default function PromoDialog({
       setValue("promocode_for", promo.promocode_for);
       setValue("Discount_type", promo.Discount_type);
       setValue("Discount", promo.Discount);
-      setValue("Max_discount_amount", promo.Max_discount_amount || "");
+      setValue("Max_discount_amount", promo.Max_discount_amount || 0);
       setValue("Min_purchase_amount", promo.Min_purchase_amount);
       setValue("promo_code", promo.promo_code);
       setValue("status", promo.status);
       if (promo.expiry_date) {
         const expiryDate = new Date(promo.expiry_date);
-        setValue("expiry_date", expiryDate);
+        // Convert to YYYY-MM-DD format for HTML date input
+        const formattedDate = expiryDate.toISOString().split("T")[0];
+        setValue("expiry_date", formattedDate);
       }
     } else {
       // Creating new promo
@@ -145,7 +149,9 @@ export default function PromoDialog({
         Max_discount_amount: "",
         Min_purchase_amount: "",
         promo_code: "",
-        expiry_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
+        expiry_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split("T")[0], // 1 week from now in YYYY-MM-DD format
         status: "active",
       });
     }
@@ -153,11 +159,14 @@ export default function PromoDialog({
 
   const onSubmit = async (data) => {
     try {
-      // For fixed discounts, set Max_discount_amount to null if not provided
-      if (data.Discount_type === "fixed" && !data.Max_discount_amount) {
-        data.Max_discount_amount = null;
+      // Convert expiry_date from YYYY-MM-DD to ISO-8601 format
+      if (data.expiry_date) {
+        data.expiry_date = new Date(
+          data.expiry_date + "T23:59:59.000Z"
+        ).toISOString();
       }
 
+      console.log("Processed data:", data);
       await onSave(data);
       onOpenChange(false);
       // Reset form to initial state after successful creation
@@ -169,7 +178,9 @@ export default function PromoDialog({
           Max_discount_amount: "",
           Min_purchase_amount: "",
           promo_code: "",
-          expiry_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
+          expiry_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            .toISOString()
+            .split("T")[0], // 1 week from now in YYYY-MM-DD format
           status: "active",
         });
       }
@@ -195,7 +206,13 @@ export default function PromoDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          onSubmit={handleSubmit(onSubmit, (errors) => {
+            console.log("Form validation errors:", errors);
+            toast.error("Please fix the form errors before submitting");
+          })}
+          className="space-y-4"
+        >
           {/* Promo Code */}
           <div className="space-y-2">
             <Label htmlFor="promo_code" className="text-sm font-medium">
@@ -286,7 +303,7 @@ export default function PromoDialog({
             <Input
               id="Discount"
               type="number"
-              step="0.01"
+              step="1"
               {...register("Discount", { valueAsNumber: true })}
               placeholder={discountType === "percentage" ? "10" : "100"}
               className={cn(
@@ -314,8 +331,8 @@ export default function PromoDialog({
               <Input
                 id="Max_discount_amount"
                 type="number"
-                step="0.01"
-                {...register("Max_discount_amount", { valueAsNumber: true })}
+                step="1"
+                {...register("Max_discount_amount")}
                 placeholder="500"
                 className={cn(
                   "transition-colors",
@@ -343,7 +360,7 @@ export default function PromoDialog({
             <Input
               id="Min_purchase_amount"
               type="number"
-              step="0.01"
+              step="1"
               {...register("Min_purchase_amount", { valueAsNumber: true })}
               placeholder="1000"
               className={cn(
@@ -366,9 +383,7 @@ export default function PromoDialog({
             </Label>
             <Input
               type="date"
-              {...register("expiry_date", {
-                valueAsDate: true,
-              })}
+              {...register("expiry_date")}
               className={cn(
                 "transition-colors",
                 errors.expiry_date &&
@@ -423,7 +438,11 @@ export default function PromoDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              onClick={() => console.log("Submit button clicked")}
+            >
               {isLoading
                 ? "Saving..."
                 : promo

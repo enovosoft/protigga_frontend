@@ -35,9 +35,9 @@ export default function PromoManagement({ useLayout = true }) {
   const fetchPromos = async () => {
     setLoading(true);
     try {
-      const response = await api.get("/promo-codes");
+      const response = await api.get("/promocodes");
       if (response.data.success) {
-        let promos = response.data?.promo_codes || [];
+        let promos = response.data?.promocodes || [];
 
         promos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setPromos(promos);
@@ -77,7 +77,7 @@ export default function PromoManagement({ useLayout = true }) {
         // Update existing promo
         response = await api.put("/promo-code", {
           ...promoData,
-          id: selectedPromo.id,
+          promo_code_id: selectedPromo.promo_code_id,
         });
       } else {
         // Create new promo
@@ -103,7 +103,7 @@ export default function PromoManagement({ useLayout = true }) {
     try {
       const response = await api.delete("/promo-code", {
         data: {
-          id: promoToDelete.id,
+          promo_code_id: promoToDelete.promo_code_id,
         },
       });
 

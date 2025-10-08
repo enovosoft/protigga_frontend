@@ -3,7 +3,6 @@ import NotesManagement from "@/components/Admin/Notes/NotesManagement";
 import PromoManagement from "@/components/Admin/Promo/PromoManagement";
 import AdminLayout from "@/components/shared/AdminLayout";
 import { useAuth } from "@/contexts/AuthContext";
-import { Book, FileText, Ticket } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function AdminDashboard() {
@@ -25,77 +24,7 @@ export default function AdminDashboard() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Notes Management Card */}
-              <div
-                onClick={() => navigate("/dashboard/notes")}
-                className="bg-card p-6 rounded-lg border hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer group"
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-4 bg-primary/10 rounded-lg group-hover:scale-110 transition-transform">
-                    <FileText className="w-7 h-7 text-primary" />
-                  </div>
-                  <h3 className="font-bold text-xl text-foreground">
-                    Notes Management
-                  </h3>
-                </div>
-                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                  Add, edit, and manage study notes and PDF materials for
-                  students. Upload educational content and organize learning
-                  resources.
-                </p>
-                <div className="flex items-center gap-2 text-primary font-medium text-sm group-hover:gap-3 transition-all">
-                  <span>Manage Notes</span>
-                  <span className="group-hover:translate-x-1 transition-transform">
-                    →
-                  </span>
-                </div>
-              </div>
-
-              {/* Promo Codes Card */}
-              <div className="bg-card p-6 rounded-lg border hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer group">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-4 bg-primary/10 rounded-lg group-hover:scale-110 transition-transform">
-                    <Ticket className="w-7 h-7 text-primary" />
-                  </div>
-                  <h3 className="font-bold text-xl text-foreground">
-                    Promo Codes
-                  </h3>
-                </div>
-                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                  Create and manage promotional codes for discounts and special
-                  offers. Track usage and effectiveness of marketing campaigns.
-                </p>
-                <div className="flex items-center gap-2 text-primary font-medium text-sm group-hover:gap-3 transition-all">
-                  <span>Manage Codes</span>
-                  <span className="group-hover:translate-x-1 transition-transform">
-                    →
-                  </span>
-                </div>
-              </div>
-
-              {/* Books Management Card */}
-              <div className="bg-card p-6 rounded-lg border hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer group">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-4 bg-primary/10 rounded-lg group-hover:scale-110 transition-transform">
-                    <Book className="w-7 h-7 text-primary" />
-                  </div>
-                  <h3 className="font-bold text-xl text-foreground">
-                    Books Management
-                  </h3>
-                </div>
-                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                  Manage the book catalog, inventory, and pricing. Add new books
-                  and update existing book information.
-                </p>
-                <div className="flex items-center gap-2 text-primary font-medium text-sm group-hover:gap-3 transition-all">
-                  <span>Manage Books</span>
-                  <span className="group-hover:translate-x-1 transition-transform">
-                    →
-                  </span>
-                </div>
-              </div>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
           </div>
         );
 

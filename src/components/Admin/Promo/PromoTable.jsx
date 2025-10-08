@@ -92,9 +92,9 @@ export default function PromoTable({ promos, startIndex, onEdit, onDelete }) {
 
   const getStatusBadge = (status) => {
     const variants = {
-      active: "bg-green-100 text-green-800 border-green-200",
-      inactive: "bg-gray-100 text-gray-800 border-gray-200",
-      expired: "bg-red-100 text-red-800 border-red-200",
+      active: "bg-success/30 text-success border-success/50",
+      inactive: "bg-destructive/30 text-destructive border-destructive/50",
+      expired: "bg-warning/30 text-warning border-warning/50",
     };
 
     return (
@@ -105,6 +105,24 @@ export default function PromoTable({ promos, startIndex, onEdit, onDelete }) {
         }`}
       >
         {status?.charAt(0).toUpperCase() + status?.slice(1)}
+      </Badge>
+    );
+  };
+
+  const getForBadge = (promocode_for) => {
+    const variants = {
+      book: "bg-primary/30 text-primary border-primary/50",
+      course: "bg-secondary/30 text-secondary border-secondary/50",
+    };
+
+    return (
+      <Badge
+        variant="outline"
+        className={`text-xs font-medium capitalize ${
+          variants[promocode_for] || variants.book
+        }`}
+      >
+        {promocode_for}
       </Badge>
     );
   };
@@ -176,9 +194,7 @@ export default function PromoTable({ promos, startIndex, onEdit, onDelete }) {
                   </span>
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">
-                  <span className="capitalize text-sm">
-                    {promo.promocode_for}
-                  </span>
+                  {getForBadge(promo.promocode_for)}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground whitespace-nowrap hidden sm:table-cell">
                   {promo.expiry_date ? formatDate(promo.expiry_date) : "N/A"}
