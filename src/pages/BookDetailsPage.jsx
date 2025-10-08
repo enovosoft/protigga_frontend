@@ -1,46 +1,51 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import {
-  BookOpen,
-  Loader2,
-  Calendar,
-  ShoppingCart,
-  Book,
-  DollarSign,
-  ImageIcon,
-} from "lucide-react";
-import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Book,
+  BookOpen,
+  Calendar,
+  DollarSign,
+  ShoppingCart,
+} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useNavigate, useParams } from "react-router-dom";
 
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 import apiInstance from "@/lib/api";
 export default function BookDetailsPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const [book, setBook] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
+  const [imageUrl, setImageUrl] = useState(null);
 
-  useEffect(() => {
-    fetchBookDetails();
-  }, [slug]);
-
-  const fetchBookDetails = async () => {
+  const fetchBookDetails = useCallback(async () => {
     try {
       const response = await apiInstance.get(`/book/${slug}`);
       if (response.data.success) {
-        setBook(response.data.book);
+        const bookData = response.data.book;
+        setBook(bookData);
+
+        // Fetch image as blob to bypass CORS
+        if (bookData.book_image) {
+          try {
+            const imageResponse = await fetch(bookData.book_image);
+            if (imageResponse.ok) {
+              const blob = await imageResponse.blob();
+              const objectUrl = URL.createObjectURL(blob);
+              setImageUrl(objectUrl);
+            }
+          } catch (error) {
+            console.error(
+              `Failed to fetch image for ${bookData.title}:`,
+              error
+            );
+          }
+        }
       } else {
         toast.error("Book not found");
         navigate("/books");
@@ -52,7 +57,11 @@ export default function BookDetailsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [slug, navigate]);
+
+  useEffect(() => {
+    fetchBookDetails();
+  }, [fetchBookDetails]);
 
   const handleOrderNow = () => {
     if (book) {
@@ -154,7 +163,7 @@ export default function BookDetailsPage() {
                     <div className="relative aspect-square overflow-hidden bg-muted">
                       {book.book_image && !imageError ? (
                         <img
-                          src={book.book_image}
+                          src={imageUrl || book.book_image}
                           alt={book.title}
                           className="w-full h-full object-cover"
                           onError={handleImageError}

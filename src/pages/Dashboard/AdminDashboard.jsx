@@ -1,5 +1,6 @@
 import BooksManagement from "@/components/Admin/Books/BooksManagement";
 import NotesManagement from "@/components/Admin/Notes/NotesManagement";
+import PromoManagement from "@/components/Admin/Promo/PromoManagement";
 import AdminLayout from "@/components/shared/AdminLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { Book, FileText, Ticket } from "lucide-react";
@@ -102,25 +103,7 @@ export default function AdminDashboard() {
         return <NotesManagement useLayout={false} />;
 
       case "promo-codes":
-        return (
-          <div className="space-y-6">
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold text-foreground">
-                Promo Codes Management
-              </h2>
-              <p className="text-muted-foreground mt-2">
-                Create and manage promotional codes for your platform
-              </p>
-            </div>
-            <div className="bg-card p-8 rounded-lg border text-center">
-              <Ticket className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Coming Soon</h3>
-              <p className="text-muted-foreground">
-                Promo codes management feature is under development.
-              </p>
-            </div>
-          </div>
-        );
+        return <PromoManagement useLayout={false} />;
 
       case "books":
         return <BooksManagement useLayout={false} />;

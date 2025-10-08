@@ -1,43 +1,80 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2 } from "lucide-react";
-import toast from "react-hot-toast";
 import apiInstance from "@/lib/api";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
-import OrderSummary from "./OrderSummary";
 import CustomerInformation from "./CustomerInformation";
+import OrderSummary from "./OrderSummary";
 
 import {
   DELIVERY_OPTIONS,
-  DIVISIONS,
-  PAYMENT_OPTIONS,
+  PAYMENT_DELIVERY_OPTIONS,
 } from "@/config/checkout/data";
+import { useCallback } from "react";
+import { z } from "zod";
+
+// Zod schema for checkout form validation
+const checkoutSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Name is required")
+    .max(50, "Name must be less than 50 characters"),
+  phone: z
+    .string()
+    .regex(/^\+8801[0-9]{9}$/, "Phone number must be in format +8801XXXXXXXXX"),
+  email: z
+    .string()
+    .email("Please enter a valid email address")
+    .optional()
+    .or(z.literal("")),
+  address: z
+    .string()
+    .min(2, "Address is required")
+    .max(200, "Address must be less than 200 characters"),
+  city: z
+    .string()
+    .min(2, "Thana/State is required")
+    .max(50, "Thana/State must be less than 50 characters"),
+  district: z
+    .string()
+    .min(2, "District is required")
+    .max(50, "District must be less than 50 characters"),
+  zipCode: z.string().regex(/^[0-9]{4}$/, "Zip code must be exactly 4 digits"),
+  division: z.string().min(1, "Please select a division").optional(),
+  deliveryMethod: z.string().optional(),
+});
+
+const initialFormData = {
+  name: "",
+  phone: "",
+  email: "",
+  address: "",
+  district: "",
+  division: undefined,
+  zipCode: "",
+  deliveryMethod: "inside_dhaka",
+};
 
 export default function CheckoutForm() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, user, authLoading } = useAuth();
+  const { isAuthenticated, user, isAuthLoading } = useAuth();
 
   const [isLoading, setIsLoading] = useState(true);
   const [product, setProduct] = useState(null);
+  const [productType, setProductType] = useState(null); // "book" or "course"
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoData, setPromoData] = useState(null);
   const [paymentType, setPaymentType] = useState("cod");
-  const [deliveryFee, setDeliveryFee] = useState(200);
+  const [deliveryFee, setDeliveryFee] = useState(80); // Default to inside_dhaka price
   const [quantity, setQuantity] = useState(1);
-  const [deliveryMethod, setDeliveryMethod] = useState("inside_dhaka");
+  const [validationErrors, setValidationErrors] = useState({});
 
   // Form state
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    address: "",
-    district: "",
-    division: "",
-  });
+  const [formData, setFormData] = useState({ ...initialFormData });
 
   const [searchParams] = useSearchParams();
 
@@ -46,46 +83,33 @@ export default function CheckoutForm() {
 
   const isBook = bookSlug && !courseId;
 
+  // Update delivery fee based on payment type and delivery method
   useEffect(() => {
-    // Update delivery fee based on delivery method for books only
+    // Update delivery fee based on payment type and delivery method
     if (isBook) {
-      const deliveryOptions = [
-        { value: "inside_dhaka", label: "Inside Dhaka", price: 80 },
-        { value: "outside_dhaka", label: "Outside Dhaka", price: 160 },
-        { value: "sundarban", label: "Sundarban Courier", price: 60 },
-      ];
-      const selectedOption = deliveryOptions.find(
-        (option) => option.value === deliveryMethod
+      const paymentOption = PAYMENT_DELIVERY_OPTIONS.find(
+        (option) => option.value === paymentType
       );
-      if (selectedOption) {
-        setDeliveryFee(selectedOption.price);
+
+      if (paymentType === "cod") {
+        // For COD, delivery fee comes from selected delivery method
+        const selectedDeliveryOption = DELIVERY_OPTIONS.find(
+          (option) => option.value === formData.deliveryMethod
+        );
+        setDeliveryFee(selectedDeliveryOption?.price || 80);
+      } else if (paymentType === "sundarban") {
+        // For Sundarban, fixed delivery charge
+        setDeliveryFee(paymentOption?.deliveryCharge || 60);
+      } else {
+        // For SSL COMMERZ, no delivery charge
+        setDeliveryFee(0);
       }
     } else {
       // Courses have no delivery fee
       setDeliveryFee(0);
     }
-  }, [deliveryMethod, isBook]);
-
-  useEffect(() => {
-    // Check authentication first
-    if (!isAuthenticated && !authLoading) {
-      toast.error("Please login first to continue purchasing");
-      // navigate("/auth/login", {
-      //   state: {
-      //     message: `Please login first to continue purchasing ${
-      //       product?.title || product?.course_title || "this item"
-      //     }`,
-      //     variant: "warning",
-      //     successRedirect: location.pathname + location.search,
-      //   },
-      // });
-      return;
-    }
-
-    fetchProductDetails();
-  }, [isAuthenticated, authLoading, searchParams, navigate, location]);
-
-  const fetchProductDetails = async () => {
+  }, [paymentType, formData.deliveryMethod, isBook]);
+  const fetchProductDetails = useCallback(async () => {
     if (courseId) {
       // Handle course checkout (existing logic)
       try {
@@ -93,6 +117,7 @@ export default function CheckoutForm() {
         if (response.data) {
           const course = response.data;
           setProduct(course);
+          setProductType("course");
         } else {
           toast.error("Course not found");
           navigate("/");
@@ -110,13 +135,16 @@ export default function CheckoutForm() {
         if (response.data.success && response.data.book) {
           const book = response.data.book;
           setProduct(book);
+          setProductType("book");
         } else {
           toast.error("Book not found");
           navigate("/books");
           return;
         }
       } catch (error) {
-        toast.error("Failed to load book details");
+        toast.error(
+          error?.response?.data?.message || "Failed to load book details"
+        );
         navigate("/books");
         return;
       }
@@ -127,7 +155,40 @@ export default function CheckoutForm() {
     }
 
     setIsLoading(false);
-  };
+  }, [bookSlug, courseId, navigate]);
+
+  // Check authentication and fetch product details on mount
+  useEffect(() => {
+    // Check authentication first
+
+    if (isAuthLoading) return;
+    if (!isAuthenticated) {
+      navigate("/auth/login", {
+        state: {
+          message: `Please login first to continue with checkout`,
+          variant: "warning",
+          successRedirect: location.pathname + location.search,
+        },
+      });
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      name: user?.name || "",
+      phone: user?.phone || "",
+    }));
+
+    fetchProductDetails();
+  }, [
+    isAuthenticated,
+    isAuthLoading,
+    fetchProductDetails,
+    navigate,
+    location,
+    user?.name,
+    user?.phone,
+  ]);
 
   const checkPromoCode = async () => {
     if (!promoCode.trim()) {
@@ -177,9 +238,7 @@ export default function CheckoutForm() {
         setPromoData(promo);
         setPromoApplied(true);
 
-        toast.success(
-          `Promo code applied! ${promo.Discount}% off (Max ৳${promo.Max_discount_amount})`
-        );
+        toast.success(`Promo code applied!`);
         return;
       } else {
         toast.error(response.data.message || "Invalid promo code");
@@ -188,7 +247,9 @@ export default function CheckoutForm() {
       }
     } catch (error) {
       console.error("Promo code validation error:", error);
-      toast.error("Failed to validate promo code");
+      toast.error(
+        error.response?.data?.message || "Failed to validate promo code"
+      );
       setPromoApplied(false);
       setPromoData(null);
     }
@@ -199,6 +260,14 @@ export default function CheckoutForm() {
       ...prev,
       [field]: value,
     }));
+
+    // Clear validation error for this field when user starts typing
+    if (validationErrors[field]) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        [field]: undefined,
+      }));
+    }
   };
 
   const calculateSubtotal = () => {
@@ -230,61 +299,69 @@ export default function CheckoutForm() {
     return calculateSubtotal() - calculateDiscount() + deliveryFee;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
-    if (
-      !formData.name ||
-      !formData.phone ||
-      !formData.address ||
-      !formData.city ||
-      !formData.district ||
-      !formData.division
-    ) {
-      toast.error("Please fill in all required fields");
-      return;
+    // Validate form data with Zod
+    try {
+      checkoutSchema.parse(formData);
+      setValidationErrors({}); // Clear any previous errors
+
+      // Prepare data in the format specified by user
+      const orderData = {
+        meterial_type: product.title ? "book" : "course",
+        delevery_type:
+          paymentType === "cod" ? "COD" : paymentType.toUpperCase(),
+        inside_dhaka:
+          paymentType === "cod" && formData.deliveryMethod === "inside_dhaka",
+        outside_dhaka:
+          paymentType === "cod" && formData.deliveryMethod === "outside_dhaka",
+        sundarban_courier: paymentType === "sundarban",
+        customer: {
+          name: formData.name,
+          email: formData.email || user?.email || "",
+          address: `${formData.address}, ${formData.city}, ${formData.district}, ${formData.division} - ${formData.zipCode}`,
+          alternative_phone: formData.phone,
+        },
+        meterial_details: {
+          product_name:
+            productType === "book" ? product.title : product.course_title,
+          product_id:
+            productType === "book" ? product.book_id : product.course_id,
+          user_id: user?.user_id || "",
+          quantity: quantity,
+          promo_code_id: promoApplied ? promoData?.id : null,
+          address: `${formData.address}, ${formData.city}, ${formData.district}, ${formData.division}, ${formData.zipCode}`,
+          alternative_phone: formData.phone,
+        },
+      };
+
+      const response = await apiInstance.post("/payment/init", orderData);
+      if (response.data.success) {
+        toast.success(response.data?.message || "Order placed successfully!");
+        console.log(response.data);
+      } else {
+        toast.error(response.data.message || "Failed to place order");
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Set validation errors
+        const errors = {};
+        error.issues.forEach((err) => {
+          errors[err.path[0]] = err.message;
+        });
+        setValidationErrors(errors);
+        toast.error(
+          "Validation Error: " + errors[Object.keys(errors)[0]] ||
+            "Please fix the errors in the form"
+        );
+      } else {
+        toast.error(
+          error?.response?.data?.errors[0]?.message ||
+            "An unexpected error occurred"
+        );
+      }
     }
-
-    // Prepare data in the format specified by user
-    const orderData = {
-      amount: calculateTotal(),
-      tran_id: "TaBD72G5v", // Generate a random transaction ID
-      meterial_type: product.title ? "book" : "course",
-      delevery_type: paymentType === "cod" ? "COD" : "SSL",
-      payment_method: paymentType,
-      customer: {
-        name: formData.name,
-        email: formData.email || user?.email || "",
-        address: `${formData.address}, ${formData.city}, ${formData.district}, ${formData.division}`,
-        phone: formData.phone,
-      },
-      meterial_details: {
-        product_name: product.title || product.course_title,
-        user_id: user?.id || "",
-        product_price: product.price,
-        discount: calculateDiscount(),
-        quantity: quantity,
-        promo_code: promoApplied ? promoCode : "",
-        promo_code_id: promoApplied ? "promo_6789" : "",
-        address: `${formData.address}, ${formData.city}, ${formData.district}, ${formData.division}`,
-        status: "pending",
-        Txn_ID: "324234",
-        confirmed: false,
-        delivery_fee: deliveryFee,
-        delivery_method: isBook ? deliveryMethod : null,
-        subtotal: calculateSubtotal(),
-        total: calculateTotal(),
-      },
-    };
-
-    // Show alert with the parsed data for now
-    alert(`Order data prepared:\n${JSON.stringify(orderData, null, 2)}`);
-
-    // For now, just show success message
-    toast.success(
-      "Order data prepared successfully! Integration with payment gateway coming soon."
-    );
   };
 
   if (isLoading) {
@@ -319,11 +396,12 @@ export default function CheckoutForm() {
             deliveryFee={deliveryFee}
             quantity={quantity}
             setQuantity={setQuantity}
-            deliveryMethod={deliveryMethod}
-            setDeliveryMethod={setDeliveryMethod}
+            deliveryMethod={formData.deliveryMethod || "inside_dhaka"}
             promoCode={promoCode}
             setPromoCode={setPromoCode}
             onApplyPromo={checkPromoCode}
+            paymentType={paymentType}
+            isBook={isBook}
           />
 
           {/* Customer Information */}
@@ -340,6 +418,7 @@ export default function CheckoutForm() {
             promoData={promoData}
             product={product}
             isBook={isBook}
+            validationErrors={validationErrors}
           />
         </div>
       </div>

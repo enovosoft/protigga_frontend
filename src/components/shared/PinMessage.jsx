@@ -1,28 +1,36 @@
-import { AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AlertTriangle, CheckCircle, Info, XCircle } from "lucide-react";
 
 const PinMessage = ({ variant = "success", message, className }) => {
   const variants = {
     success: {
       icon: CheckCircle,
-      bgColor: "bg-success/10",
-      textColor: "text-success",
-      borderColor: "border-success/20",
-      iconColor: "text-success",
+      bgColor: "bg-success/50",
+      textColor: "text-primary",
+      borderColor: "border-success/40",
+      iconColor: "text-primary",
     },
     warning: {
       icon: AlertTriangle,
-      bgColor: "bg-warning/10",
-      textColor: "text-warning",
-      borderColor: "border-warning/20",
-      iconColor: "text-warning",
+      bgColor: "bg-warning/50",
+      textColor: "text-primary",
+      borderColor: "border-warning/40",
+      iconColor: "text-primary",
     },
     invalid: {
       icon: XCircle,
-      bgColor: "bg-destructive/10",
-      textColor: "text-destructive",
-      borderColor: "border-destructive/20",
-      iconColor: "text-destructive",
+      bgColor: "bg-destructive/50",
+      textColor: "text-primary",
+      borderColor: "border-destructive/40",
+      iconColor: "text-primary",
+    },
+    info: {
+      icon: Info,
+
+      bgColor: "bg-secondary/50",
+      textColor: "text-primary",
+      borderColor: "border-secondary/40",
+      iconColor: "text-primary",
     },
   };
 

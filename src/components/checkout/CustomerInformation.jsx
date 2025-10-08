@@ -1,16 +1,10 @@
-import { User, Tag, CreditCard, InfoIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { RadioGroup } from "@/components/ui/radio-group";
+import { CreditCard, User } from "lucide-react";
 
-import {
-  DELIVERY_OPTIONS,
-  DIVISIONS,
-  PAYMENT_OPTIONS,
-} from "@/config/checkout/data";
 import {
   Select,
   SelectContent,
@@ -18,6 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DELIVERY_OPTIONS,
+  DIVISIONS,
+  PAYMENT_DELIVERY_OPTIONS,
+} from "@/config/checkout/data";
+import PinMessage from "../shared/PinMessage";
 
 export default function CustomerInformation({
   formData,
@@ -32,12 +32,15 @@ export default function CustomerInformation({
   promoData = null,
   product = null,
   isBook = false,
+  validationErrors = {},
 }) {
   const getPaymentOptions = () => {
     if (isBook) {
-      return PAYMENT_OPTIONS; // Both options for books
+      return PAYMENT_DELIVERY_OPTIONS; // All options for books
     } else {
-      return PAYMENT_OPTIONS.filter((option) => option.value === "sslcommerz"); // Only SSL for courses
+      return PAYMENT_DELIVERY_OPTIONS.filter(
+        (option) => option.value === "sslcommerz"
+      ); // Only SSL for courses
     }
   };
 
@@ -68,6 +71,11 @@ export default function CustomerInformation({
                 required
                 className="w-full"
               />
+              {validationErrors.name && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.name}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -79,13 +87,32 @@ export default function CustomerInformation({
               </Label>
               <Input
                 id="phone"
-                placeholder="01XXXXXXXXX"
+                placeholder="+8801XXXXXXXXX"
                 value={formData.phone}
-                onChange={(e) => handleInputChange("phone", e.target.value)}
-                require
-                title="Phone number should be in the format 01XXXXXXXXXX"
+                onChange={(e) => {
+                  let value = e.target.value;
+                  // Ensure it starts with +880
+                  if (!value.startsWith("+880")) {
+                    value = "+880" + value.replace(/^\+?880?/, "");
+                  }
+                  // Limit to 14 characters (+880 + 10 digits)
+                  if (value.length <= 14) {
+                    handleInputChange("phone", value);
+                  }
+                }}
+                required
+                pattern="^\+8801[0-9]{9}$"
+                title="Phone number must be in the format +8801XXXXXXXXX"
                 className="w-full"
               />
+              <p className="text-xs text-muted-foreground">
+                Phone number must start with +880 and be 14 digits total
+              </p>
+              {validationErrors.phone && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.phone}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2 md:col-span-2">
@@ -103,6 +130,11 @@ export default function CustomerInformation({
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 className="w-full"
               />
+              {validationErrors.email && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.email}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2 md:col-span-2">
@@ -120,6 +152,11 @@ export default function CustomerInformation({
                 required
                 className="w-full"
               />
+              {validationErrors.address && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.address}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -136,6 +173,11 @@ export default function CustomerInformation({
                 required
                 className="w-full"
               />
+              {validationErrors.city && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.city}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -153,6 +195,33 @@ export default function CustomerInformation({
                 required
                 className="w-full"
               />
+              {validationErrors.district && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.district}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="zipCode"
+                className="text-sm font-medium text-foreground"
+              >
+                Zip Code <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="zipCode"
+                placeholder="1230"
+                value={formData.zipCode}
+                onChange={(e) => handleInputChange("zipCode", e.target.value)}
+                required
+                className="w-full"
+              />
+              {validationErrors.zipCode && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.zipCode}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2 md:col-span-2">
@@ -163,7 +232,7 @@ export default function CustomerInformation({
                 Division <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.division}
+                value={formData.division || ""}
                 onValueChange={(value) => handleInputChange("division", value)}
                 required
               >
@@ -178,6 +247,11 @@ export default function CustomerInformation({
                   ))}
                 </SelectContent>
               </Select>
+              {validationErrors.division && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.division}
+                </p>
+              )}
             </div>
           </div>
 
@@ -231,16 +305,73 @@ export default function CustomerInformation({
               ))}
             </RadioGroup>
 
+            {/* Delivery Method Selection - Only for COD */}
+            {isBook && paymentType === "cod" && (
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-foreground">
+                  Delivery Method <span className="text-destructive">*</span>
+                </Label>
+                <RadioGroup
+                  value={formData.deliveryMethod || "inside_dhaka"}
+                  onValueChange={(value) =>
+                    handleInputChange("deliveryMethod", value)
+                  }
+                  className="space-y-2"
+                >
+                  {DELIVERY_OPTIONS.filter(
+                    (option) => option.value !== "sundarban"
+                  ).map((option) => (
+                    <div
+                      key={option.value}
+                      className={`flex items-center space-x-3 p-3 border rounded-lg transition-colors cursor-pointer ${
+                        formData.deliveryMethod === option.value
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:bg-muted/30"
+                      }`}
+                      onClick={() =>
+                        handleInputChange("deliveryMethod", option.value)
+                      }
+                    >
+                      <div className="flex items-center h-5">
+                        <div
+                          className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                            formData.deliveryMethod === option.value
+                              ? "border-primary"
+                              : "border-muted-foreground/50"
+                          }`}
+                        >
+                          {formData.deliveryMethod === option.value && (
+                            <div className="w-2 h-2 rounded-full bg-primary" />
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <Label className="cursor-pointer font-medium text-foreground">
+                          {option.label}
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          ৳{option.price} delivery charge
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+            )}
+
             {/* Cash on Delivery Info Alert */}
-            {paymentType === "cod" && isBook && (
-              <Alert className="mt-3 border-warning/50 bg-warning/40">
-                <InfoIcon className="h-4 w-4" />
-                <AlertDescription className="text-warning-foreground">
-                  For Cash on Delivery, you need to pay ৳200 in advance to
-                  confirm your order. The remaining amount will be collected
-                  upon delivery.
-                </AlertDescription>
-              </Alert>
+            {isBook && paymentType === "cod" && (
+              <PinMessage
+                variant="info"
+                message="For Cash on Delivery, you need pay BDT 200 + delivery charge in advance"
+              />
+            )}
+
+            {isBook && paymentType === "sundarban" && (
+              <PinMessage
+                variant="info"
+                message="For Currier delivery, you need pay full amount also collect from Sundarban Courier service point"
+              />
             )}
           </div>
 

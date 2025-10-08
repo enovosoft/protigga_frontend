@@ -1,10 +1,8 @@
-import { BookOpen, ShoppingCart, Tag } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { DELIVERY_OPTIONS } from "@/config/checkout/data";
+import { BookOpen, ShoppingCart, Tag } from "lucide-react";
 
 export default function OrderSummary({
   product = null,
@@ -14,13 +12,12 @@ export default function OrderSummary({
   quantity = 1,
   setQuantity = () => {},
   deliveryMethod = "inside_dhaka",
-  setDeliveryMethod = () => {},
   promoCode = "",
   setPromoCode = () => {},
   onApplyPromo = () => {},
+  paymentType = "cod",
+  isBook = false,
 }) {
-  const isBook = product?.title && !product?.course_title;
-
   const calculateSubtotal = () => {
     return (product?.price || 0) * Math.min(Math.max(quantity || 1, 1), 10000);
   };
@@ -113,7 +110,7 @@ export default function OrderSummary({
                 Promo code applied! You saved{" "}
                 {promoData.Discount_type === "percentage"
                   ? `${promoData.Discount}%`
-                  : `BDT ${promoData.Discount}`}
+                  : `৳ ${promoData.Discount}`}
               </p>
             </div>
           )}
@@ -150,37 +147,6 @@ export default function OrderSummary({
           </div>
         )}
 
-        {/* Delivery Options - Only for Books */}
-        {isBook && (
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-foreground">
-              Delivery Method
-            </Label>
-            <Tabs
-              value={deliveryMethod}
-              onValueChange={setDeliveryMethod}
-              className="w-full"
-            >
-              <TabsList className="grid w-full grid-cols-3 h-auto">
-                {DELIVERY_OPTIONS.map((option) => (
-                  <TabsTrigger
-                    key={option.value}
-                    value={option.value}
-                    className="text-xs py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                  >
-                    <div className="flex flex-col items-center">
-                      <span className="font-medium">{option.label}</span>
-                      <span className="text-xs opacity-75">
-                        ৳{option.price}
-                      </span>
-                    </div>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-          </div>
-        )}
-
         {/* Price Breakdown */}
         <div className="border-t border-border pt-4 space-y-3">
           <div className="flex justify-between text-sm">
@@ -191,13 +157,27 @@ export default function OrderSummary({
           </div>
           {promoApplied && (
             <div className="flex justify-between text-sm text-success">
-              <span>Discount ({promoData?.Discount}%):</span>
+              <span>
+                Discount{" "}
+                {promoData.Discount_type === "percentage"
+                  ? `${promoData.Discount}%`
+                  : `৳ ${promoData.Discount}`}{" "}
+                :
+              </span>
               <span>-৳{calculateDiscount()}</span>
             </div>
           )}
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Delivery Fee:</span>
-            <span className="font-medium text-foreground">৳{deliveryFee}</span>
+            <span className="font-medium text-foreground">
+              {paymentType === "sslcommerz" && "No delivery fee"}
+              {paymentType === "sundarban" && "Sundarban Courier (৳60)"}
+              {paymentType === "cod" &&
+                isBook &&
+                (deliveryMethod === "inside_dhaka"
+                  ? "Inside Dhaka (৳80)"
+                  : "Outside Dhaka (৳160)")}
+            </span>
           </div>
           <div className="border-t border-border pt-3">
             <div className="flex justify-between text-lg font-bold">

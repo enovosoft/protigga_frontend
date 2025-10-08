@@ -1,7 +1,3 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Book, Loader2, ShoppingCart } from "lucide-react";
-import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,27 +5,60 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import apiInstance from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import apiInstance from "@/lib/api";
+import { Book, ShoppingCart } from "lucide-react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 export default function BooksPage() {
   const navigate = useNavigate();
   const [books, setBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [imageErrors, setImageErrors] = useState({});
+  const [imageUrls, setImageUrls] = useState({});
 
   useEffect(() => {
     fetchBooks();
   }, []);
 
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(imageUrls).forEach((url) => {
+        if (url && url.startsWith("blob:")) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, [imageUrls]);
+
   const fetchBooks = async () => {
     try {
       const response = await apiInstance.get("/books");
-      setBooks(response.data.books || []);
+      const booksData = response.data.books || [];
+      setBooks(booksData);
+
+      // Fetch images as blobs to bypass CORS
+      for (const book of booksData) {
+        if (book.book_image) {
+          try {
+            const imageResponse = await fetch(book.book_image);
+            if (imageResponse.ok) {
+              const blob = await imageResponse.blob();
+              const objectUrl = URL.createObjectURL(blob);
+              setImageUrls((prev) => ({ ...prev, [book.slug]: objectUrl }));
+            }
+          } catch (error) {
+            console.error(`Failed to fetch image for ${book.title}:`, error);
+          }
+        }
+      }
     } catch (error) {
-      toast.error("Failed to load books");
+      toast.error(error?.response?.data?.message || "Failed to load books");
       console.error("Error fetching books:", error);
     } finally {
       setIsLoading(false);
@@ -62,7 +91,10 @@ export default function BooksPage() {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {Array.from({ length: 8 }).map((_, index) => (
-                <Card key={`book-skeleton-${index}`} className="overflow-hidden">
+                <Card
+                  key={`book-skeleton-${index}`}
+                  className="overflow-hidden"
+                >
                   <CardHeader className="p-0">
                     <Skeleton className="w-full aspect-square" />
                   </CardHeader>
@@ -90,17 +122,17 @@ export default function BooksPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {books.map((book) => (
                     <Card
-                      key={book.id}
+                      key={book.slug}
                       className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
                     >
                       <CardHeader className="p-0">
                         <div className="relative aspect-square overflow-hidden bg-muted">
-                          {book.book_image && !imageErrors[book.id] ? (
+                          {book.book_image && !imageErrors[book.slug] ? (
                             <img
-                              src={book.book_image}
+                              src={imageUrls[book.slug] || book.book_image}
                               alt={book.title}
                               className="w-full h-full object-cover"
-                              onError={() => handleImageError(book.id)}
+                              onError={() => handleImageError(book.slug)}
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">

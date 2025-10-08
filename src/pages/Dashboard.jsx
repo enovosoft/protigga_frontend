@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -41,8 +42,14 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
-        <h2 className="text-2xl font-bold mb-4">Role not recognized</h2>
+        <h2 className="text-2xl font-bold mb-4">User Role not recognized</h2>
         <p>Please contact support for assistance.</p>
+
+        <div className="mt-4">
+          <Button variant="outline" onClick={() => navigate("/auth/logout")}>
+            Logout
+          </Button>
+        </div>
       </div>
     </div>
   );

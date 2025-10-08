@@ -1,3 +1,4 @@
+import PinMessage from "@/components/shared/PinMessage";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import PinMessage from "@/components/shared/PinMessage";
 import { useAuth } from "@/contexts/AuthContext";
 import apiInstance from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,12 +21,11 @@ import {
   LogIn,
   Phone,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { useState } from "react";
 
 const loginSchema = z.object({
   phone: z.string().regex(/^1[3-9]\d{8}$/, "Invalid Bangladeshi phone number"),
@@ -112,8 +111,8 @@ export default function LoginPage() {
         <CardHeader className="space-y-3 text-center">
           {message && (
             <PinMessage
-              variant={message.variant}
-              message={message.text}
+              variant={message.variant || "warning"}
+              message={message.text || "login to continue"}
               className="mb-4"
             />
           )}
