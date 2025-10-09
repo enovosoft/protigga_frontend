@@ -22,6 +22,9 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import VerifyAccountPage from "./pages/auth/VerifyAccountPage";
 import AuthIndex from "./pages/auth/index";
+import PaymentCancelPage from "./pages/payment/PaymentCancelPage";
+import PaymentFailPage from "./pages/payment/PaymentFailPage";
+import PaymentSuccessPage from "./pages/payment/PaymentSuccessPage";
 
 // Protected Route Component - Redirects to home if not authenticated
 function ProtectedRoute({ children }) {
@@ -150,6 +153,30 @@ function App() {
             <Route path="/books" element={<BooksPage />} />
             <Route path="/books/:slug" element={<BookDetailsPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route
+              path="/payment/success"
+              element={
+                <ProtectedRoute>
+                  <PaymentSuccessPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/payment/fail"
+              element={
+                <ProtectedRoute>
+                  <PaymentFailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/payment/cancel"
+              element={
+                <ProtectedRoute>
+                  <PaymentCancelPage />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </Router>
       </AuthProvider>

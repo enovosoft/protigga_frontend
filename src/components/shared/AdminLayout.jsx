@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Book,
+  BookOpen,
   FileText,
   LogOut,
   Menu,
@@ -84,6 +85,15 @@ const AdminLayout = ({ children }) => {
       icon: Book,
       onClick: () => {
         setActiveSection("books");
+        setSidebarOpen(false);
+      },
+    },
+    {
+      id: "courses",
+      label: "Courses",
+      icon: BookOpen,
+      onClick: () => {
+        setActiveSection("courses");
         setSidebarOpen(false);
       },
     },
