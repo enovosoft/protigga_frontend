@@ -8,10 +8,7 @@ import CustomerInformation from "./CustomerInformation";
 import OrderSummary from "./OrderSummary";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  DELIVERY_OPTIONS,
-  PAYMENT_DELIVERY_OPTIONS,
-} from "@/config/checkout/data";
+import { PAYMENT_DELIVERY_OPTIONS } from "@/config/checkout/data";
 import { useCallback } from "react";
 import { z } from "zod";
 
@@ -42,8 +39,9 @@ const checkoutSchema = z.object({
     .min(2, "District is required")
     .max(50, "District must be less than 50 characters"),
   zipCode: z.string().regex(/^[0-9]{4}$/, "Zip code must be exactly 4 digits"),
-  division: z.string().min(1, "Please select a division").optional(),
-  deliveryMethod: z.string().optional(),
+  division: z.string().refine((val) => val && val.length > 0, {
+    message: "Division is required",
+  }),
 });
 
 const initialFormData = {
@@ -52,9 +50,8 @@ const initialFormData = {
   email: "",
   address: "",
   district: "",
-  division: undefined,
+  division: "",
   zipCode: "",
-  deliveryMethod: "inside_dhaka",
 };
 
 export default function CheckoutForm() {
@@ -83,47 +80,41 @@ export default function CheckoutForm() {
 
   const isBook = bookSlug && !courseId;
 
-  // Update delivery fee based on payment type and delivery method
+  // Update delivery fee based on payment type and district
   useEffect(() => {
-    // Update delivery fee based on payment type and delivery method
     if (isBook) {
-      const paymentOption = PAYMENT_DELIVERY_OPTIONS.find(
-        (option) => option.value === paymentType
-      );
-
-      if (paymentType === "cod") {
-        // For COD, delivery fee comes from selected delivery method
-        const selectedDeliveryOption = DELIVERY_OPTIONS.find(
-          (option) => option.value === formData.deliveryMethod
+      if (paymentType === "sslcommerz") {
+        // SSL COMMERZ uses delivery charge from config
+        const sslOption = PAYMENT_DELIVERY_OPTIONS.find(
+          (option) => option.value === "sslcommerz"
         );
-        setDeliveryFee(selectedDeliveryOption?.price || 80);
-      } else if (paymentType === "sundarban") {
-        // For Sundarban, fixed delivery charge
-        setDeliveryFee(paymentOption?.deliveryCharge || 60);
-      } else {
-        // For SSL COMMERZ, no delivery charge
-        setDeliveryFee(0);
+        setDeliveryFee(sslOption?.deliveryCharge || 60);
+      } else if (paymentType === "cod") {
+        // COD delivery fee based on district
+        const isDhaka = formData.district?.toLowerCase() === "dhaka";
+        setDeliveryFee(isDhaka ? 80 : 160);
       }
     } else {
       // Courses have no delivery fee
       setDeliveryFee(0);
     }
-  }, [paymentType, formData.deliveryMethod, isBook]);
+  }, [paymentType, formData.district, isBook]);
   const fetchProductDetails = useCallback(async () => {
     if (courseId) {
       // Handle course checkout (existing logic)
       try {
-        const response = await apiInstance.get(`/courses/${courseId}`);
+        const response = await apiInstance.get(`/course/${courseId}`);
         if (response.data) {
-          const course = response.data;
+          const course = response.data.course;
           setProduct(course);
           setProductType("course");
+          setPaymentType("sslcommerz"); // Default to SSL Commerz for courses
         } else {
           toast.error("Course not found");
           navigate("/");
           return;
         }
-      } catch (error) {
+      } catch {
         toast.error("Failed to load course details");
         navigate("/");
         return;
@@ -136,6 +127,7 @@ export default function CheckoutForm() {
           const book = response.data.book;
           setProduct(book);
           setProductType("book");
+          // Keep default payment type (cod) for books
         } else {
           toast.error("Book not found");
           navigate("/books");
@@ -312,14 +304,14 @@ export default function CheckoutForm() {
         meterial_type: product.title ? "book" : "course",
         delevery_type: paymentType === "cod" ? "COD" : "Prepaid",
         inside_dhaka:
-          paymentType === "cod" && formData.deliveryMethod === "inside_dhaka",
+          paymentType === "cod" && formData.district?.toLowerCase() === "dhaka",
         outside_dhaka:
-          paymentType === "cod" && formData.deliveryMethod === "outside_dhaka",
-        sundarban_courier: paymentType === "sundarban",
+          paymentType === "cod" && formData.district?.toLowerCase() !== "dhaka",
+        sundarban_courier: paymentType === "sslcommerz",
         customer: {
           name: formData.name,
           email: formData.email || user?.email || "",
-          address: `${formData.address}, ${formData.city}, ${formData.district}, ${formData.division} - ${formData.zipCode}`,
+          address: `${formData.address}, ${formData.city}, ${formData.district}, ${formData.division}, ${formData.zipCode}`,
           alternative_phone: formData.phone,
         },
         meterial_details: {
@@ -522,7 +514,7 @@ export default function CheckoutForm() {
             deliveryFee={deliveryFee}
             quantity={quantity}
             setQuantity={setQuantity}
-            deliveryMethod={formData.deliveryMethod || "inside_dhaka"}
+            district={formData.district}
             promoCode={promoCode}
             setPromoCode={setPromoCode}
             onApplyPromo={checkPromoCode}
@@ -545,6 +537,8 @@ export default function CheckoutForm() {
             product={product}
             isBook={isBook}
             validationErrors={validationErrors}
+            totalAmount={calculateTotal()}
+            deliveryFee={deliveryFee}
           />
         </div>
       </div>

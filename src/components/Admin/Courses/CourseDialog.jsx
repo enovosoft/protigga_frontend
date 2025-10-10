@@ -44,6 +44,19 @@ export default function CourseDialog({
   });
   const [loading, setLoading] = useState(false);
   const [fetchingCourse, setFetchingCourse] = useState(false);
+  const [books, setBooks] = useState([]);
+
+  const fetchBooks = useCallback(async () => {
+    try {
+      const response = await api.get("/books");
+      if (response.data.success) {
+        setBooks(response.data.books || []);
+      }
+    } catch (error) {
+      console.error("Error fetching books:", error);
+      // Don't show error toast for books fetch, just keep empty
+    }
+  }, []);
 
   const fetchCourseDetails = useCallback(async () => {
     if (!course?.slug) return;
@@ -95,26 +108,29 @@ export default function CourseDialog({
     }
   }, [course]);
 
-  // Fetch course details when editing
+  // Fetch course details and books when editing
   useEffect(() => {
-    if (course && open) {
-      fetchCourseDetails();
-    } else if (!course) {
-      setFormData({
-        batch: "",
-        course_title: "",
-        price: "",
-        thumbnail: "",
-        academy_name: "",
-        description: "",
-        related_book: "",
-        quiz_count: "",
-        assessment: false,
-        skill_level: "",
-        expired_date: "",
-      });
+    if (open) {
+      fetchBooks();
+      if (course) {
+        fetchCourseDetails();
+      } else {
+        setFormData({
+          batch: "",
+          course_title: "",
+          price: "",
+          thumbnail: "",
+          academy_name: "",
+          description: "",
+          related_book: "",
+          quiz_count: "",
+          assessment: false,
+          skill_level: "",
+          expired_date: "",
+        });
+      }
     }
-  }, [course, open, fetchCourseDetails]);
+  }, [course, open, fetchCourseDetails, fetchBooks]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -460,14 +476,40 @@ export default function CourseDialog({
                 <Label htmlFor="related_book" className="text-sm font-medium">
                   Related Book
                 </Label>
-                <Input
-                  id="related_book"
-                  name="related_book"
+                <Select
                   value={formData.related_book}
-                  onChange={handleChange}
-                  placeholder="C Programming for Beginners by M.S. Samad"
-                  className="w-full h-10 sm:h-11"
-                />
+                  onValueChange={(value) =>
+                    handleSelectChange("related_book", value)
+                  }
+                >
+                  <SelectTrigger className="w-full h-10 sm:h-11">
+                    <SelectValue placeholder="Select a related book (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {formData.related_book &&
+                      !books.some(
+                        (book) => book.title === formData.related_book
+                      ) && (
+                        <SelectItem value={formData.related_book}>
+                          {formData.related_book} (previously selected)
+                        </SelectItem>
+                      )}
+                    {books.length > 0 ? (
+                      books.map((book) => (
+                        <SelectItem
+                          key={book.book_id || book.id}
+                          value={book.title}
+                        >
+                          {book.title}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="no-books" disabled>
+                        No books available
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Description */}

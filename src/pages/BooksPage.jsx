@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import apiInstance from "@/lib/api";
+import { cleanupImageUrls, fetchImageAsBlob } from "@/lib/helper";
 import { Book, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -28,11 +29,7 @@ export default function BooksPage() {
   // Cleanup object URLs on unmount
   useEffect(() => {
     return () => {
-      Object.values(imageUrls).forEach((url) => {
-        if (url && url.startsWith("blob:")) {
-          URL.revokeObjectURL(url);
-        }
-      });
+      cleanupImageUrls(imageUrls);
     };
   }, [imageUrls]);
 
@@ -45,15 +42,9 @@ export default function BooksPage() {
       // Fetch images as blobs to bypass CORS
       for (const book of booksData) {
         if (book.book_image) {
-          try {
-            const imageResponse = await fetch(book.book_image);
-            if (imageResponse.ok) {
-              const blob = await imageResponse.blob();
-              const objectUrl = URL.createObjectURL(blob);
-              setImageUrls((prev) => ({ ...prev, [book.slug]: objectUrl }));
-            }
-          } catch (error) {
-            console.error(`Failed to fetch image for ${book.title}:`, error);
+          const objectUrl = await fetchImageAsBlob(book.book_image);
+          if (objectUrl) {
+            setImageUrls((prev) => ({ ...prev, [book.slug]: objectUrl }));
           }
         }
       }

@@ -102,7 +102,7 @@ export default function CoursesTable({
           <TableBody>
             {courses.map((course, index) => (
               <TableRow
-                key={course.course_id || course.id}
+                key={course.course_id || course.id || index}
                 className="hover:bg-muted/30 transition-colors"
               >
                 <TableCell className="font-medium text-muted-foreground">

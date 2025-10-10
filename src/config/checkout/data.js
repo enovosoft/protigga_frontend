@@ -1,48 +1,18 @@
-export const DELIVERY_OPTIONS = [
-  {
-    value: "inside_dhaka",
-    label: "Inside Dhaka",
-    price: 80,
-  },
-  {
-    value: "outside_dhaka",
-    label: "Outside Dhaka",
-    price: 160,
-  },
-  {
-    value: "sundarban",
-    label: "Sundarban Courier",
-    price: 60,
-  },
-];
-
 export const PAYMENT_DELIVERY_OPTIONS = [
   {
     value: "sslcommerz",
     label: "SSL COMMERZ",
-    deliveryCharge: 0, // No delivery charge for online payment
+    deliveryCharge: 60, // Sundarban delivery charge for online payment
     advancePayment: 0, // Full payment required
     deliveryMethods: [], // No delivery method selection needed
     description: "Pay full amount in online.",
   },
   {
-    value: "sundarban",
-    label: "Sundarban Courier",
-    deliveryCharge: 60, // Fixed delivery charge
-    advancePayment: 0, // Full payment required
-    deliveryMethods: [], // No delivery method selection needed
-    description:
-      "Pay full amount with delivery charge 60৳. You need to pickup from Sundarban Courier service point.",
-  },
-  {
     value: "cod",
     label: "Cash on Delivery",
-    deliveryCharge: 0, // Delivery charge based on selected delivery method
+    deliveryCharge: 0, // Delivery charge based on district (Dhaka/Outside)
     advancePayment: 200, // Advance payment plus delivery charge
-    deliveryMethods: [
-      { value: "inside_dhaka", label: "Inside Dhaka", price: 80 },
-      { value: "outside_dhaka", label: "Outside Dhaka", price: 160 },
-    ],
+    deliveryMethods: [], // No manual selection, auto-determined by district
     description: "Pay ৳200 advance + delivery charge and rest on delivery",
   },
 ];

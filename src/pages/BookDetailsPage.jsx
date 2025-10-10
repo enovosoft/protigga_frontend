@@ -20,15 +20,29 @@ export default function BookDetailsPage() {
 
   const fetchBookDetails = useCallback(async () => {
     try {
-      const response = await apiInstance.get(`/book/${slug}`);
+      const response = await apiInstance.get(`/course/${slug}`);
       if (response.data.success) {
-        const bookData = response.data.book;
-        setBook(bookData);
+        const courseData = response.data.course;
+        setBook({
+          id: courseData.id,
+          course_id: courseData.course_id,
+          title: courseData.course_title,
+          price: courseData.price,
+          book_image: courseData.thumbnail,
+          slug: courseData.slug,
+          description: courseData.course_details?.description || "",
+          writter:
+            courseData.course_details?.academy_name || "Protigga Academy",
+          language: courseData.course_details?.language || "Bangla",
+          batch: courseData.batch,
+          createdAt: courseData.createdAt,
+          updatedAt: courseData.updatedAt,
+        });
 
         // Fetch image as blob to bypass CORS and detect dimensions
-        if (bookData.book_image) {
+        if (courseData.thumbnail) {
           try {
-            const imageResponse = await fetch(bookData.book_image);
+            const imageResponse = await fetch(courseData.thumbnail);
             if (imageResponse.ok) {
               const blob = await imageResponse.blob();
               const objectUrl = URL.createObjectURL(blob);
@@ -51,19 +65,19 @@ export default function BookDetailsPage() {
             }
           } catch (error) {
             console.error(
-              `Failed to fetch image for ${bookData.title}:`,
+              `Failed to fetch image for ${courseData.course_title}:`,
               error
             );
           }
         }
       } else {
-        toast.error("Book not found");
-        navigate("/books");
+        toast.error("Course not found");
+        navigate("/courses");
       }
     } catch (error) {
-      toast.error("Failed to load book details");
-      console.error("Error fetching book details:", error);
-      navigate("/books");
+      toast.error("Failed to load course details");
+      console.error("Error fetching course details:", error);
+      navigate("/courses");
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +89,7 @@ export default function BookDetailsPage() {
 
   const handleOrderNow = () => {
     if (book) {
-      navigate(`/checkout?book=${book.slug}`);
+      navigate(`/checkout?course=${book.slug}`);
     }
   };
 
@@ -90,7 +104,7 @@ export default function BookDetailsPage() {
 
         <main className="flex-1 container mx-auto px-4 py-12">
           <div className="max-w-7xl mx-auto">
-            {/* Book Title Skeleton */}
+            {/* Course Title Skeleton */}
             <div className="mb-8">
               <Skeleton className="h-10 w-64 mb-4" />
               <div className="flex gap-4">
@@ -150,7 +164,7 @@ export default function BookDetailsPage() {
   if (!book) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Book not found</p>
+        <p className="text-muted-foreground">Course not found</p>
       </div>
     );
   }

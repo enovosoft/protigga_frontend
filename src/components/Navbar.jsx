@@ -1,8 +1,8 @@
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { LayoutDashboard, Menu, User, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Menu, X, User } from "lucide-react";
 
 export default function Navbar() {
   const { isAuthenticated } = useAuth();
@@ -11,10 +11,6 @@ export default function Navbar() {
 
   const handleDashboardClick = () => {
     navigate("/auth");
-  };
-
-  const handleProfileClick = () => {
-    navigate("/user-dashboard");
   };
 
   const toggleMobileMenu = () => {
@@ -69,22 +65,16 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          {isAuthenticated && (
-            <Button
-              onClick={handleProfileClick}
-              variant="outline"
-              className="gap-2 hidden sm:flex"
-            >
-              <User className="h-4 w-4" />
-              Profile
-            </Button>
-          )}
           <Button
             onClick={handleDashboardClick}
             className="gap-2 hidden sm:flex"
           >
-            <LayoutDashboard className="h-4 w-4" />
-            Dashboard
+            {isAuthenticated ? (
+              <LayoutDashboard className="w-4 h-4" />
+            ) : (
+              <User className="w-4 h-4" />
+            )}
+            {isAuthenticated ? "Dashboard" : "Login"}
           </Button>
           {/* Mobile Menu Toggle */}
           <Button
@@ -139,21 +129,12 @@ export default function Navbar() {
               >
                 Books
               </Link>
-              {isAuthenticated && (
-                <Link
-                  to="/user-dashboard"
-                  className="block py-3 px-4 text-sm font-medium text-foreground hover:bg-muted rounded-md transition-colors"
-                  onClick={closeMobileMenu}
-                >
-                  Profile
-                </Link>
-              )}
               <Link
                 to="/auth"
                 className="block py-3 px-4 text-sm font-medium bg-primary text-primary-foreground rounded-md transition-colors"
                 onClick={closeMobileMenu}
               >
-                Dashboard
+                {isAuthenticated ? "Dashboard" : "Login"}
               </Link>
             </div>
           </div>

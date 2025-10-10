@@ -1,157 +1,113 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import {
-  BookOpen,
-  Loader2,
-  Calendar,
-  Globe,
-  CheckCircle,
-  XCircle,
-  Clock,
-  BarChart,
-  ShoppingCart,
-  Book,
-} from "lucide-react";
-import toast from "react-hot-toast";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-
-// Dummy data for UI testing
-const DUMMY_COURSE = {
-  id: 1,
-  course_title: "Physics Complete Course - HSC 27",
-  price: 2500,
-  thumbnail: null,
-  batch: "HSC 27",
-  language: "Bangla",
-  created_at: "2024-01-15",
-  description:
-    "This comprehensive physics course covers all topics required for HSC 2027 examination. You'll learn fundamental concepts, solve complex problems, and prepare for your exams with confidence. The course includes video lectures, practice problems, and mock tests.",
-  curriculum: [
-    {
-      title: "Mechanics",
-      description: "Kinematics, dynamics, and energy concepts",
-    },
-    {
-      title: "Thermodynamics",
-      description: "Heat, temperature, and laws of thermodynamics",
-    },
-    {
-      title: "Electromagnetism",
-      description: "Electric fields, circuits, and magnetic fields",
-    },
-    { title: "Optics", description: "Light, lenses, and optical instruments" },
-    {
-      title: "Modern Physics",
-      description: "Quantum mechanics and relativity basics",
-    },
-  ],
-  instructor: {
-    name: "Dr. Mohammad Rahman",
-    bio: "PhD in Physics from BUET with 15+ years of teaching experience",
-  },
-  quiz_count: 25,
-  assessment: true,
-  expiry: 365,
-  skill_level: "Intermediate",
-};
-
-const DUMMY_RELATED_BOOKS = [
-  {
-    id: 1,
-    title: "HSC Physics Solved Problems",
-    book_image: null,
-    price: 450,
-  },
-  {
-    id: 2,
-    title: "Advanced Physics Concepts",
-    book_image: null,
-    price: 380,
-  },
-  {
-    id: 3,
-    title: "Physics Formula Handbook",
-    book_image: null,
-    price: 280,
-  },
-  {
-    id: 4,
-    title: "HSC Physics MCQ Bank",
-    book_image: null,
-    price: 320,
-  },
-];
-
-const DUMMY_RELATED_COURSES = [
-  {
-    id: 2,
-    course_title: "Chemistry Crash Course - HSC 27",
-    price: 2200,
-    thumbnail: null,
-    batch: "HSC 27",
-  },
-  {
-    id: 3,
-    course_title: "Mathematics Advanced - HSC 27",
-    price: 2800,
-    thumbnail: null,
-    batch: "HSC 27",
-  },
-];
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  DUMMY_COURSE,
+  DUMMY_RELATED_BOOKS,
+  DUMMY_RELATED_COURSES,
+} from "@/config/data";
+import api from "@/lib/api";
+import { cleanupImageUrls, fetchImageAsBlob } from "@/lib/helper";
+import {
+  BarChart,
+  Book,
+  BookOpen,
+  CheckCircle,
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  Globe,
+  Play,
+  ShoppingCart,
+  XCircle,
+} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function CourseDetailsPage() {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [relatedBooks, setRelatedBooks] = useState([]);
   const [relatedCourses, setRelatedCourses] = useState([]);
   const [activeTab, setActiveTab] = useState("description");
   const [isLoading, setIsLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [expandedChapters, setExpandedChapters] = useState({});
+
+  const fetchCourseDetails = useCallback(async () => {
+    try {
+      const response = await api.get(`/course/${slug}`);
+      if (response.data.success && response.data.course) {
+        const courseData = response.data.course;
+        const courseInfo = {
+          id: courseData.id,
+          course_id: courseData.course_id,
+          course_title: courseData.course_title,
+          price: courseData.price,
+          thumbnail: courseData.thumbnail,
+          batch: courseData.batch,
+          slug: courseData.slug,
+          language: courseData.course_details?.language || "Bangla",
+          description: courseData.course_details?.description || "",
+          quiz_count: courseData.course_details?.quiz_count || 0,
+          assessment: courseData.course_details?.assessment || false,
+          skill_level: courseData.course_details?.skill_level || "Beginner",
+          expired_date: courseData.course_details?.expired_date,
+          academy_name: courseData.course_details?.academy_name || "",
+          curriculum: DUMMY_COURSE.curriculum, // Use dummy curriculum for now
+          instructor: DUMMY_COURSE.instructor, // Use dummy instructor for now
+        };
+
+        setCourse(courseInfo);
+
+        // Load image if available
+        if (courseData.thumbnail) {
+          const blobUrl = await fetchImageAsBlob(courseData.thumbnail);
+          if (blobUrl) {
+            setImageUrl(blobUrl);
+          }
+        }
+      } else {
+        // Use dummy data for development
+        setCourse(DUMMY_COURSE);
+        setRelatedBooks(DUMMY_RELATED_BOOKS);
+        setRelatedCourses(DUMMY_RELATED_COURSES);
+      }
+    } catch (error) {
+      console.error("Error fetching course details:", error);
+      // Use dummy data for development
+      setCourse(DUMMY_COURSE);
+      setRelatedBooks(DUMMY_RELATED_BOOKS);
+      setRelatedCourses(DUMMY_RELATED_COURSES);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [slug]);
+
+  // Cleanup image URLs on unmount
+  useEffect(() => {
+    return () => {
+      if (imageUrl) {
+        cleanupImageUrls({ courseImage: imageUrl });
+      }
+    };
+  }, [imageUrl]);
 
   useEffect(() => {
     fetchCourseDetails();
-  }, [id]);
-
-  const fetchCourseDetails = async () => {
-    // Simulate API loading delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Using dummy data for UI testing
-    setCourse(DUMMY_COURSE);
-    setRelatedBooks(DUMMY_RELATED_BOOKS);
-    setRelatedCourses(DUMMY_RELATED_COURSES);
-
-    setIsLoading(false);
-    // Comment out actual API calls for now
-    // try {
-    //   const [courseRes, booksRes, coursesRes] = await Promise.all([
-    //     axiosInstance.get(`/courses/${id}`),
-    //     axiosInstance.get(`/courses/${id}/related-books`),
-    //     axiosInstance.get(`/courses/${id}/related-courses`)
-    //   ]);
-    //
-    //   setCourse(courseRes.data);
-    //   setRelatedBooks(booksRes.data);
-    //   setRelatedCourses(coursesRes.data);
-    // } catch (error) {
-    //   toast.error('Failed to load course details');
-    //   console.error('Error fetching course details:', error);
-    // } finally {
-    //   setIsLoading(false);
-    // }
-  };
+  }, [fetchCourseDetails]);
 
   const handleEnroll = () => {
-    navigate(`/checkout?course=${id}`);
+    navigate(`/checkout?course=${slug}`);
   };
 
   const handleOrderBook = (bookId) => {
@@ -163,10 +119,54 @@ export default function CourseDetailsPage() {
     window.scrollTo(0, 0);
   };
 
+  const toggleChapter = (chapterId) => {
+    setExpandedChapters((prev) => ({
+      ...prev,
+      [chapterId]: !prev[chapterId],
+    }));
+  };
+
+  const getTopicIcon = (type) => {
+    return <Play className="w-4 h-4 text-primary" />;
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1 container mx-auto px-4 py-12">
+          <div className="max-w-4xl mx-auto space-y-8">
+            {/* Hero Section Skeleton */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <Skeleton className="h-8 w-3/4" />
+                <Skeleton className="h-6 w-1/2" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-5/6" />
+                <div className="flex gap-4">
+                  <Skeleton className="h-10 w-32" />
+                  <Skeleton className="h-10 w-32" />
+                </div>
+              </div>
+              <Skeleton className="aspect-video w-full rounded-lg" />
+            </div>
+
+            {/* Tabs Skeleton */}
+            <div className="space-y-4">
+              <div className="flex gap-4">
+                <Skeleton className="h-10 w-24" />
+                <Skeleton className="h-10 w-24" />
+                <Skeleton className="h-10 w-24" />
+              </div>
+              <div className="space-y-3">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-5/6" />
+                <Skeleton className="h-4 w-4/5" />
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }
@@ -193,13 +193,7 @@ export default function CourseDetailsPage() {
             <div className="flex flex-wrap gap-4 mt-2 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4" />
-                <span>{course.language || "Bangla"}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span>
-                  Created: {new Date(course.created_at).toLocaleDateString()}
-                </span>
+                <span>{course.academy_name}</span>
               </div>
             </div>
           </div>
@@ -212,15 +206,25 @@ export default function CourseDetailsPage() {
                 <Card className="overflow-hidden">
                   <CardHeader className="p-0">
                     <div className="relative aspect-video overflow-hidden bg-muted">
-                      {course.thumbnail ? (
+                      {imageUrl && !imageError ? (
                         <img
-                          src={course.thumbnail}
+                          src={imageUrl}
                           alt={course.course_title}
                           className="w-full h-full object-cover"
+                          onError={() => setImageError(true)}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <BookOpen className="w-12 h-12 text-muted-foreground" />
+                        </div>
+                      )}
+                      {/* Batch Tag */}
+                      {course.batch && (
+                        <div className="absolute top-3 right-3">
+                          <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                            <BookOpen className="w-3 h-3" />
+                            {course.batch}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -265,7 +269,7 @@ export default function CourseDetailsPage() {
                           {course.assessment ? (
                             <CheckCircle className="w-4 h-4 text-success" />
                           ) : (
-                            <XCircle className="w-4 h-4 text-muted-foreground" />
+                            <XCircle className="w-4 h-4 text-destructive" />
                           )}
                         </span>
                       </div>
@@ -347,7 +351,7 @@ export default function CourseDetailsPage() {
               <div className="bg-card rounded-lg p-6 border border-border">
                 {activeTab === "description" && (
                   <div className="prose prose-sm max-w-none">
-                    <p className="text-foreground whitespace-pre-wrap">
+                    <p className="text-foreground whitespace-pre-wrap leading-relaxed">
                       {course.description ||
                         "No description available for this course."}
                     </p>
@@ -355,30 +359,67 @@ export default function CourseDetailsPage() {
                 )}
 
                 {activeTab === "curriculum" && (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {course.curriculum && course.curriculum.length > 0 ? (
-                      course.curriculum.map((item, index) => (
+                      course.curriculum.map((chapter) => (
                         <div
-                          key={index}
-                          className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg"
+                          key={chapter.id}
+                          className="border border-border rounded-lg overflow-hidden"
                         >
-                          <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                          <div>
-                            <h4 className="font-medium text-foreground">
-                              {item.title}
-                            </h4>
-                            {item.description && (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {item.description}
-                              </p>
-                            )}
-                          </div>
+                          <button
+                            onClick={() => toggleChapter(chapter.id)}
+                            className="w-full flex items-center justify-between p-4 bg-muted/30 hover:bg-muted/50 transition-colors text-left"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                <BookOpen className="w-4 h-4 text-primary" />
+                              </div>
+                              <span className="font-medium text-foreground">
+                                {chapter.chapter}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-muted-foreground">
+                                {chapter.topics.length} topics
+                              </span>
+                              {expandedChapters[chapter.id] ? (
+                                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                              ) : (
+                                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                              )}
+                            </div>
+                          </button>
+
+                          {expandedChapters[chapter.id] && (
+                            <div className="border-t border-border">
+                              {chapter.topics.map((topic, index) => (
+                                <div
+                                  key={topic.id}
+                                  className={`flex items-center gap-3 p-3 hover:bg-muted/30 transition-colors ${
+                                    index !== chapter.topics.length - 1
+                                      ? "border-b border-border/50"
+                                      : ""
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2 flex-1">
+                                    {getTopicIcon(topic.type)}
+                                    <span className="text-sm font-medium text-foreground">
+                                      {topic.title}
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       ))
                     ) : (
-                      <p className="text-muted-foreground">
-                        Curriculum details will be updated soon.
-                      </p>
+                      <div className="text-center py-8">
+                        <BookOpen className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                        <p className="text-muted-foreground">
+                          Curriculum details will be updated soon.
+                        </p>
+                      </div>
                     )}
                   </div>
                 )}

@@ -23,6 +23,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
     book_image: "",
     writter: "",
     description: "",
+    batch: "",
   });
   const [loading, setLoading] = useState(false);
   const [fetchingBook, setFetchingBook] = useState(false);
@@ -41,6 +42,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
           book_image: bookData.book_image || "",
           writter: bookData.writter || "",
           description: bookData.description || "",
+          batch: bookData.batch || "",
         });
       }
     } catch (error) {
@@ -53,6 +55,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
         book_image: book.book_image || "",
         writter: book.writter || "",
         description: book.description || "",
+        batch: book.batch || "",
       });
     } finally {
       setFetchingBook(false);
@@ -70,6 +73,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
         book_image: "",
         writter: "",
         description: "",
+        batch: "",
       });
     }
   }, [book, open, fetchBookDetails]);
@@ -268,7 +272,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 overflow-hidden p-1">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 overflow-hidden p-1">
                 <div className="space-y-1.5 sm:space-y-2">
                   <Label htmlFor="price" className="text-sm font-medium">
                     Price (BDT) <span className="text-destructive">*</span>
@@ -297,6 +301,21 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
                     value={formData.writter}
                     onChange={handleChange}
                     placeholder="Protigga Publication"
+                    required
+                    className="w-full h-10 sm:h-11"
+                  />
+                </div>
+
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="batch" className="text-sm font-medium">
+                    Batch <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="batch"
+                    name="batch"
+                    value={formData.batch}
+                    onChange={handleChange}
+                    placeholder="HSC 2025"
                     required
                     className="w-full h-10 sm:h-11"
                   />

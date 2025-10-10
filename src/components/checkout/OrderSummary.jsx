@@ -11,7 +11,7 @@ export default function OrderSummary({
   deliveryFee = 0,
   quantity = 1,
   setQuantity = () => {},
-  deliveryMethod = "inside_dhaka",
+  district = "",
   promoCode = "",
   setPromoCode = () => {},
   onApplyPromo = () => {},
@@ -167,18 +167,20 @@ export default function OrderSummary({
               <span>-৳{calculateDiscount()}</span>
             </div>
           )}
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Delivery Fee:</span>
-            <span className="font-medium text-foreground">
-              {paymentType === "sslcommerz" && "No delivery fee"}
-              {paymentType === "sundarban" && "Sundarban Courier (৳60)"}
-              {paymentType === "cod" &&
-                isBook &&
-                (deliveryMethod === "inside_dhaka"
-                  ? "Inside Dhaka (৳80)"
-                  : "Outside Dhaka (৳160)")}
-            </span>
-          </div>
+
+          {isBook && (
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Delivery Fee:</span>
+              <span className="font-medium text-foreground">
+                {paymentType === "sslcommerz" &&
+                  `Sundarban Courier (৳${deliveryFee})`}
+                {paymentType === "cod" &&
+                  (district?.toLowerCase() === "dhaka"
+                    ? `Inside Dhaka (৳${deliveryFee})`
+                    : `Outside Dhaka (৳${deliveryFee})`)}
+              </span>
+            </div>
+          )}
           <div className="border-t border-border pt-3">
             <div className="flex justify-between text-lg font-bold">
               <span className="text-foreground">Total:</span>

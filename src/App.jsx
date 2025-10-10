@@ -147,7 +147,7 @@ function App() {
             />
 
             <Route path="/courses" element={<CoursesPage />} />
-            <Route path="/courses/:id" element={<CourseDetailsPage />} />
+            <Route path="/courses/:slug" element={<CourseDetailsPage />} />
             <Route path="/notes" element={<NotesPage />} />
             <Route path="/notes/view" element={<NotesViewPage />} />
             <Route path="/books" element={<BooksPage />} />

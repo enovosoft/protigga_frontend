@@ -1,41 +1,6 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { User, Award, BookOpen } from 'lucide-react';
-
-// Mock data - replace with actual API data
-const INSTRUCTORS = [
-  {
-    id: 1,
-    name: 'Dr. Ahmed Rahman',
-    subject: 'Physics',
-    experience: '15 years',
-    students: 2000,
-    image: null,
-  },
-  {
-    id: 2,
-    name: 'Prof. Fatima Khatun',
-    subject: 'Chemistry',
-    experience: '12 years',
-    students: 1800,
-    image: null,
-  },
-  {
-    id: 3,
-    name: 'Md. Karim Hossain',
-    subject: 'Mathematics',
-    experience: '10 years',
-    students: 2200,
-    image: null,
-  },
-  {
-    id: 4,
-    name: 'Dr. Nusrat Jahan',
-    subject: 'Biology',
-    experience: '14 years',
-    students: 1900,
-    image: null,
-  },
-];
+import { Card, CardContent } from "@/components/ui/card";
+import { INSTRUCTORS } from "@/config/data";
+import { Award, BookOpen, User } from "lucide-react";
 
 export default function InstructorList() {
   return (
@@ -54,8 +19,8 @@ export default function InstructorList() {
         {/* Instructor Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {INSTRUCTORS.map((instructor) => (
-            <Card 
-              key={instructor.id} 
+            <Card
+              key={instructor.id}
               className="group hover:shadow-xl transition-all duration-300 hover:border-secondary/50 overflow-hidden"
             >
               <CardContent className="p-6">
@@ -82,7 +47,9 @@ export default function InstructorList() {
                     <h3 className="font-semibold text-lg text-foreground group-hover:text-secondary transition-colors">
                       {instructor.name}
                     </h3>
-                    <p className="text-secondary font-medium">{instructor.subject}</p>
+                    <p className="text-secondary font-medium">
+                      {instructor.subject}
+                    </p>
                   </div>
 
                   <div className="space-y-2 pt-3 border-t border-border">

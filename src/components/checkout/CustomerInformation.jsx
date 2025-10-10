@@ -12,11 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  DELIVERY_OPTIONS,
-  DIVISIONS,
-  PAYMENT_DELIVERY_OPTIONS,
-} from "@/config/checkout/data";
+import { DIVISIONS, PAYMENT_DELIVERY_OPTIONS } from "@/config/checkout/data";
 import PinMessage from "../shared/PinMessage";
 
 export default function CustomerInformation({
@@ -33,10 +29,12 @@ export default function CustomerInformation({
   product = null,
   isBook = false,
   validationErrors = {},
+  totalAmount = 0,
+  deliveryFee = 0,
 }) {
   const getPaymentOptions = () => {
     if (isBook) {
-      return PAYMENT_DELIVERY_OPTIONS; // All options for books
+      return PAYMENT_DELIVERY_OPTIONS; // SSL COMMERZ and COD for books
     } else {
       return PAYMENT_DELIVERY_OPTIONS.filter(
         (option) => option.value === "sslcommerz"
@@ -233,7 +231,9 @@ export default function CustomerInformation({
               </Label>
               <Select
                 value={formData.division || ""}
-                onValueChange={(value) => handleInputChange("division", value)}
+                onValueChange={(value) =>
+                  handleInputChange("division", value || "")
+                }
                 required
               >
                 <SelectTrigger className="w-full">
@@ -305,60 +305,6 @@ export default function CustomerInformation({
               ))}
             </RadioGroup>
 
-            {/* Delivery Method Selection - Only for COD */}
-            {isBook && paymentType === "cod" && (
-              <div className="space-y-3">
-                <Label className="text-sm font-medium text-foreground">
-                  Delivery Method <span className="text-destructive">*</span>
-                </Label>
-                <RadioGroup
-                  value={formData.deliveryMethod || "inside_dhaka"}
-                  onValueChange={(value) =>
-                    handleInputChange("deliveryMethod", value)
-                  }
-                  className="space-y-2"
-                >
-                  {DELIVERY_OPTIONS.filter(
-                    (option) => option.value !== "sundarban"
-                  ).map((option) => (
-                    <div
-                      key={option.value}
-                      className={`flex items-center space-x-3 p-3 border rounded-lg transition-colors cursor-pointer ${
-                        formData.deliveryMethod === option.value
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:bg-muted/30"
-                      }`}
-                      onClick={() =>
-                        handleInputChange("deliveryMethod", option.value)
-                      }
-                    >
-                      <div className="flex items-center h-5">
-                        <div
-                          className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                            formData.deliveryMethod === option.value
-                              ? "border-primary"
-                              : "border-muted-foreground/50"
-                          }`}
-                        >
-                          {formData.deliveryMethod === option.value && (
-                            <div className="w-2 h-2 rounded-full bg-primary" />
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <Label className="cursor-pointer font-medium text-foreground">
-                          {option.label}
-                        </Label>
-                        <p className="text-xs text-muted-foreground">
-                          ৳{option.price} delivery charge
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-            )}
-
             {/* Cash on Delivery Info Alert */}
             {isBook && paymentType === "cod" && (
               <PinMessage
@@ -367,10 +313,10 @@ export default function CustomerInformation({
               />
             )}
 
-            {isBook && paymentType === "sundarban" && (
+            {isBook && paymentType === "sslcommerz" && (
               <PinMessage
                 variant="info"
-                message="For Currier delivery, you need pay full amount also collect from Sundarban Courier service point"
+                message="For online payment, you will pay full amount including Sundarban Courier delivery charge"
               />
             )}
           </div>
@@ -379,7 +325,7 @@ export default function CustomerInformation({
             type="submit"
             className="w-full h-11 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
           >
-            Place Order
+            Pay now ৳{paymentType === "sslcommerz" ? totalAmount : 260}
           </Button>
         </form>
       </CardContent>

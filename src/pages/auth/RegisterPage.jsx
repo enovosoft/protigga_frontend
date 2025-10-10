@@ -99,7 +99,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-accent/20 to-secondary/10 p-4">
       {/* Back Button */}
       <Button
-        variant="ghost"
+        variant="secondary"
         size="sm"
         className="fixed top-4 left-4 z-10 gap-2"
         onClick={() => navigate("/")}

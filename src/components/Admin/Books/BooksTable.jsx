@@ -22,9 +22,12 @@ export function BooksTableSkeleton() {
                 Title
               </TableHead>
               <TableHead className="min-w-[100px] hidden sm:table-cell">
-                Price
+                Batch
               </TableHead>
               <TableHead className="min-w-[100px] hidden md:table-cell">
+                Price
+              </TableHead>
+              <TableHead className="min-w-[100px] hidden lg:table-cell">
                 Created
               </TableHead>
               <TableHead className="text-right w-28 sm:w-36">Actions</TableHead>
@@ -43,6 +46,9 @@ export function BooksTableSkeleton() {
                   <Skeleton className="h-4 w-16" />
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
+                  <Skeleton className="h-4 w-16" />
+                </TableCell>
+                <TableCell className="hidden lg:table-cell">
                   <Skeleton className="h-4 w-24" />
                 </TableCell>
                 <TableCell>
@@ -97,9 +103,12 @@ export default function BooksTable({
                 Title
               </TableHead>
               <TableHead className="font-semibold text-foreground min-w-[100px] hidden sm:table-cell">
-                Price
+                Batch
               </TableHead>
               <TableHead className="font-semibold text-foreground min-w-[100px] hidden md:table-cell">
+                Price
+              </TableHead>
+              <TableHead className="font-semibold text-foreground min-w-[100px] hidden lg:table-cell">
                 Created
               </TableHead>
               <TableHead className="text-right font-semibold text-foreground w-28 sm:w-36">
@@ -123,10 +132,15 @@ export default function BooksTable({
                 </TableCell>
                 <TableCell className="hidden sm:table-cell">
                   <span className="font-medium text-foreground">
+                    {book.batch || "N/A"}
+                  </span>
+                </TableCell>
+                <TableCell className="hidden md:table-cell">
+                  <span className="font-medium text-foreground">
                     {formatPrice(book.price)}
                   </span>
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground whitespace-nowrap hidden md:table-cell">
+                <TableCell className="text-sm text-muted-foreground whitespace-nowrap hidden lg:table-cell">
                   {book.createdAt ? formatDate(book.createdAt) : "N/A"}
                 </TableCell>
                 <TableCell className="text-right">
