@@ -20,29 +20,28 @@ export default function BookDetailsPage() {
 
   const fetchBookDetails = useCallback(async () => {
     try {
-      const response = await apiInstance.get(`/course/${slug}`);
+      const response = await apiInstance.get(`/book/${slug}`);
       if (response.data.success) {
-        const courseData = response.data.course;
+        const bookData = response.data.book;
         setBook({
-          id: courseData.id,
-          course_id: courseData.course_id,
-          title: courseData.course_title,
-          price: courseData.price,
-          book_image: courseData.thumbnail,
-          slug: courseData.slug,
-          description: courseData.course_details?.description || "",
-          writter:
-            courseData.course_details?.academy_name || "Protigga Academy",
-          language: courseData.course_details?.language || "Bangla",
-          batch: courseData.batch,
-          createdAt: courseData.createdAt,
-          updatedAt: courseData.updatedAt,
+          id: bookData.id,
+          book_id: bookData.book_id,
+          title: bookData.title,
+          price: bookData.price,
+          book_image: bookData.thumbnail,
+          slug: bookData.slug,
+          description: bookData.details?.description || "",
+          writter: bookData.details?.academy_name || "Protigga Academy",
+          language: bookData.details?.language || "Bangla",
+          batch: bookData.batch,
+          createdAt: bookData.createdAt,
+          updatedAt: bookData.updatedAt,
         });
 
         // Fetch image as blob to bypass CORS and detect dimensions
-        if (courseData.thumbnail) {
+        if (bookData.thumbnail) {
           try {
-            const imageResponse = await fetch(courseData.thumbnail);
+            const imageResponse = await fetch(bookData.thumbnail);
             if (imageResponse.ok) {
               const blob = await imageResponse.blob();
               const objectUrl = URL.createObjectURL(blob);
@@ -65,19 +64,19 @@ export default function BookDetailsPage() {
             }
           } catch (error) {
             console.error(
-              `Failed to fetch image for ${courseData.course_title}:`,
+              `Failed to fetch image for ${bookData.title}:`,
               error
             );
           }
         }
       } else {
         toast.error("Course not found");
-        navigate("/courses");
+        navigate("/books");
       }
     } catch (error) {
       toast.error("Failed to load course details");
       console.error("Error fetching course details:", error);
-      navigate("/courses");
+      navigate("/books");
     } finally {
       setIsLoading(false);
     }
