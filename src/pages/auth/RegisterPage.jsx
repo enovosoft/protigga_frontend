@@ -85,13 +85,7 @@ export default function RegisterPage() {
 
   if (step === "otp") {
     return (
-      <OtpVerification
-        phoneNumber={phoneNumber}
-        onSuccess={() => {
-          login();
-          navigate("/dashboard");
-        }}
-      />
+      <OtpVerification phoneNumber={phoneNumber} redirectTo="/auth/login" />
     );
   }
 

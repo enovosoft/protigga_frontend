@@ -61,7 +61,7 @@ export default function OtpVerification({
   const resendOtp = async () => {
     setIsResending(true);
     try {
-      await apiInstance.post("/resend-otp", {
+      await apiInstance.post("/auth/resend-otp", {
         phone: `+880${phoneNumber}`,
       });
       toast.success("OTP resent successfully");

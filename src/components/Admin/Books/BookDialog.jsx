@@ -11,6 +11,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import api from "@/lib/api";
 import { Book, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -24,6 +31,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
     writter: "",
     description: "",
     batch: "",
+    is_featured: false,
   });
   const [loading, setLoading] = useState(false);
   const [fetchingBook, setFetchingBook] = useState(false);
@@ -43,6 +51,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
           writter: bookData.writter || "",
           description: bookData.description || "",
           batch: bookData.batch || "",
+          is_featured: bookData.is_featured || false,
         });
       }
     } catch (error) {
@@ -56,6 +65,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
         writter: book.writter || "",
         description: book.description || "",
         batch: book.batch || "",
+        is_featured: book.is_featured || false,
       });
     } finally {
       setFetchingBook(false);
@@ -74,6 +84,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
         writter: "",
         description: "",
         batch: "",
+        is_featured: false,
       });
     }
   }, [book, open, fetchBookDetails]);
@@ -90,6 +101,13 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
     setFormData((prev) => ({
       ...prev,
       book_image: url,
+    }));
+  };
+
+  const handleToggleChange = (checked) => {
+    setFormData((prev) => ({
+      ...prev,
+      is_featured: checked,
     }));
   };
 
@@ -336,6 +354,34 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
                   rows={3}
                   className="w-full px-3 py-2 text-sm rounded-md border border-solid border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none min-h-[80px] sm:min-h-[100px]"
                 />
+              </div>
+
+              {/* Is Featured Toggle */}
+              <div className="space-y-1.5 sm:space-y-2 overflow-hidden p-1">
+                <div className="flex gap-4">
+                  <Label htmlFor="is_featured" className="text-sm font-medium">
+                    Featured Book
+                  </Label>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            id="is_featured"
+                            checked={formData.is_featured}
+                            onCheckedChange={handleToggleChange}
+                          />
+                          <span className="text-sm text-muted-foreground">
+                            {formData.is_featured ? "Featured" : "Not Featured"}
+                          </span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Whether book should be displayed on home page</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </div>
 
               <div className="overflow-hidden p-1">

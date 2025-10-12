@@ -21,7 +21,7 @@ export default function VerifyAccountPage() {
 
     const resendOtp = async () => {
       try {
-        const response = await apiInstance.post("/resend-otp", {
+        const response = await apiInstance.post("/auth/resend-otp", {
           phone: `+880${phone}`,
         });
         if (response.data.success) {
