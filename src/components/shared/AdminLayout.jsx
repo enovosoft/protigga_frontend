@@ -7,6 +7,7 @@ import {
   FileText,
   LogOut,
   Menu,
+  Package,
   Shield,
   Ticket,
   User,
@@ -85,6 +86,15 @@ const AdminLayout = ({ children }) => {
       icon: Book,
       onClick: () => {
         setActiveSection("books");
+        setSidebarOpen(false);
+      },
+    },
+    {
+      id: "orders",
+      label: "Orders",
+      icon: Package,
+      onClick: () => {
+        setActiveSection("orders");
         setSidebarOpen(false);
       },
     },

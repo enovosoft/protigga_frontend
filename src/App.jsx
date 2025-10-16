@@ -7,6 +7,7 @@ import {
   Routes,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import OrderDetailsPage from "./pages/Admin/Orders/OrderDetailsPage";
 import BookDetailsPage from "./pages/BookDetailsPage";
 import BooksPage from "./pages/BooksPage";
 import CheckoutPage from "./pages/CheckoutPage";
@@ -152,6 +153,14 @@ function App() {
             <Route path="/notes/view" element={<NotesViewPage />} />
             <Route path="/books" element={<BooksPage />} />
             <Route path="/books/:slug" element={<BookDetailsPage />} />
+            <Route
+              path="/admin/orders/:orderId"
+              element={
+                <ProtectedRoute>
+                  <OrderDetailsPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route
               path="/payment/success"
