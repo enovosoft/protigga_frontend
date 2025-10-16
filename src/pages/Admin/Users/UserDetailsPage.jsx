@@ -7,6 +7,7 @@ import {
   getPaymentMethodBadge,
   getPaymentStatusBadge,
 } from "@/lib/badgeUtils";
+import { formatDate, formatPrice, getRelativeTime } from "@/lib/helper";
 import {
   ArrowLeft,
   BookOpen,
@@ -30,23 +31,6 @@ export default function UserDetailsPage() {
       navigate("/dashboard", { replace: true });
     }
   }, [user, navigate]);
-
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "BDT",
-    }).format(price);
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
 
   const getStatusBadge = (isVerified, isBlocked) => {
     if (isBlocked) {
@@ -101,14 +85,15 @@ export default function UserDetailsPage() {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-                User Details
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                User ID: <span className="font-mono">{user.user_id}</span>
-              </p>
-            </div>
+          </div>
+
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+              User Details
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              User ID: <span className="font-mono">{user.user_id}</span>
+            </p>
           </div>
           {getStatusBadge(user.is_verified, user.is_blocked)}
         </div>
@@ -163,7 +148,11 @@ export default function UserDetailsPage() {
                 </label>
                 <p className="flex items-center gap-2 text-sm">
                   <Calendar className="w-4 h-4" />
-                  {formatDate(user.createdAt)}
+                  <span> {formatDate(user.createdAt)}</span>
+                  <span className="text-primary/70">
+                    {" "}
+                    {getRelativeTime(user.createdAt)}
+                  </span>
                 </p>
               </div>
 
@@ -173,7 +162,11 @@ export default function UserDetailsPage() {
                 </label>
                 <p className="flex items-center gap-2 text-sm">
                   <Calendar className="w-4 h-4" />
-                  {formatDate(user.updatedAt)}
+                  <span> {formatDate(user.updatedAt)}</span>
+                  <span className="text-primary/70">
+                    {" "}
+                    {getRelativeTime(user.updatedAt)}
+                  </span>
                 </p>
               </div>
             </CardContent>
@@ -218,52 +211,63 @@ export default function UserDetailsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {user.book_orders.slice(0, 3).map((order, index) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h4 className="font-medium">
-                            {order.book?.title || "Unknown Book"}
-                          </h4>
-                          <p className="text-sm text-muted-foreground">
-                            Order ID: {order.order_id}
-                          </p>
-                        </div>
-                        {getOrderStatusBadge(order.status)}
-                      </div>
+                  {user.book_orders.slice(0, 3).map((order, index) => {
+                    // Find the corresponding payment to get quantity and status
+                    const payment = user.payments?.find(
+                      (p) =>
+                        p.book_order?.order_id === order.payment?.book_order_id
+                    );
 
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">Price:</span>
-                          <span className="font-medium ml-1">
-                            {formatPrice(order.product_price)}
-                          </span>
+                    return (
+                      <div key={index} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h4 className="font-medium">
+                              {order.book?.title || "Unknown Book"}
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              Order ID: {order.payment?.book_order_id || "N/A"}
+                            </p>
+                          </div>
+                          {payment?.book_order?.status &&
+                            getOrderStatusBadge(payment.book_order.status)}
                         </div>
-                        <div>
-                          <span className="text-muted-foreground">
-                            Quantity:
-                          </span>
-                          <span className="font-medium ml-1">
-                            {order.quantity}
-                          </span>
-                        </div>
-                      </div>
 
-                      {order.payment && (
-                        <div className="mt-2 pt-2 border-t">
-                          <div className="flex justify-between items-center text-sm">
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
                             <span className="text-muted-foreground">
-                              Payment:
+                              Price:
                             </span>
-                            <div className="flex gap-2">
-                              {getPaymentStatusBadge(order.payment.status)}
-                              {getPaymentMethodBadge(order.payment.method)}
-                            </div>
+                            <span className="font-medium ml-1">
+                              {formatPrice(order.payment?.meterial_price)}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">
+                              Quantity:
+                            </span>
+                            <span className="font-medium ml-1">
+                              {payment?.book_order?.quantity || 1}
+                            </span>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  ))}
+
+                        {order.payment && (
+                          <div className="mt-2 pt-2 border-t">
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-muted-foreground">
+                                Payment:
+                              </span>
+                              <div className="flex gap-2">
+                                {getPaymentStatusBadge(order.payment.status)}
+                                {getPaymentMethodBadge(order.payment.method)}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -316,11 +320,26 @@ export default function UserDetailsPage() {
                           </span>
                         </div>
                         <div>
+                          <span className="text-muted-foreground">Price:</span>
+                          <span className="font-medium ml-1">
+                            ৳{enrollment.payment?.meterial_price || 0}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 text-sm mt-2">
+                        <div>
                           <span className="text-muted-foreground">
                             Expires:
                           </span>
                           <span className="font-medium ml-1">
                             {formatDate(enrollment.expiry_date)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Batch:</span>
+                          <span className="font-medium ml-1">
+                            {enrollment.course?.batch || "N/A"}
                           </span>
                         </div>
                       </div>

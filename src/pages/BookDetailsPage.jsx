@@ -88,7 +88,7 @@ export default function BookDetailsPage() {
 
   const handleOrderNow = () => {
     if (book) {
-      navigate(`/checkout?course=${book.slug}`);
+      navigate(`/checkout?book=${book.slug}`);
     }
   };
 

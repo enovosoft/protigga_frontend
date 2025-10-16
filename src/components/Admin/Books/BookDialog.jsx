@@ -32,6 +32,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
     description: "",
     batch: "",
     is_featured: false,
+    stock: 1,
   });
   const [loading, setLoading] = useState(false);
   const [fetchingBook, setFetchingBook] = useState(false);
@@ -52,6 +53,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
           description: bookData.description || "",
           batch: bookData.batch || "",
           is_featured: bookData.is_featured || false,
+          stock: bookData.stock || 1,
         });
       }
     } catch (error) {
@@ -66,6 +68,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
         description: book.description || "",
         batch: book.batch || "",
         is_featured: book.is_featured || false,
+        stock: book.stock || 1,
       });
     } finally {
       setFetchingBook(false);
@@ -136,6 +139,10 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
       return;
     }
 
+    if (!formData.stock || isNaN(formData.stock) || formData.stock < 0) {
+      toast.error("Please enter a valid stock quantity");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -144,6 +151,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
       const payload = {
         ...formData,
         price: parseFloat(formData.price),
+        stock: parseInt(formData.stock, 10),
       };
 
       if (book) {
@@ -290,7 +298,8 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 overflow-hidden p-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 overflow-hidden p-1">
+                {" "}
                 <div className="space-y-1.5 sm:space-y-2">
                   <Label htmlFor="price" className="text-sm font-medium">
                     Price (BDT) <span className="text-destructive">*</span>
@@ -304,6 +313,26 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
                     value={formData.price}
                     onChange={handleChange}
                     placeholder="299"
+                    required
+                    className="w-full h-10 sm:h-11"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 overflow-hidden p-1">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="stock" className="text-sm font-medium">
+                    Stock: <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="stock"
+                    name="stock"
+                    type="number"
+                    step="1"
+                    min="0"
+                    value={formData.stock}
+                    onChange={handleChange}
+                    placeholder="100"
                     required
                     className="w-full h-10 sm:h-11"
                   />

@@ -13,19 +13,43 @@ import { useCallback } from "react";
 import { z } from "zod";
 
 // Zod schema for checkout form validation
-const checkoutSchema = z.object({
-  name: z
+const bookCheckoutSchema = z.object({
+  address: z
     .string()
-    .min(2, "Name is required")
-    .max(50, "Name must be less than 50 characters"),
-  phone: z
+    .min(2, "Address is required")
+    .max(200, "Address must be less than 200 characters"),
+  city: z
     .string()
-    .regex(/^\+8801[0-9]{9}$/, "Phone number must be in format +8801XXXXXXXXX"),
-  email: z
+    .min(2, "Thana/State is required")
+    .max(50, "Thana/State must be less than 50 characters"),
+  district: z
     .string()
-    .email("Please enter a valid email address")
+    .min(2, "District is required")
+    .max(50, "District must be less than 50 characters"),
+  zipCode: z.string().regex(/^[0-9]{4}$/, "Zip code must be exactly 4 digits"),
+  division: z.string().refine((val) => val && val.length > 0, {
+    message: "Division is required",
+  }),
+  alternative_phone: z
+    .string()
+    .regex(/^\+8801[0-9]{9}$/, "Phone number must be in format +8801XXXXXXXXX")
     .optional()
     .or(z.literal("")),
+});
+
+const courseCheckoutSchema = z.object({
+  whatsapp_number: z
+    .string()
+    .regex(
+      /^\+8801[0-9]{9}$/,
+      "WhatsApp number must be in format +8801XXXXXXXXX"
+    ),
+  facebook_profile_link: z
+    .string()
+    .url("Please enter a valid Facebook profile URL")
+    .refine((val) => val.includes("facebook.com") || val.includes("fb.com"), {
+      message: "Please enter a valid Facebook profile link",
+    }),
   address: z
     .string()
     .min(2, "Address is required")
@@ -45,13 +69,14 @@ const checkoutSchema = z.object({
 });
 
 const initialFormData = {
-  name: "",
-  phone: "",
-  email: "",
   address: "",
+  city: "",
   district: "",
   division: "",
   zipCode: "",
+  alternative_phone: "",
+  whatsapp_number: "",
+  facebook_profile_link: "",
 };
 
 export default function CheckoutForm() {
@@ -167,8 +192,7 @@ export default function CheckoutForm() {
 
     setFormData((prev) => ({
       ...prev,
-      name: user?.name || "",
-      phone: user?.phone || "",
+      whatsapp_number: user?.phone || "", // Prefill WhatsApp number with user phone for courses
     }));
 
     fetchProductDetails();
@@ -294,40 +318,43 @@ export default function CheckoutForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate form data with Zod
+    // Validate form data with appropriate Zod schema
+    const schema = isBook ? bookCheckoutSchema : courseCheckoutSchema;
     try {
-      checkoutSchema.parse(formData);
+      schema.parse(formData);
       setValidationErrors({}); // Clear any previous errors
 
-      // Prepare data in the format specified by user
+      // Prepare data in the new format
       const orderData = {
-        meterial_type: product.title ? "book" : "course",
-        delevery_type: paymentType === "cod" ? "COD" : "Prepaid",
-        inside_dhaka:
-          paymentType === "cod" && formData.district?.toLowerCase() === "dhaka",
-        outside_dhaka:
-          paymentType === "cod" && formData.district?.toLowerCase() !== "dhaka",
-        sundarban_courier: paymentType === "sslcommerz",
-        customer: {
-          name: formData.name,
-          email: formData.email || user?.email || "",
-          address: `${formData.address}, ${formData.city}, ${formData.district}, ${formData.division}, ${formData.zipCode}`,
-          alternative_phone: formData.phone,
-        },
+        meterial_type: isBook ? "book" : "course",
+        delevery_type: isBook
+          ? paymentType === "cod"
+            ? "COD"
+            : "Prepaid"
+          : "none",
+        inside_dhaka: isBook
+          ? paymentType === "cod" &&
+            formData.district?.toLowerCase() === "dhaka"
+          : false,
+        outside_dhaka: isBook
+          ? paymentType === "cod" &&
+            formData.district?.toLowerCase() !== "dhaka"
+          : false,
+        sundarban_courier: isBook ? paymentType === "sslcommerz" : false,
         meterial_details: {
-          product_name:
-            productType === "book" ? product.title : product.course_title,
-          product_id:
-            productType === "book" ? product.book_id : product.course_id,
-          user_id: user?.user_id || "",
+          product_id: isBook ? product.book_id : product.course_id,
           quantity: quantity,
-          address: `${formData.address}, ${formData.city}, ${formData.district}, ${formData.division}, ${formData.zipCode}`,
-          alternative_phone: formData.phone,
+          enrollment_type: "online", // Default to online, can be changed to hybrid later
+          promo_code_id: promoApplied ? promoData?.promo_code_id : "",
         },
+        address: `${formData.address}, ${formData.city}, ${formData.district}, ${formData.division}, ${formData.zipCode}`,
+        alternative_phone: formData.alternative_phone || "",
       };
 
-      if (promoApplied) {
-        orderData.meterial_details.promo_code_id = promoData?.promo_code_id;
+      // Add course-specific fields if it's a course
+      if (!isBook) {
+        orderData.whatsapp_number = formData.whatsapp_number;
+        orderData.facebook_profile_link = formData.facebook_profile_link;
       }
 
       setIsLoading(true);
