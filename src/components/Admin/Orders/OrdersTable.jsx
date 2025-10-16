@@ -14,31 +14,33 @@ import { Eye } from "lucide-react";
 export function OrdersTableSkeleton() {
   return (
     <div className="bg-card rounded-lg border">
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="w-14 sm:w-16">S/N</TableHead>
-              <TableHead className="min-w-[120px] sm:min-w-[150px]">
+              <TableHead className="w-12 sm:w-14">S/N</TableHead>
+              <TableHead className="min-w-[100px] sm:min-w-[120px]">
                 Order ID
               </TableHead>
-              <TableHead className="min-w-[120px] sm:table-cell">
+              <TableHead className="min-w-[100px] hidden sm:table-cell">
                 User Name
               </TableHead>
-              <TableHead className="min-w-[150px] sm:table-cell">
+              <TableHead className="min-w-[120px] sm:table-cell">
                 Book Name
               </TableHead>
-              <TableHead className="min-w-[100px] md:table-cell">
+              <TableHead className="min-w-[80px] hidden md:table-cell">
                 Price
               </TableHead>
-              <TableHead className="min-w-[100px] lg:table-cell">
+              <TableHead className="min-w-[80px] hidden lg:table-cell">
                 Status
               </TableHead>
-              <TableHead className="min-w-[100px] lg:table-cell">
+              <TableHead className="min-w-[80px] hidden lg:table-cell">
                 Method
               </TableHead>
-              <TableHead className="min-w-[80px] md:table-cell">Qty</TableHead>
-              <TableHead className="text-right w-20">Actions</TableHead>
+              <TableHead className="min-w-[60px] hidden md:table-cell">
+                Qty
+              </TableHead>
+              <TableHead className="text-right w-16">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -92,35 +94,35 @@ export default function OrdersTable({ orders, startIndex, onView }) {
 
   return (
     <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50 hover:bg-muted/50">
-              <TableHead className="font-semibold text-foreground w-18 sm:w-16">
+              <TableHead className="font-semibold text-foreground w-12 sm:w-14">
                 S/N
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[120px] sm:min-w-[150px]">
+              <TableHead className="font-semibold text-foreground min-w-[100px] sm:min-w-[120px]">
                 Order ID
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[120px] sm:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[100px] hidden sm:table-cell">
                 User Name
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[150px] sm:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[120px] sm:table-cell">
                 Book Name
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] md:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden md:table-cell">
                 Price
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] lg:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden lg:table-cell">
                 Status
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] lg:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden lg:table-cell">
                 Method
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[80px] md:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[60px] hidden md:table-cell">
                 Qty
               </TableHead>
-              <TableHead className="text-right font-semibold text-foreground w-20">
+              <TableHead className="text-right font-semibold text-foreground w-16">
                 Actions
               </TableHead>
             </TableRow>
@@ -139,28 +141,28 @@ export default function OrdersTable({ orders, startIndex, onView }) {
                     {order.order_id}
                   </div>
                 </TableCell>
-                <TableCell className="sm:table-cell">
+                <TableCell className="hidden sm:table-cell">
                   <div className="font-medium text-foreground break-words max-w-[200px]">
                     {order.user?.name || "N/A"}
                   </div>
                 </TableCell>
-                <TableCell className="sm:table-cell">
+                <TableCell className="hidden sm:table-cell">
                   <div className="font-medium text-foreground break-words max-w-[200px]">
                     {order.book?.title || "N/A"}
                   </div>
                 </TableCell>
-                <TableCell className="md:table-cell">
+                <TableCell className="hidden md:table-cell">
                   <span className="font-medium text-foreground">
                     {formatPrice(order.product_price || 0)}
                   </span>
                 </TableCell>
-                <TableCell className="lg:table-cell">
+                <TableCell className="hidden lg:table-cell">
                   {getOrderStatusBadge(order.status)}
                 </TableCell>
-                <TableCell className="lg:table-cell">
+                <TableCell className="hidden lg:table-cell">
                   {getPaymentMethodBadge(order.payment?.method)}
                 </TableCell>
-                <TableCell className="md:table-cell">
+                <TableCell className="hidden md:table-cell">
                   <span className="font-medium text-foreground">
                     {order.quantity}
                   </span>

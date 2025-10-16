@@ -5,10 +5,13 @@ import UserDashboardLayout from "@/components/shared/DashboardLayout";
 import Pagination from "@/components/shared/Pagination";
 import api from "@/lib/api";
 import { Eye } from "lucide-react";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function EnrollmentsManagement({ useLayout = true }) {
+const EnrollmentsManagement = forwardRef(function EnrollmentsManagement(
+  { useLayout = true },
+  ref
+) {
   const navigate = useNavigate();
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,6 +44,10 @@ export default function EnrollmentsManagement({ useLayout = true }) {
     }
   };
 
+  useImperativeHandle(ref, () => ({
+    fetchEnrollments,
+  }));
+
   useEffect(() => {
     fetchEnrollments(currentPage);
   }, [currentPage]);
@@ -56,18 +63,6 @@ export default function EnrollmentsManagement({ useLayout = true }) {
 
   const content = (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-            Enrollments Management
-          </h2>
-          <p className="text-muted-foreground mt-1">
-            View and manage all course enrollments
-          </p>
-        </div>
-      </div>
-
       {loading ? (
         <EnrollmentsTableSkeleton />
       ) : enrollments.length === 0 ? (
@@ -107,4 +102,6 @@ export default function EnrollmentsManagement({ useLayout = true }) {
   ) : (
     content
   );
-}
+});
+
+export default EnrollmentsManagement;

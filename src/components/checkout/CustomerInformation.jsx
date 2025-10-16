@@ -116,7 +116,7 @@ export default function CustomerInformation({
                   className="w-full"
                 />
                 <p className="text-xs text-muted-foreground ">
-                  If you have a different number linked with whatsapp use that.
+                  If you have a different whatsapp number, enter that.
                 </p>
                 {validationErrors.whatsapp_number && (
                   <p className="text-sm text-destructive">

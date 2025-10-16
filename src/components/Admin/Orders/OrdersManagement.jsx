@@ -5,16 +5,15 @@ import UserDashboardLayout from "@/components/shared/DashboardLayout";
 import Pagination from "@/components/shared/Pagination";
 import api from "@/lib/api";
 import { Eye } from "lucide-react";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function OrdersManagement({ useLayout = true }) {
+const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   const itemsPerPage = 20;
 
   const fetchOrders = async (page = 1) => {
@@ -28,7 +27,6 @@ export default function OrdersManagement({ useLayout = true }) {
         setOrders(ordersData);
         setTotalPages(response.data.total_page || 1);
         setCurrentPage(response.data.curr_page || 1);
-        setTotalItems(ordersData.length);
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -36,6 +34,10 @@ export default function OrdersManagement({ useLayout = true }) {
       setLoading(false);
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    fetchOrders,
+  }));
 
   useEffect(() => {
     fetchOrders(currentPage);
@@ -51,18 +53,6 @@ export default function OrdersManagement({ useLayout = true }) {
 
   const content = (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-            Orders Management
-          </h2>
-          <p className="text-muted-foreground mt-1">
-            View and manage all book orders
-          </p>
-        </div>
-      </div>
-
       {loading ? (
         <OrdersTableSkeleton />
       ) : orders.length === 0 ? (
@@ -100,4 +90,8 @@ export default function OrdersManagement({ useLayout = true }) {
   ) : (
     content
   );
-}
+});
+
+OrdersManagement.displayName = "OrdersManagement";
+
+export default OrdersManagement;

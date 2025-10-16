@@ -14,21 +14,31 @@ import { Eye, Phone, User } from "lucide-react";
 export function UsersTableSkeleton() {
   return (
     <div className="bg-card rounded-lg border">
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="w-14 sm:w-16">S/N</TableHead>
-              <TableHead className="min-w-[120px] sm:min-w-[150px]">
+              <TableHead className="w-12 sm:w-14">S/N</TableHead>
+              <TableHead className="min-w-[100px] sm:min-w-[120px]">
                 Name
               </TableHead>
-              <TableHead className="min-w-[150px]">Phone</TableHead>
-              <TableHead className="min-w-[100px]">isActive</TableHead>
-              <TableHead className="min-w-[80px]">isBlocked</TableHead>
-              <TableHead className="min-w-[100px]">Orders</TableHead>
-              <TableHead className="min-w-[100px]">Enrollments</TableHead>
-              <TableHead className="min-w-[120px]">Joined</TableHead>
-              <TableHead className="text-right w-20">Action</TableHead>
+              <TableHead className="min-w-[120px]">Phone</TableHead>
+              <TableHead className="min-w-[80px] hidden md:table-cell">
+                Verified
+              </TableHead>
+              <TableHead className="min-w-[80px] hidden md:table-cell">
+                Blocked
+              </TableHead>
+              <TableHead className="min-w-[80px] hidden lg:table-cell">
+                Book Orders
+              </TableHead>
+              <TableHead className="min-w-[80px] hidden lg:table-cell">
+                Enrollments
+              </TableHead>
+              <TableHead className="min-w-[100px] hidden sm:table-cell">
+                Joined
+              </TableHead>
+              <TableHead className="text-right w-16">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -83,35 +93,35 @@ export default function UsersTable({ users, startIndex, onView }) {
 
   return (
     <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50 hover:bg-muted/50">
-              <TableHead className="font-semibold text-foreground w-14 sm:w-16">
+              <TableHead className="font-semibold text-foreground w-12 sm:w-14">
                 S/N
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[120px] sm:min-w-[150px]">
+              <TableHead className="font-semibold text-foreground min-w-[100px] sm:min-w-[120px]">
                 Name
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[150px]">
+              <TableHead className="font-semibold text-foreground min-w-[120px]">
                 Phone
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px]">
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden md:table-cell">
                 Active
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[80px]">
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden md:table-cell">
                 Blocked
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px]">
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden lg:table-cell">
                 Orders
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px]">
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden lg:table-cell">
                 Enrollments
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[120px]">
+              <TableHead className="font-semibold text-foreground min-w-[100px] hidden sm:table-cell">
                 Joined
               </TableHead>
-              <TableHead className="text-right font-semibold text-foreground w-20">
+              <TableHead className="text-right font-semibold text-foreground w-16">
                 Action
               </TableHead>
             </TableRow>
@@ -148,7 +158,7 @@ export default function UsersTable({ users, startIndex, onView }) {
                     </span>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden md:table-cell">
                   {user.is_verified ? (
                     <Badge
                       variant="default"
@@ -165,7 +175,7 @@ export default function UsersTable({ users, startIndex, onView }) {
                     </Badge>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden md:table-cell">
                   {user.is_blocked ? (
                     <Badge
                       variant="destructive"
@@ -182,17 +192,17 @@ export default function UsersTable({ users, startIndex, onView }) {
                     </Badge>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden lg:table-cell">
                   <Badge variant="outline" className="font-medium">
                     {user.book_orders?.length || 0}
                   </Badge>
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden lg:table-cell">
                   <Badge variant="outline" className="font-medium">
                     {user.enrollments?.length || 0}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                <TableCell className="hidden sm:table-cell text-sm text-muted-foreground whitespace-nowrap">
                   {user.createdAt ? formatDate(user.createdAt) : "N/A"}
                 </TableCell>
                 <TableCell className="text-right">

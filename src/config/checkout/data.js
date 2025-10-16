@@ -1,7 +1,7 @@
 export const PAYMENT_DELIVERY_OPTIONS = [
   {
     value: "sslcommerz",
-    label: "SSL COMMERZ",
+    label: "Full Payment in Advance",
     deliveryCharge: 60, // Sundarban delivery charge for online payment
     advancePayment: 0, // Full payment required
     deliveryMethods: [], // No delivery method selection needed

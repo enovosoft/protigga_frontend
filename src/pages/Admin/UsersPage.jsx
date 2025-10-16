@@ -4,7 +4,9 @@ import AdminLayout from "@/components/shared/AdminLayout";
 export default function AdminUsersPage() {
   return (
     <AdminLayout>
-      <UsersManagement useLayout={false} />
+      <div className="w-full">
+        <UsersManagement useLayout={false} />
+      </div>
     </AdminLayout>
   );
 }

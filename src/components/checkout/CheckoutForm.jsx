@@ -353,8 +353,8 @@ export default function CheckoutForm() {
 
       // Add course-specific fields if it's a course
       if (!isBook) {
-        orderData.wp_number = formData.whatsapp_number;
-        orderData.facebook_profile_link = formData.facebook_profile_link;
+        orderData.meterial_details.wp_number = formData.whatsapp_number;
+        orderData.meterial_details.fb_name = formData.facebook_profile_link;
       }
 
       setIsLoading(true);

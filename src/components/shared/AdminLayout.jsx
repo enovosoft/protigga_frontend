@@ -114,7 +114,7 @@ const AdminLayout = ({ children }) => {
         />
       )}
 
-      <div className="mx-auto">
+      <div className="mx-auto w-full">
         {/* Admin Dashboard Header */}
         <div className="px-4 py-4   bg-card border ">
           <div className="flex items-center justify-between container mx-auto">
@@ -165,11 +165,11 @@ const AdminLayout = ({ children }) => {
         <div className="flex flex-col md:flex-row gap-6 min-h-[calc(100vh-130px)]">
           {/* Sidebar */}
           <div
-            className={`w-full md:w-64 bg-card rounded-lg border p-4 h-full md:h-auto transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
+            className={`w-full md:w-64 bg-card rounded-lg border p-4 md:sticky md:top-4 md:self-start md:max-h-[calc(100vh-140px)] md:overflow-y-auto transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
               sidebarOpen
                 ? "translate-x-0"
                 : "-translate-x-full md:translate-x-0"
-            } fixed md:static inset-y-0 left-0 z-50 md:z-auto md:min-h-[calc(100vh-130px)]`}
+            } fixed md:static inset-y-0 left-0 z-50 md:z-auto`}
           >
             {/* Mobile close button */}
             <div className="flex items-center justify-between mb-4 md:hidden">
@@ -211,8 +211,8 @@ const AdminLayout = ({ children }) => {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 md:ml-0 min-h-[calc(100vh-200px)] p-4 lg:p-6">
-            {children}
+          <div className="flex-1 md:ml-0 p-4 lg:p-6 md:overflow-x-auto">
+            <div className="max-w-7xl mx-auto w-full">{children}</div>
           </div>
         </div>
       </div>

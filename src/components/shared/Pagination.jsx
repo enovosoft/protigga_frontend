@@ -19,14 +19,14 @@ export default function Pagination({
     <div className="border-t bg-muted/30 px-4 py-3">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="text-sm text-muted-foreground">
-          Showing{" "}
+          {/* Showing{" "}
           <span className="font-medium text-foreground">{startIndex + 1}</span>{" "}
           to{" "}
           <span className="font-medium text-foreground">
             {Math.min(endIndex, totalItems)}
           </span>{" "}
           of <span className="font-medium text-foreground">{totalItems}</span>{" "}
-          notes
+          items */}
         </div>
         <div className="flex items-center gap-2">
           <Button

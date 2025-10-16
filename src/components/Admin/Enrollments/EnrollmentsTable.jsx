@@ -18,30 +18,33 @@ import { Eye } from "lucide-react";
 export function EnrollmentsTableSkeleton() {
   return (
     <div className="bg-card rounded-lg border">
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="w-14 sm:w-16">S/N</TableHead>
-              <TableHead className="min-w-[120px] sm:min-w-[150px]">
+              <TableHead className="w-12 sm:w-14">S/N</TableHead>
+              <TableHead className="min-w-[100px] sm:min-w-[120px]">
                 Enrollment ID
               </TableHead>
-              <TableHead className="min-w-[150px] sm:table-cell">
+              <TableHead className="min-w-[100px] hidden sm:table-cell">
+                User Name
+              </TableHead>
+              <TableHead className="min-w-[120px] sm:table-cell">
                 Course Name
               </TableHead>
-              <TableHead className="min-w-[100px] md:table-cell">
+              <TableHead className="min-w-[80px] hidden md:table-cell">
                 Amount
               </TableHead>
-              <TableHead className="min-w-[100px] lg:table-cell">
+              <TableHead className="min-w-[80px] hidden lg:table-cell">
                 Status
               </TableHead>
-              <TableHead className="min-w-[100px] lg:table-cell">
+              <TableHead className="min-w-[80px] hidden lg:table-cell">
                 Payment Status
               </TableHead>
-              <TableHead className="min-w-[100px] lg:table-cell">
+              <TableHead className="min-w-[80px] hidden lg:table-cell">
                 Method
               </TableHead>
-              <TableHead className="text-right w-20">Actions</TableHead>
+              <TableHead className="text-right w-16">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -95,35 +98,35 @@ export default function EnrollmentsTable({ enrollments, startIndex, onView }) {
 
   return (
     <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50 hover:bg-muted/50">
-              <TableHead className="font-semibold text-foreground w-14 sm:w-16">
+              <TableHead className="font-semibold text-foreground w-12 sm:w-14">
                 S/N
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[120px] sm:min-w-[150px]">
+              <TableHead className="font-semibold text-foreground min-w-[100px] sm:min-w-[120px]">
                 Enrollment ID
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[120px] sm:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[100px] hidden sm:table-cell">
                 User Name
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[150px] sm:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[120px] sm:table-cell">
                 Course Name
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] md:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden md:table-cell">
                 Amount
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] lg:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden lg:table-cell">
                 Status
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] lg:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden lg:table-cell">
                 Payment Status
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] lg:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden lg:table-cell">
                 Method
               </TableHead>
-              <TableHead className="text-right font-semibold text-foreground w-20">
+              <TableHead className="text-right font-semibold text-foreground w-16">
                 Actions
               </TableHead>
             </TableRow>
@@ -142,28 +145,28 @@ export default function EnrollmentsTable({ enrollments, startIndex, onView }) {
                     {enrollment.enrollment_id}
                   </div>
                 </TableCell>
-                <TableCell className="sm:table-cell">
+                <TableCell className="hidden sm:table-cell">
                   <div className="font-medium text-foreground break-words max-w-[200px]">
                     {enrollment.user?.name || "N/A"}
                   </div>
                 </TableCell>
-                <TableCell className="sm:table-cell">
+                <TableCell className="hidden sm:table-cell">
                   <div className="font-medium text-foreground break-words max-w-[200px]">
                     {enrollment.course?.course_title || "N/A"}
                   </div>
                 </TableCell>
-                <TableCell className="md:table-cell">
+                <TableCell className="hidden md:table-cell">
                   <span className="font-medium text-foreground">
                     {formatPrice(enrollment.payment?.amount || 0)}
                   </span>
                 </TableCell>
-                <TableCell className="lg:table-cell">
+                <TableCell className="hidden lg:table-cell">
                   {getEnrollmentStatusBadge(enrollment.status)}
                 </TableCell>
-                <TableCell className="lg:table-cell">
+                <TableCell className="hidden lg:table-cell">
                   {getPaymentStatusBadge(enrollment.payment?.status)}
                 </TableCell>
-                <TableCell className="lg:table-cell">
+                <TableCell className="hidden lg:table-cell">
                   {getPaymentMethodBadge(enrollment.payment?.method)}
                 </TableCell>
                 <TableCell className="text-right">
