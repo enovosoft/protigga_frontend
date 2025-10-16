@@ -44,12 +44,7 @@ const courseCheckoutSchema = z.object({
       /^\+8801[0-9]{9}$/,
       "WhatsApp number must be in format +8801XXXXXXXXX"
     ),
-  facebook_profile_link: z
-    .string()
-    .url("Please enter a valid Facebook profile URL")
-    .refine((val) => val.includes("facebook.com") || val.includes("fb.com"), {
-      message: "Please enter a valid Facebook profile link",
-    }),
+  fb_name: z.string().min(2, "Facebook profile name is required"),
   address: z
     .string()
     .min(2, "Address is required")

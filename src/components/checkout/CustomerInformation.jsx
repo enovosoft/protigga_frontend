@@ -127,28 +127,26 @@ export default function CustomerInformation({
 
               <div className="space-y-2">
                 <Label
-                  htmlFor="facebook_profile_link"
+                  htmlFor="fb_name"
                   className="text-sm font-medium text-foreground"
                 >
-                  Facebook Profile Link{" "}
+                  Facebook Profile Name{" "}
                   <span className="text-destructive">*</span>
                 </Label>
                 <Input
-                  id="facebook_profile_link"
-                  placeholder="https://www.facebook.com/yourprofile"
-                  value={formData.facebook_profile_link}
-                  onChange={(e) =>
-                    handleInputChange("facebook_profile_link", e.target.value)
-                  }
+                  id="fb_name"
+                  placeholder="Your Facebook Profile Name"
+                  value={formData.fb_name}
+                  onChange={(e) => handleInputChange("fb_name", e.target.value)}
                   required
                   className="w-full"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Enter your Facebook profile URL
+                  Enter your Facebook profile name
                 </p>
-                {validationErrors.facebook_profile_link && (
+                {validationErrors.fb_name && (
                   <p className="text-sm text-destructive">
-                    {validationErrors.facebook_profile_link}
+                    {validationErrors.fb_name}
                   </p>
                 )}
               </div>

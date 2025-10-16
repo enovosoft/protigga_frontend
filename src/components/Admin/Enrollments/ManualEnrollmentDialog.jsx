@@ -52,7 +52,7 @@ const manualEnrollmentSchema = z.object({
   expiry_date: z.string().min(1, "Expiry date is required"),
   product_price: z.number().min(0, "Price must be positive"),
   discount_amount: z.number().min(0, "Discount must be positive").default(0),
-  fb_name: z.string().min(1, "Facebook profile link is required"),
+  fb_name: z.string().min(1, "Facebook profile name is required"),
   wp_number: z
     .string()
     .regex(
@@ -373,14 +373,11 @@ export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Facebook Profile Link{" "}
+                      Facebook Profile Name{" "}
                       <span className="text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="facebook.com/studentprofile"
-                        {...field}
-                      />
+                      <Input placeholder="Profile name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

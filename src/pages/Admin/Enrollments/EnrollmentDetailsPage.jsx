@@ -11,9 +11,7 @@ import {
   ArrowLeft,
   Calendar,
   CreditCard,
-  Facebook,
   GraduationCap,
-  MessageCircle,
   Phone,
   User,
 } from "lucide-react";
@@ -358,7 +356,6 @@ export default function EnrollmentDetailsPage() {
               {enrollment.wp_number && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <MessageCircle className="w-4 h-4" />
                     WhatsApp
                   </label>
                   <a
@@ -378,17 +375,9 @@ export default function EnrollmentDetailsPage() {
               {enrollment.fb_name && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <Facebook className="w-4 h-4" />
                     Facebook Profile
                   </label>
-                  <a
-                    href={`${enrollment.fb_name}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500/60 hover:underline"
-                  >
-                    {enrollment.fb_name}
-                  </a>
+                  {enrollment.fb_name}
                 </div>
               )}
             </CardContent>
