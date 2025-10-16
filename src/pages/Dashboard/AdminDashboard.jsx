@@ -1,8 +1,10 @@
 import BooksManagement from "@/components/Admin/Books/BooksManagement";
 import CoursesManagement from "@/components/Admin/Courses/CoursesManagement";
+import EnrollmentsManagement from "@/components/Admin/Enrollments/EnrollmentsManagement";
 import NotesManagement from "@/components/Admin/Notes/NotesManagement";
 import OrdersManagement from "@/components/Admin/Orders/OrdersManagement";
 import PromoManagement from "@/components/Admin/Promo/PromoManagement";
+import UsersManagement from "@/components/Admin/Users/UsersManagement";
 import AdminLayout from "@/components/shared/AdminLayout";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -39,6 +41,12 @@ export default function AdminDashboard() {
 
       case "orders":
         return <OrdersManagement useLayout={false} />;
+
+      case "enrollments":
+        return <EnrollmentsManagement useLayout={false} />;
+
+      case "users":
+        return <UsersManagement useLayout={false} />;
 
       case "courses":
         return <CoursesManagement useLayout={false} />;

@@ -2,7 +2,7 @@ import UserDashboardLayout from "@/components/shared/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  getOrderStatusBadge,
+  getEnrollmentStatusBadge,
   getPaymentMethodBadge,
   getPaymentStatusBadge,
 } from "@/lib/badgeUtils";
@@ -11,31 +11,30 @@ import {
   ArrowLeft,
   Calendar,
   CreditCard,
-  MapPin,
-  Package,
-  Phone,
+  GraduationCap,
+  User,
 } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-export default function OrderDetailsPage() {
+export default function EnrollmentDetailsPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const order = location.state?.order || null;
+  const enrollment = location.state?.enrollment || null;
 
   useEffect(() => {
-    // If no order data in state, redirect back to orders
-    if (!order) {
+    // If no enrollment data in state, redirect back to enrollments
+    if (!enrollment) {
       navigate("/dashboard", { replace: true });
     }
-  }, [order, navigate]);
+  }, [enrollment, navigate]);
 
-  if (!order) {
+  if (!enrollment) {
     return (
       <UserDashboardLayout>
         <div className="text-center py-16">
           <h2 className="text-2xl font-bold text-foreground mb-4">
-            Loading Order Details...
+            Loading Enrollment Details...
           </h2>
         </div>
       </UserDashboardLayout>
@@ -53,134 +52,139 @@ export default function OrderDetailsPage() {
               Back to Dashboard
             </Button>
           </div>
-
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground text-center">
-              Order Details
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+              Enrollment Details
             </h1>
             <p className="text-muted-foreground mt-1">
-              Order ID: <span className="font-mono">{order.order_id}</span>
+              Enrollment ID:{" "}
+              <span className="font-mono">{enrollment.enrollment_id}</span>
             </p>
           </div>
-          {getOrderStatusBadge(order.status)}
+          {getEnrollmentStatusBadge(enrollment.status)}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Order Information */}
+          {/* Enrollment Information */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Package className="w-5 h-5" />
-                Order Information
+                <GraduationCap className="w-5 h-5" />
+                Enrollment Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">
-                    Order ID
+                    Enrollment ID
                   </label>
-                  <p className="font-mono text-sm">{order.order_id}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Quantity
-                  </label>
-                  <p className="font-semibold">{order.quantity}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Price
-                  </label>
-                  <p className="font-semibold">
-                    {formatPrice(order.product_price || 0)}
+                  <p className="font-mono text-sm">
+                    {enrollment.enrollment_id}
                   </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">
-                    Transaction ID
+                    Type
                   </label>
-                  <p className="font-mono text-sm">{order.Txn_ID}</p>
+                  <p className="capitalize">{enrollment.enrollment_type}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Status
+                  </label>
+                  <div className="mt-1">
+                    {getEnrollmentStatusBadge(enrollment.enrollment_status)}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Is Expired
+                  </label>
+                  <p
+                    className={
+                      enrollment.is_expired
+                        ? "text-destructive"
+                        : "text-success"
+                    }
+                  >
+                    {enrollment.is_expired ? "Yes" : "No"}
+                  </p>
                 </div>
               </div>
 
               <div className="border-t border-border my-4"></div>
-
               <div>
                 <label className="text-sm font-medium text-muted-foreground">
-                  Order Date
+                  Enrollment Date
                 </label>
                 <p className="flex items-center gap-2 text-sm">
                   <Calendar className="w-4 h-4" />
-                  <span>{formatDate(order.createdAt)} </span> |
+                  <span> {formatDate(enrollment.createdAt)}</span> |
                   <span className="text-primary/70">
                     {" "}
-                    {getRelativeTime(order.createdAt)}
+                    {getRelativeTime(enrollment.createdAt)}
                   </span>
                 </p>
               </div>
-
               <div>
                 <label className="text-sm font-medium text-muted-foreground">
-                  Last Updated
+                  Expiry Date
                 </label>
                 <p className="flex items-center gap-2 text-sm">
                   <Calendar className="w-4 h-4" />
-                  <span>{formatDate(order.updatedAt)} </span> |
+                  <span> {formatDate(enrollment.expiry_date)}</span> |
                   <span className="text-primary/70">
                     {" "}
-                    {getRelativeTime(order.updatedAt)}
+                    {getRelativeTime(enrollment.expiry_date)}
                   </span>
                 </p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Book Information */}
+          {/* Course Information */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Package className="w-5 h-5" />
-                Book Information
+                <GraduationCap className="w-5 h-5" />
+                Course Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {order.book && (
+              {enrollment.course && (
                 <>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">
-                      Title
+                      Course Title
                     </label>
-                    <p className="font-semibold">{order.book.title}</p>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Author
-                    </label>
-                    <p>{order.book.writter}</p>
+                    <p className="font-semibold">
+                      {enrollment.course.course_title}
+                    </p>
                   </div>
 
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">
                       Batch
                     </label>
-                    <p>{order.book.batch}</p>
+                    <p>{enrollment.course.batch}</p>
                   </div>
 
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">
-                      Book ID
+                      Course ID
                     </label>
-                    <p className="font-mono text-sm">{order.book.book_id}</p>
+                    <p className="font-mono text-sm">
+                      {enrollment.course.course_id}
+                    </p>
                   </div>
 
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">
-                      Description
+                      Price
                     </label>
-                    <p className="text-sm text-muted-foreground">
-                      {order.book.description}
+                    <p className="font-semibold">
+                      {formatPrice(enrollment.course.price)}
                     </p>
                   </div>
                 </>
@@ -197,7 +201,7 @@ export default function OrderDetailsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {order.payment && (
+              {enrollment.payment && (
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -205,7 +209,7 @@ export default function OrderDetailsPage() {
                         Payment ID
                       </label>
                       <p className="font-mono text-sm">
-                        {order.payment.payment_id}
+                        {enrollment.payment.payment_id}
                       </p>
                     </div>
                     <div>
@@ -213,7 +217,7 @@ export default function OrderDetailsPage() {
                         Method
                       </label>
                       <div className="mt-1">
-                        {getPaymentMethodBadge(order.payment.method)}
+                        {getPaymentMethodBadge(enrollment.payment.method)}
                       </div>
                     </div>
                     <div>
@@ -221,14 +225,14 @@ export default function OrderDetailsPage() {
                         Status
                       </label>
                       <div className="mt-1">
-                        {getPaymentStatusBadge(order.payment.status)}
+                        {getPaymentStatusBadge(enrollment.payment.status)}
                       </div>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
                         Currency
                       </label>
-                      <p>{order.payment.currency}</p>
+                      <p>{enrollment.payment.currency}</p>
                     </div>
                   </div>
 
@@ -240,7 +244,7 @@ export default function OrderDetailsPage() {
                         Material Price
                       </label>
                       <p className="font-semibold">
-                        {formatPrice(order.payment.meterial_price || 0)}
+                        {formatPrice(enrollment.payment.meterial_price || 0)}
                       </p>
                     </div>
                     <div>
@@ -248,7 +252,7 @@ export default function OrderDetailsPage() {
                         Discount Amount
                       </label>
                       <p className="font-semibold text-green-600">
-                        -{formatPrice(order.payment.discount_amount || 0)}
+                        -{formatPrice(enrollment.payment.discount_amount || 0)}
                       </p>
                     </div>
                     <div>
@@ -256,7 +260,7 @@ export default function OrderDetailsPage() {
                         Total Amount
                       </label>
                       <p className="font-semibold">
-                        {formatPrice(order.payment.amount || 0)}
+                        {formatPrice(enrollment.payment.amount || 0)}
                       </p>
                     </div>
                     <div>
@@ -264,7 +268,7 @@ export default function OrderDetailsPage() {
                         Paid Amount
                       </label>
                       <p className="font-semibold text-green-600">
-                        {formatPrice(order.payment.paid_amount || 0)}
+                        {formatPrice(enrollment.payment.paid_amount || 0)}
                       </p>
                     </div>
                     <div>
@@ -272,7 +276,7 @@ export default function OrderDetailsPage() {
                         Due Amount
                       </label>
                       <p className="font-semibold text-red-600">
-                        {formatPrice(order.payment.due_amount || 0)}
+                        {formatPrice(enrollment.payment.due_amount || 0)}
                       </p>
                     </div>
                     <div>
@@ -280,27 +284,27 @@ export default function OrderDetailsPage() {
                         Transaction ID
                       </label>
                       <p className="font-mono text-sm">
-                        {order.payment.Txn_ID}
+                        {enrollment.payment.Txn_ID}
                       </p>
                     </div>
                   </div>
 
-                  {order.payment.purpose && (
+                  {enrollment.payment.purpose && (
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
                         Purpose
                       </label>
-                      <p>{order.payment.purpose}</p>
+                      <p>{enrollment.payment.purpose}</p>
                     </div>
                   )}
 
-                  {order.payment.remarks && (
+                  {enrollment.payment.remarks && (
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
                         Remarks
                       </label>
                       <p className="text-sm text-muted-foreground">
-                        {order.payment.remarks}
+                        {enrollment.payment.remarks}
                       </p>
                     </div>
                   )}
@@ -309,28 +313,20 @@ export default function OrderDetailsPage() {
             </CardContent>
           </Card>
 
-          {/* Shipping Information */}
+          {/* User Information */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <MapPin className="w-5 h-5" />
-                Shipping Information
+                <User className="w-5 h-5" />
+                Student Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-muted-foreground">
-                  Address
+                  User ID
                 </label>
-                <p className="whitespace-pre-line">{order.address}</p>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  Alternative Phone
-                </label>
-                <p>{order.alternative_phone}</p>
+                <p className="font-mono text-sm">{enrollment.user_id}</p>
               </div>
             </CardContent>
           </Card>

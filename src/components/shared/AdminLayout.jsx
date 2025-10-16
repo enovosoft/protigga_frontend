@@ -5,12 +5,14 @@ import {
   Book,
   BookOpen,
   FileText,
+  GraduationCap,
   LogOut,
   Menu,
   Package,
   Shield,
   Ticket,
   User,
+  Users,
   X,
 } from "lucide-react";
 import { useState } from "react";
@@ -95,6 +97,24 @@ const AdminLayout = ({ children }) => {
       icon: Package,
       onClick: () => {
         setActiveSection("orders");
+        setSidebarOpen(false);
+      },
+    },
+    {
+      id: "enrollments",
+      label: "Enrollments",
+      icon: GraduationCap,
+      onClick: () => {
+        setActiveSection("enrollments");
+        setSidebarOpen(false);
+      },
+    },
+    {
+      id: "users",
+      label: "Users",
+      icon: Users,
+      onClick: () => {
+        setActiveSection("users");
         setSidebarOpen(false);
       },
     },

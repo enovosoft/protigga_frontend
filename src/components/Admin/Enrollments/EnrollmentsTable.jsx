@@ -8,10 +8,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getOrderStatusBadge, getPaymentMethodBadge } from "@/lib/badgeUtils";
+import {
+  getEnrollmentStatusBadge,
+  getPaymentMethodBadge,
+  getPaymentStatusBadge,
+} from "@/lib/badgeUtils";
 import { Eye } from "lucide-react";
 
-export function OrdersTableSkeleton() {
+export function EnrollmentsTableSkeleton() {
   return (
     <div className="bg-card rounded-lg border">
       <div className="overflow-x-auto">
@@ -20,21 +24,23 @@ export function OrdersTableSkeleton() {
             <TableRow className="bg-muted/50">
               <TableHead className="w-14 sm:w-16">S/N</TableHead>
               <TableHead className="min-w-[120px] sm:min-w-[150px]">
-                Order ID
+                Enrollment ID
               </TableHead>
-              <TableHead className="min-w-[150px] sm:table-cell">
-                Book Name
+              <TableHead className="min-w-[150px] hidden sm:table-cell">
+                Course Name
               </TableHead>
-              <TableHead className="min-w-[100px] md:table-cell">
-                Price
+              <TableHead className="min-w-[100px] hidden md:table-cell">
+                Amount
               </TableHead>
-              <TableHead className="min-w-[100px] lg:table-cell">
+              <TableHead className="min-w-[100px] hidden lg:table-cell">
                 Status
               </TableHead>
-              <TableHead className="min-w-[100px] lg:table-cell">
+              <TableHead className="min-w-[100px] hidden lg:table-cell">
+                Payment Status
+              </TableHead>
+              <TableHead className="min-w-[100px] hidden lg:table-cell">
                 Method
               </TableHead>
-              <TableHead className="min-w-[80px] md:table-cell">Qty</TableHead>
               <TableHead className="text-right w-20">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -47,20 +53,20 @@ export function OrdersTableSkeleton() {
                 <TableCell>
                   <Skeleton className="h-4 w-24 sm:w-32" />
                 </TableCell>
-                <TableCell className="sm:table-cell">
+                <TableCell className="hidden sm:table-cell">
                   <Skeleton className="h-4 w-20" />
                 </TableCell>
-                <TableCell className="md:table-cell">
+                <TableCell className="hidden md:table-cell">
                   <Skeleton className="h-4 w-16" />
                 </TableCell>
-                <TableCell className="lg:table-cell">
+                <TableCell className="hidden lg:table-cell">
                   <Skeleton className="h-4 w-16" />
                 </TableCell>
-                <TableCell className="lg:table-cell">
+                <TableCell className="hidden lg:table-cell">
                   <Skeleton className="h-4 w-20" />
                 </TableCell>
-                <TableCell className="md:table-cell">
-                  <Skeleton className="h-4 w-8" />
+                <TableCell className="hidden lg:table-cell">
+                  <Skeleton className="h-4 w-20" />
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center justify-end">
@@ -76,7 +82,7 @@ export function OrdersTableSkeleton() {
   );
 }
 
-export default function OrdersTable({ orders, startIndex, onView }) {
+export default function EnrollmentsTable({ enrollments, startIndex, onView }) {
   const formatPrice = (price) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -90,26 +96,26 @@ export default function OrdersTable({ orders, startIndex, onView }) {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50 hover:bg-muted/50">
-              <TableHead className="font-semibold text-foreground w-18 sm:w-16">
+              <TableHead className="font-semibold text-foreground w-14 sm:w-16">
                 S/N
               </TableHead>
               <TableHead className="font-semibold text-foreground min-w-[120px] sm:min-w-[150px]">
-                Order ID
+                Enrollment ID
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[150px] sm:table-cell">
-                Book Name
+              <TableHead className="font-semibold text-foreground min-w-[150px] hidden sm:table-cell">
+                Course Name
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] md:table-cell">
-                Price
+              <TableHead className="font-semibold text-foreground min-w-[100px] hidden md:table-cell">
+                Amount
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] lg:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[100px] hidden lg:table-cell">
                 Status
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] lg:table-cell">
-                Method
+              <TableHead className="font-semibold text-foreground min-w-[100px] hidden lg:table-cell">
+                Payment Status
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[80px] md:table-cell">
-                Qty
+              <TableHead className="font-semibold text-foreground min-w-[100px] hidden lg:table-cell">
+                Method
               </TableHead>
               <TableHead className="text-right font-semibold text-foreground w-20">
                 Actions
@@ -117,9 +123,9 @@ export default function OrdersTable({ orders, startIndex, onView }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order, index) => (
+            {enrollments.map((enrollment, index) => (
               <TableRow
-                key={order.id}
+                key={enrollment.id}
                 className="hover:bg-muted/30 transition-colors"
               >
                 <TableCell className="font-medium text-muted-foreground">
@@ -127,37 +133,35 @@ export default function OrdersTable({ orders, startIndex, onView }) {
                 </TableCell>
                 <TableCell>
                   <div className="font-mono text-sm text-foreground break-all">
-                    {order.order_id}
+                    {enrollment.enrollment_id}
                   </div>
                 </TableCell>
-                <TableCell className="sm:table-cell">
+                <TableCell className="hidden sm:table-cell">
                   <div className="font-medium text-foreground break-words max-w-[200px]">
-                    {order.book?.title || "N/A"}
+                    {enrollment.course?.course_title || "N/A"}
                   </div>
                 </TableCell>
-                <TableCell className="md:table-cell">
+                <TableCell className="hidden md:table-cell">
                   <span className="font-medium text-foreground">
-                    {formatPrice(order.product_price || 0)}
+                    {formatPrice(enrollment.payment?.amount || 0)}
                   </span>
                 </TableCell>
-                <TableCell className="lg:table-cell">
-                  {getOrderStatusBadge(order.status)}
+                <TableCell className="hidden lg:table-cell">
+                  {getEnrollmentStatusBadge(enrollment.status)}
                 </TableCell>
-                <TableCell className="lg:table-cell">
-                  {getPaymentMethodBadge(order.payment?.method)}
+                <TableCell className="hidden lg:table-cell">
+                  {getPaymentStatusBadge(enrollment.payment?.status)}
                 </TableCell>
-                <TableCell className="md:table-cell">
-                  <span className="font-medium text-foreground">
-                    {order.quantity}
-                  </span>
+                <TableCell className="hidden lg:table-cell">
+                  {getPaymentMethodBadge(enrollment.payment?.method)}
                 </TableCell>
                 <TableCell className="text-right">
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onView(order)}
+                    onClick={() => onView(enrollment)}
                     className="hover:bg-primary/10 hover:text-primary transition-colors h-8 w-8 p-0"
-                    title="View Order Details"
+                    title="View Enrollment Details"
                   >
                     <Eye className="w-4 h-4" />
                   </Button>
