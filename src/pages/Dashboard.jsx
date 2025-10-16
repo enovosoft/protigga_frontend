@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AdminDashboard from "./Dashboard/AdminDashboard";
 import StudentDashboard from "./Dashboard/StudentDashboard";
 
 export default function Dashboard() {
@@ -15,8 +14,11 @@ export default function Dashboard() {
 
     if (!isAuthenticated) {
       navigate("/");
+    } else if (primaryRole === "admin") {
+      // Redirect admins to the admin dashboard
+      navigate("/admin");
     }
-  }, [isAuthenticated, isAuthLoading, navigate]);
+  }, [isAuthenticated, isAuthLoading, navigate, primaryRole]);
 
   if (isAuthLoading) {
     return (
@@ -33,14 +35,12 @@ export default function Dashboard() {
     return null;
   }
 
-  // Render dashboard based on user's primary role
-  if (primaryRole === "admin") {
-    return <AdminDashboard />;
-  } else if (primaryRole === "student") {
+  // Only students should reach here, admins are redirected
+  if (primaryRole === "student") {
     return <StudentDashboard />;
   }
 
-  // Default fallback (if role is not recognized)
+  // Fallback for unrecognized roles
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
@@ -48,8 +48,8 @@ export default function Dashboard() {
         <p>Please contact support for assistance.</p>
 
         <div className="mt-4">
-          <Button variant="outline" onClick={() => navigate("/auth/logout")}>
-            Logout
+          <Button onClick={() => navigate("/")} className="mt-4">
+            Go to home
           </Button>
         </div>
       </div>

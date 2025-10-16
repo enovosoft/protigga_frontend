@@ -22,7 +22,6 @@ const AdminLayout = ({ children }) => {
   const { user, isAuthenticated, isAuthLoading, getPrimaryRole } = useAuth();
   const navigate = useNavigate();
   const primaryRole = getPrimaryRole();
-  const [activeSection, setActiveSection] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Get role-based icon
@@ -59,73 +58,49 @@ const AdminLayout = ({ children }) => {
       id: "dashboard",
       label: "Dashboard",
       icon: Shield,
-      onClick: () => {
-        setActiveSection("dashboard");
-        setSidebarOpen(false);
-      },
+      path: "/admin",
     },
     {
       id: "notes",
       label: "Notes",
       icon: FileText,
-      onClick: () => {
-        setActiveSection("notes");
-        setSidebarOpen(false);
-      },
+      path: "/admin/notes",
     },
     {
       id: "promo-codes",
       label: "Promo Codes",
       icon: Ticket,
-      onClick: () => {
-        setActiveSection("promo-codes");
-        setSidebarOpen(false);
-      },
+      path: "/admin/promo",
     },
     {
       id: "books",
       label: "Books",
       icon: Book,
-      onClick: () => {
-        setActiveSection("books");
-        setSidebarOpen(false);
-      },
+      path: "/admin/books",
     },
     {
       id: "orders",
       label: "Orders",
       icon: Package,
-      onClick: () => {
-        setActiveSection("orders");
-        setSidebarOpen(false);
-      },
+      path: "/admin/orders",
     },
     {
       id: "enrollments",
       label: "Enrollments",
       icon: GraduationCap,
-      onClick: () => {
-        setActiveSection("enrollments");
-        setSidebarOpen(false);
-      },
+      path: "/admin/enrollments",
     },
     {
       id: "users",
       label: "Users",
       icon: Users,
-      onClick: () => {
-        setActiveSection("users");
-        setSidebarOpen(false);
-      },
+      path: "/admin/users",
     },
     {
       id: "courses",
       label: "Courses",
       icon: BookOpen,
-      onClick: () => {
-        setActiveSection("courses");
-        setSidebarOpen(false);
-      },
+      path: "/admin/courses",
     },
   ];
 
@@ -220,20 +195,16 @@ const AdminLayout = ({ children }) => {
             <nav className="space-y-2">
               {sidebarItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = activeSection === item.id;
                 return (
-                  <button
+                  <Link
                     key={item.id}
-                    onClick={item.onClick}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                    }`}
+                    to={item.path}
+                    onClick={() => setSidebarOpen(false)}
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors hover:bg-muted text-muted-foreground hover:text-foreground"
                   >
                     <Icon className="w-5 h-5" />
                     <span className="font-medium">{item.label}</span>
-                  </button>
+                  </Link>
                 );
               })}
             </nav>
@@ -241,7 +212,7 @@ const AdminLayout = ({ children }) => {
 
           {/* Main Content */}
           <div className="flex-1 md:ml-0 min-h-[calc(100vh-200px)] p-4 lg:p-6">
-            {children(activeSection)}
+            {children}
           </div>
         </div>
       </div>
