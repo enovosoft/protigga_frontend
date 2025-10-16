@@ -22,22 +22,13 @@ export function UsersTableSkeleton() {
               <TableHead className="min-w-[120px] sm:min-w-[150px]">
                 Name
               </TableHead>
-              <TableHead className="min-w-[150px] hidden sm:table-cell">
-                Phone
-              </TableHead>
-              <TableHead className="min-w-[100px] hidden md:table-cell">
-                Status
-              </TableHead>
-              <TableHead className="min-w-[100px] hidden lg:table-cell">
-                Orders
-              </TableHead>
-              <TableHead className="min-w-[100px] hidden lg:table-cell">
-                Enrollments
-              </TableHead>
-              <TableHead className="min-w-[120px] hidden md:table-cell">
-                Joined
-              </TableHead>
-              <TableHead className="text-right w-20">Actions</TableHead>
+              <TableHead className="min-w-[150px]">Phone</TableHead>
+              <TableHead className="min-w-[100px]">isActive</TableHead>
+              <TableHead className="min-w-[80px]">isBlocked</TableHead>
+              <TableHead className="min-w-[100px]">Orders</TableHead>
+              <TableHead className="min-w-[100px]">Enrollments</TableHead>
+              <TableHead className="min-w-[120px]">Joined</TableHead>
+              <TableHead className="text-right w-20">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -49,19 +40,22 @@ export function UsersTableSkeleton() {
                 <TableCell>
                   <Skeleton className="h-4 w-24 sm:w-32" />
                 </TableCell>
-                <TableCell className="hidden sm:table-cell">
+                <TableCell>
                   <Skeleton className="h-4 w-20" />
                 </TableCell>
-                <TableCell className="hidden md:table-cell">
+                <TableCell>
                   <Skeleton className="h-4 w-16" />
                 </TableCell>
-                <TableCell className="hidden lg:table-cell">
+                <TableCell>
+                  <Skeleton className="h-4 w-12" />
+                </TableCell>
+                <TableCell>
                   <Skeleton className="h-4 w-8" />
                 </TableCell>
-                <TableCell className="hidden lg:table-cell">
+                <TableCell>
                   <Skeleton className="h-4 w-8" />
                 </TableCell>
-                <TableCell className="hidden md:table-cell">
+                <TableCell>
                   <Skeleton className="h-4 w-20" />
                 </TableCell>
                 <TableCell>
@@ -87,37 +81,6 @@ export default function UsersTable({ users, startIndex, onView }) {
     });
   };
 
-  const getStatusBadge = (isVerified, isBlocked) => {
-    if (isBlocked) {
-      return (
-        <Badge
-          variant="destructive"
-          className="bg-red-100 text-red-800 border-red-200 hover:bg-red-100"
-        >
-          Blocked
-        </Badge>
-      );
-    }
-    if (isVerified) {
-      return (
-        <Badge
-          variant="default"
-          className="bg-green-100 text-green-800 border-green-200 hover:bg-green-100"
-        >
-          Verified
-        </Badge>
-      );
-    }
-    return (
-      <Badge
-        variant="secondary"
-        className="bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100"
-      >
-        Unverified
-      </Badge>
-    );
-  };
-
   return (
     <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
@@ -130,23 +93,26 @@ export default function UsersTable({ users, startIndex, onView }) {
               <TableHead className="font-semibold text-foreground min-w-[120px] sm:min-w-[150px]">
                 Name
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[150px] hidden sm:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[150px]">
                 Phone
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] hidden md:table-cell">
-                Status
+              <TableHead className="font-semibold text-foreground min-w-[100px]">
+                Active
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] hidden lg:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px]">
+                Blocked
+              </TableHead>
+              <TableHead className="font-semibold text-foreground min-w-[100px]">
                 Orders
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] hidden lg:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[100px]">
                 Enrollments
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[120px] hidden md:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[120px]">
                 Joined
               </TableHead>
               <TableHead className="text-right font-semibold text-foreground w-20">
-                Actions
+                Action
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -174,7 +140,7 @@ export default function UsersTable({ users, startIndex, onView }) {
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="hidden sm:table-cell">
+                <TableCell>
                   <div className="flex items-center gap-2">
                     <Phone className="w-4 h-4 text-muted-foreground" />
                     <span className="font-medium text-foreground">
@@ -182,20 +148,51 @@ export default function UsersTable({ users, startIndex, onView }) {
                     </span>
                   </div>
                 </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {getStatusBadge(user.is_verified, user.is_blocked)}
+                <TableCell>
+                  {user.is_verified ? (
+                    <Badge
+                      variant="default"
+                      className="bg-success/90 text-background border-success text-xs"
+                    >
+                      Yes
+                    </Badge>
+                  ) : (
+                    <Badge
+                      variant="default"
+                      className="bg-destructive/90 text-background border-destructive text-xs"
+                    >
+                      No
+                    </Badge>
+                  )}
                 </TableCell>
-                <TableCell className="hidden lg:table-cell">
+                <TableCell>
+                  {user.is_blocked ? (
+                    <Badge
+                      variant="destructive"
+                      className="bg-destructive/90 text-background border-destructive text-xs"
+                    >
+                      Yes
+                    </Badge>
+                  ) : (
+                    <Badge
+                      variant="default"
+                      className="bg-success/90 text-background border-success text-xs"
+                    >
+                      No
+                    </Badge>
+                  )}
+                </TableCell>
+                <TableCell>
                   <Badge variant="outline" className="font-medium">
                     {user.book_orders?.length || 0}
                   </Badge>
                 </TableCell>
-                <TableCell className="hidden lg:table-cell">
+                <TableCell>
                   <Badge variant="outline" className="font-medium">
                     {user.enrollments?.length || 0}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground whitespace-nowrap hidden md:table-cell">
+                <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                   {user.createdAt ? formatDate(user.createdAt) : "N/A"}
                 </TableCell>
                 <TableCell className="text-right">

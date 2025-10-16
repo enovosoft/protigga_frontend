@@ -13,18 +13,22 @@ export default function OrdersManagement({ useLayout = true }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const itemsPerPage = 20;
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (page = 1) => {
     setLoading(true);
     try {
-      const response = await api.get("/orders");
+      const response = await api.get(
+        `/orders?page=${page}&limit=${itemsPerPage}`
+      );
       if (response.data.success) {
-        let orders = response.data?.orders || [];
-
-        // Sort by created date (newest first)
-        orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        setOrders(orders);
+        const ordersData = response.data?.orders || [];
+        setOrders(ordersData);
+        setTotalPages(response.data.total_page || 1);
+        setCurrentPage(response.data.curr_page || 1);
+        setTotalItems(ordersData.length);
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -34,18 +38,16 @@ export default function OrdersManagement({ useLayout = true }) {
   };
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    fetchOrders(currentPage);
+  }, [currentPage]);
 
   const handleView = (order) => {
     navigate(`/admin/orders/${order.id}`, { state: { order } });
   };
 
-  // Pagination
-  const totalPages = Math.ceil(orders.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentOrders = orders.slice(startIndex, endIndex);
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   const content = (
     <div className="space-y-6">
@@ -76,19 +78,18 @@ export default function OrdersManagement({ useLayout = true }) {
       ) : (
         <>
           <OrdersTable
-            orders={currentOrders}
-            startIndex={startIndex}
+            orders={orders}
+            startIndex={(currentPage - 1) * itemsPerPage}
             onView={handleView}
           />
 
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalItems={orders.length}
-            startIndex={startIndex}
-            endIndex={endIndex}
-            onPageChange={setCurrentPage}
-          />
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
         </>
       )}
     </div>

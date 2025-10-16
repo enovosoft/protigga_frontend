@@ -31,6 +31,7 @@ export default function CustomerInformation({
   validationErrors = {},
   totalAmount = 0,
   deliveryFee = 0,
+  user = null,
 }) {
   const getPaymentOptions = () => {
     if (isBook) {
@@ -51,6 +52,37 @@ export default function CustomerInformation({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* User Information - Readonly */}
+        <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+          <h3 className="text-sm font-medium text-foreground">
+            Account Information
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-foreground">
+                Full Name
+              </Label>
+              <Input
+                value={user?.name || ""}
+                readOnly
+                className="bg-muted cursor-not-allowed"
+              />
+            </div>
+            {isBook && (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-foreground">
+                  Phone Number
+                </Label>
+                <Input
+                  value={user?.phone || ""}
+                  readOnly
+                  className="bg-muted cursor-not-allowed"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Customer Information Form */}
         <form onSubmit={onSubmit} className="space-y-4">
           {/* Course-specific fields */}
@@ -185,101 +217,104 @@ export default function CustomerInformation({
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label
-              htmlFor="city"
-              className="text-sm font-medium text-foreground"
-            >
-              Thana / State <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              placeholder="Thana name"
-              value={formData.city}
-              onChange={(e) => handleInputChange("city", e.target.value)}
-              required
-              className="w-full"
-            />
-            {validationErrors.city && (
-              <p className="text-sm text-destructive">
-                {validationErrors.city}
-              </p>
-            )}
-          </div>
+          {/* Address and Location Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label
+                htmlFor="city"
+                className="text-sm font-medium text-foreground"
+              >
+                Thana / State <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                placeholder="Thana name"
+                value={formData.city}
+                onChange={(e) => handleInputChange("city", e.target.value)}
+                required
+                className="w-full"
+              />
+              {validationErrors.city && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.city}
+                </p>
+              )}
+            </div>
 
-          <div className="space-y-2">
-            <Label
-              htmlFor="district"
-              className="text-sm font-medium text-foreground"
-            >
-              District <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="district"
-              placeholder="District name"
-              value={formData.district}
-              onChange={(e) => handleInputChange("district", e.target.value)}
-              required
-              className="w-full"
-            />
-            {validationErrors.district && (
-              <p className="text-sm text-destructive">
-                {validationErrors.district}
-              </p>
-            )}
-          </div>
+            <div className="space-y-2">
+              <Label
+                htmlFor="district"
+                className="text-sm font-medium text-foreground"
+              >
+                District <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="district"
+                placeholder="District name"
+                value={formData.district}
+                onChange={(e) => handleInputChange("district", e.target.value)}
+                required
+                className="w-full"
+              />
+              {validationErrors.district && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.district}
+                </p>
+              )}
+            </div>
 
-          <div className="space-y-2">
-            <Label
-              htmlFor="zipCode"
-              className="text-sm font-medium text-foreground"
-            >
-              Zip Code <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="zipCode"
-              placeholder="1230"
-              value={formData.zipCode}
-              onChange={(e) => handleInputChange("zipCode", e.target.value)}
-              required
-              className="w-full"
-            />
-            {validationErrors.zipCode && (
-              <p className="text-sm text-destructive">
-                {validationErrors.zipCode}
-              </p>
-            )}
-          </div>
+            <div className="space-y-2">
+              <Label
+                htmlFor="zipCode"
+                className="text-sm font-medium text-foreground"
+              >
+                Zip Code <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="zipCode"
+                placeholder="1230"
+                value={formData.zipCode}
+                onChange={(e) => handleInputChange("zipCode", e.target.value)}
+                required
+                className="w-full"
+              />
+              {validationErrors.zipCode && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.zipCode}
+                </p>
+              )}
+            </div>
 
-          <div className="space-y-2">
-            <Label
-              htmlFor="division"
-              className="text-sm font-medium text-foreground"
-            >
-              Division <span className="text-destructive">*</span>
-            </Label>
-            <Select
-              value={formData.division || ""}
-              onValueChange={(value) =>
-                handleInputChange("division", value || "")
-              }
-              required
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Division" />
-              </SelectTrigger>
-              <SelectContent>
-                {DIVISIONS.map((division) => (
-                  <SelectItem key={division.value} value={division.value}>
-                    {division.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {validationErrors.division && (
-              <p className="text-sm text-destructive">
-                {validationErrors.division}
-              </p>
-            )}
+            <div className="space-y-2">
+              <Label
+                htmlFor="division"
+                className="text-sm font-medium text-foreground"
+              >
+                Division <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                value={formData.division || ""}
+                onValueChange={(value) =>
+                  handleInputChange("division", value || "")
+                }
+                required
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Division" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DIVISIONS.map((division) => (
+                    <SelectItem key={division.value} value={division.value}>
+                      {division.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {validationErrors.division && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.division}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Payment Type Selection */}

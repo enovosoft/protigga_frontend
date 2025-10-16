@@ -22,6 +22,9 @@ export function OrdersTableSkeleton() {
               <TableHead className="min-w-[120px] sm:min-w-[150px]">
                 Order ID
               </TableHead>
+              <TableHead className="min-w-[120px] sm:table-cell">
+                User Name
+              </TableHead>
               <TableHead className="min-w-[150px] sm:table-cell">
                 Book Name
               </TableHead>
@@ -46,6 +49,9 @@ export function OrdersTableSkeleton() {
                 </TableCell>
                 <TableCell>
                   <Skeleton className="h-4 w-24 sm:w-32" />
+                </TableCell>
+                <TableCell className="sm:table-cell">
+                  <Skeleton className="h-4 w-20" />
                 </TableCell>
                 <TableCell className="sm:table-cell">
                   <Skeleton className="h-4 w-20" />
@@ -96,6 +102,9 @@ export default function OrdersTable({ orders, startIndex, onView }) {
               <TableHead className="font-semibold text-foreground min-w-[120px] sm:min-w-[150px]">
                 Order ID
               </TableHead>
+              <TableHead className="font-semibold text-foreground min-w-[120px] sm:table-cell">
+                User Name
+              </TableHead>
               <TableHead className="font-semibold text-foreground min-w-[150px] sm:table-cell">
                 Book Name
               </TableHead>
@@ -128,6 +137,11 @@ export default function OrdersTable({ orders, startIndex, onView }) {
                 <TableCell>
                   <div className="font-mono text-sm text-foreground break-all">
                     {order.order_id}
+                  </div>
+                </TableCell>
+                <TableCell className="sm:table-cell">
+                  <div className="font-medium text-foreground break-words max-w-[200px]">
+                    {order.user?.name || "N/A"}
                   </div>
                 </TableCell>
                 <TableCell className="sm:table-cell">

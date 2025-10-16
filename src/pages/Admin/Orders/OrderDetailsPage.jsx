@@ -7,14 +7,7 @@ import {
   getPaymentStatusBadge,
 } from "@/lib/badgeUtils";
 import { formatDate, formatPrice, getRelativeTime } from "@/lib/helper";
-import {
-  ArrowLeft,
-  Calendar,
-  CreditCard,
-  MapPin,
-  Package,
-  Phone,
-} from "lucide-react";
+import { ArrowLeft, Calendar, CreditCard, MapPin, Package } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -48,7 +41,7 @@ export default function OrderDetailsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => navigate("/dashboard")}>
+            <Button variant="ghost" onClick={() => navigate(-1)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
@@ -318,20 +311,39 @@ export default function OrderDetailsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* User Information */}
+              {order.user && (
+                <>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      Customer Name
+                    </label>
+                    <p className="font-medium">{order.user.name || "N/A"}</p>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      Phone
+                    </label>
+                    <p>{order.user.phone || "N/A"}</p>
+                  </div>
+                </>
+              )}
+
               <div>
                 <label className="text-sm font-medium text-muted-foreground">
                   Address
                 </label>
                 <p className="whitespace-pre-line">{order.address}</p>
               </div>
-
-              <div>
-                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  Alternative Phone
-                </label>
-                <p>{order.alternative_phone}</p>
-              </div>
+              {order.alternative_phone && (
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    Alternative Phone
+                  </label>
+                  <p>{order.alternative_phone}</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

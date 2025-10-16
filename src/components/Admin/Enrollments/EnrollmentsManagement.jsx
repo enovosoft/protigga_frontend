@@ -13,20 +13,26 @@ export default function EnrollmentsManagement({ useLayout = true }) {
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
 
-  const fetchEnrollments = async () => {
+  const fetchEnrollments = async (page = 1) => {
     setLoading(true);
     try {
-      const response = await api.get("/enrollments");
+      const response = await api.get(
+        `/enrollments?page=${page}&limit=${itemsPerPage}`
+      );
       if (response.data.success) {
-        let enrollments = response.data?.enrollments || [];
+        const enrollmentsData = response.data?.enrollments || [];
+        const totalCount = response.data?.totalCount || enrollmentsData.length;
 
         // Sort by created date (newest first)
-        enrollments.sort(
+        enrollmentsData.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
-        setEnrollments(enrollments);
+
+        setEnrollments(enrollmentsData);
+        setTotalPages(Math.ceil(totalCount / itemsPerPage));
       }
     } catch (error) {
       console.error("Error fetching enrollments:", error);
@@ -36,18 +42,17 @@ export default function EnrollmentsManagement({ useLayout = true }) {
   };
 
   useEffect(() => {
-    fetchEnrollments();
-  }, []);
+    fetchEnrollments(currentPage);
+  }, [currentPage]);
 
   const handleView = (enrollment) => {
     navigate(`/admin/enrollments/${enrollment.id}`, { state: { enrollment } });
   };
 
   // Pagination
-  const totalPages = Math.ceil(enrollments.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentEnrollments = enrollments.slice(startIndex, endIndex);
+  const endIndex = startIndex + enrollments.length;
+  const currentEnrollments = enrollments;
 
   const content = (
     <div className="space-y-6">

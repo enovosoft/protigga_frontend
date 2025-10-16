@@ -353,7 +353,7 @@ export default function CheckoutForm() {
 
       // Add course-specific fields if it's a course
       if (!isBook) {
-        orderData.whatsapp_number = formData.whatsapp_number;
+        orderData.wp_number = formData.whatsapp_number;
         orderData.facebook_profile_link = formData.facebook_profile_link;
       }
 
@@ -566,6 +566,7 @@ export default function CheckoutForm() {
             validationErrors={validationErrors}
             totalAmount={calculateTotal()}
             deliveryFee={deliveryFee}
+            user={user}
           />
         </div>
       </div>

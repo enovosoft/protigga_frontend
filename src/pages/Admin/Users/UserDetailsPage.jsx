@@ -3,9 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  getOrderStatusBadge,
+  getEnrollmentStatusBadge,
   getPaymentMethodBadge,
   getPaymentStatusBadge,
+  getUserStatusBadge,
 } from "@/lib/badgeUtils";
 import { formatDate, formatPrice, getRelativeTime } from "@/lib/helper";
 import {
@@ -81,7 +82,7 @@ export default function UserDetailsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => navigate("/dashboard")}>
+            <Button variant="ghost" onClick={() => navigate(-1)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
@@ -148,7 +149,7 @@ export default function UserDetailsPage() {
                 </label>
                 <p className="flex items-center gap-2 text-sm">
                   <Calendar className="w-4 h-4" />
-                  <span> {formatDate(user.createdAt)}</span>
+                  <span> {formatDate(user.createdAt)}</span> |
                   <span className="text-primary/70">
                     {" "}
                     {getRelativeTime(user.createdAt)}
@@ -162,7 +163,7 @@ export default function UserDetailsPage() {
                 </label>
                 <p className="flex items-center gap-2 text-sm">
                   <Calendar className="w-4 h-4" />
-                  <span> {formatDate(user.updatedAt)}</span>
+                  <span> {formatDate(user.updatedAt)}</span> |
                   <span className="text-primary/70">
                     {" "}
                     {getRelativeTime(user.updatedAt)}
@@ -211,63 +212,91 @@ export default function UserDetailsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {user.book_orders.slice(0, 3).map((order, index) => {
-                    // Find the corresponding payment to get quantity and status
-                    const payment = user.payments?.find(
-                      (p) =>
-                        p.book_order?.order_id === order.payment?.book_order_id
-                    );
-
-                    return (
-                      <div key={index} className="border rounded-lg p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h4 className="font-medium">
-                              {order.book?.title || "Unknown Book"}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">
-                              Order ID: {order.payment?.book_order_id || "N/A"}
-                            </p>
-                          </div>
-                          {payment?.book_order?.status &&
-                            getOrderStatusBadge(payment.book_order.status)}
+                  {user.book_orders.slice(0, 5).map((order, index) => (
+                    <div key={index} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h4 className="font-medium">
+                            {order.book?.title || "Unknown Book"}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            Order ID: {order.payment?.book_order_id || "N/A"}
+                          </p>
                         </div>
-
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="text-muted-foreground">
-                              Price:
-                            </span>
-                            <span className="font-medium ml-1">
-                              {formatPrice(order.payment?.meterial_price)}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">
-                              Quantity:
-                            </span>
-                            <span className="font-medium ml-1">
-                              {payment?.book_order?.quantity || 1}
-                            </span>
-                          </div>
+                        <div className="flex flex-col gap-1 items-end">
+                          {order.payment?.status &&
+                            getPaymentStatusBadge(order.payment.status)}
+                          {user.is_blocked && getUserStatusBadge(false, true)}
                         </div>
+                      </div>
 
-                        {order.payment && (
-                          <div className="mt-2 pt-2 border-t">
-                            <div className="flex justify-between items-center text-sm">
-                              <span className="text-muted-foreground">
-                                Payment:
-                              </span>
-                              <div className="flex gap-2">
-                                {getPaymentStatusBadge(order.payment.status)}
-                                {getPaymentMethodBadge(order.payment.method)}
-                              </div>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">
+                            Paid at:
+                          </span>
+                          <span className="font-medium ml-1">
+                            {formatDate(order.payment?.createdAt)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Time:</span>
+                          <span className="font-medium ml-1 text-primary/70">
+                            {getRelativeTime(order.payment?.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 text-sm mt-2">
+                        <div>
+                          <span className="text-muted-foreground">Author:</span>
+                          <span className="font-medium ml-1">
+                            {order.book?.writter || "N/A"}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Batch:</span>
+                          <span className="font-medium ml-1">
+                            {order.book?.batch || "N/A"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 text-sm mt-2">
+                        <div>
+                          <span className="text-muted-foreground">
+                            Book ID:
+                          </span>
+                          <span className="font-medium ml-1 font-mono text-xs">
+                            {order.book?.book_id || "N/A"}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Price:</span>
+                          <span className="font-medium ml-1">
+                            {formatPrice(
+                              order.payment?.meterial_price ||
+                                order.book?.price ||
+                                0
+                            )}
+                          </span>
+                        </div>
+                      </div>
+
+                      {order.payment && (
+                        <div className="mt-2 pt-2 border-t">
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-muted-foreground">
+                              Payment:
+                            </span>
+                            <div className="flex gap-2">
+                              {getPaymentMethodBadge(order.payment.method)}
                             </div>
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -284,7 +313,7 @@ export default function UserDetailsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {user.enrollments.slice(0, 3).map((enrollment, index) => (
+                  {user.enrollments.slice(0, 5).map((enrollment, index) => (
                     <div key={index} className="border rounded-lg p-4">
                       <div className="flex justify-between items-start mb-2">
                         <div>
@@ -296,44 +325,34 @@ export default function UserDetailsPage() {
                             Enrollment ID: {enrollment.enrollment_id}
                           </p>
                         </div>
-                        <Badge
-                          variant={
-                            enrollment.status === "active"
-                              ? "default"
-                              : "secondary"
-                          }
-                          className={
-                            enrollment.status === "active"
-                              ? "bg-green-100 text-green-800 border-green-200 hover:bg-green-100"
-                              : "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-100"
-                          }
-                        >
-                          {enrollment.status}
-                        </Badge>
+                        <div className="flex flex-col gap-1 items-end">
+                          {getEnrollmentStatusBadge(enrollment.status)}
+                          {user.is_blocked && getUserStatusBadge(false, true)}
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-muted-foreground">Type:</span>
-                          <span className="font-medium ml-1 capitalize">
-                            {enrollment.enrollment_type}
+                          <span className="text-muted-foreground">
+                            Paid at:
+                          </span>
+                          <span className="font-medium ml-1">
+                            {formatDate(enrollment.payment?.createdAt)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Price:</span>
-                          <span className="font-medium ml-1">
-                            ৳{enrollment.payment?.meterial_price || 0}
+                          <span className="text-muted-foreground">Time:</span>
+                          <span className="font-medium ml-1 text-primary/70">
+                            {getRelativeTime(enrollment.payment?.createdAt)}
                           </span>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4 text-sm mt-2">
                         <div>
-                          <span className="text-muted-foreground">
-                            Expires:
-                          </span>
+                          <span className="text-muted-foreground">Price:</span>
                           <span className="font-medium ml-1">
-                            {formatDate(enrollment.expiry_date)}
+                            {formatPrice(enrollment.course?.price || 0)}
                           </span>
                         </div>
                         <div>

@@ -11,7 +11,10 @@ import {
   ArrowLeft,
   Calendar,
   CreditCard,
+  Facebook,
   GraduationCap,
+  MessageCircle,
+  Phone,
   User,
 } from "lucide-react";
 import { useEffect } from "react";
@@ -322,12 +325,72 @@ export default function EnrollmentDetailsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {enrollment.user && (
+                <>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Name
+                    </label>
+                    <p className="font-medium">
+                      {enrollment.user.name || "N/A"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      Phone
+                    </label>
+                    <p>{enrollment.user.phone || "N/A"}</p>
+                  </div>
+                </>
+              )}
+
+              <div className="border-t border-border my-4"></div>
+
               <div>
                 <label className="text-sm font-medium text-muted-foreground">
                   User ID
                 </label>
                 <p className="font-mono text-sm">{enrollment.user_id}</p>
               </div>
+
+              {enrollment.wp_number && (
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4" />
+                    WhatsApp
+                  </label>
+                  <a
+                    href={`https://wa.me/${enrollment.wp_number.replace(
+                      "+",
+                      ""
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-success/80 hover:underline"
+                  >
+                    {enrollment.wp_number}
+                  </a>
+                </div>
+              )}
+
+              {enrollment.fb_name && (
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Facebook className="w-4 h-4" />
+                    Facebook Profile
+                  </label>
+                  <a
+                    href={`${enrollment.fb_name}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500/60 hover:underline"
+                  >
+                    {enrollment.fb_name}
+                  </a>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
