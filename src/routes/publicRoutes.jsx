@@ -1,12 +1,12 @@
 import { Route } from "react-router-dom";
-import BookDetailsPage from "../pages/BookDetailsPage";
-import BooksPage from "../pages/BooksPage";
-import CheckoutPage from "../pages/CheckoutPage";
-import CourseDetailsPage from "../pages/CourseDetailsPage";
-import CoursesPage from "../pages/CoursesPage";
-import HomePage from "../pages/HomePage";
-import NotesPage from "../pages/NotesPage";
-import NotesViewPage from "../pages/NotesViewPage";
+import BookDetailsPage from "../pages/Public/BookDetailsPage";
+import BooksPage from "../pages/Public/BooksPage";
+import CheckoutPage from "../pages/Public/CheckoutPage";
+import CourseDetailsPage from "../pages/Public/CourseDetailsPage";
+import CoursesPage from "../pages/Public/CoursesPage";
+import HomePage from "../pages/Public/HomePage";
+import NotesPage from "../pages/Public/NotesPage";
+import NotesViewPage from "../pages/Public/NotesViewPage";
 export const publicRoutes = (
   <>
     <Route path="/" element={<HomePage />} />

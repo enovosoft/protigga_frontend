@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import StudentDashboard from "./Dashboard/StudentDashboard";
+import StudentDashboard from "./StudentDashboard";
 
 export default function Dashboard() {
   const { isAuthenticated, isAuthLoading, getPrimaryRole } = useAuth();

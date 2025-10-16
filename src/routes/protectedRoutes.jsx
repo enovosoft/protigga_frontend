@@ -1,7 +1,7 @@
 import { Route } from "react-router-dom";
 import { ProtectedRoute } from "../components/routing/ProtectedRoute";
 
-import Dashboard from "../pages/Dashboard";
+import Dashboard from "../pages/Dashboard/Dashboard";
 
 import PaymentCancelPage from "../pages/payment/PaymentCancelPage";
 import PaymentFailPage from "../pages/payment/PaymentFailPage";
