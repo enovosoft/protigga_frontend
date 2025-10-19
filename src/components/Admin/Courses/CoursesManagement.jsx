@@ -61,8 +61,7 @@ export default function CoursesManagement({ useLayout = true }) {
   };
 
   const handleEdit = (course) => {
-    setSelectedCourse(course);
-    setDialogOpen(true);
+    navigate(`/admin/courses/${course.slug}`);
   };
 
   const handleView = (course) => {
@@ -158,13 +157,6 @@ export default function CoursesManagement({ useLayout = true }) {
         </>
       )}
 
-      <CourseDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        course={selectedCourse}
-        onSuccess={fetchCourses}
-      />
-
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -196,6 +188,13 @@ export default function CoursesManagement({ useLayout = true }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <CourseDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        course={selectedCourse}
+        onSuccess={fetchCourses}
+      />
     </div>
   );
 

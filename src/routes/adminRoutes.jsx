@@ -2,6 +2,7 @@ import { Route } from "react-router-dom";
 import { ProtectedRoute } from "../components/routing/ProtectedRoute";
 import AdminDashboardPage from "../pages/Admin/AdminDashboardPage";
 import AdminBooksPage from "../pages/Admin/BooksPage";
+import CourseEditPage from "../pages/Admin/Courses/CourseEditPage";
 import AdminCoursesPage from "../pages/Admin/CoursesPage";
 import EnrollmentDetailsPage from "../pages/Admin/Enrollments/EnrollmentDetailsPage";
 import AdminEnrollmentsPage from "../pages/Admin/EnrollmentsPage";
@@ -84,6 +85,14 @@ export const adminRoutes = (
       element={
         <ProtectedRoute roles={["admin"]}>
           <AdminCoursesPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/admin/courses/:slug"
+      element={
+        <ProtectedRoute roles={["admin"]}>
+          <CourseEditPage />
         </ProtectedRoute>
       }
     />

@@ -38,12 +38,14 @@ export default function CourseDetailsPage() {
   const [relatedBooks, setRelatedBooks] = useState([]);
   const [relatedCourses, setRelatedCourses] = useState([]);
   const [activeTab, setActiveTab] = useState("description");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingCourse, setIsLoadingCourse] = useState(true);
+  const [isLoadingLectures, setIsLoadingLectures] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [expandedChapters, setExpandedChapters] = useState({});
 
   const fetchCourseDetails = useCallback(async () => {
+    setIsLoadingCourse(true);
     try {
       const response = await api.get(`/course/${slug}`);
       if (response.data.success && response.data.course) {
@@ -89,7 +91,7 @@ export default function CourseDetailsPage() {
       setRelatedBooks(DUMMY_RELATED_BOOKS);
       setRelatedCourses(DUMMY_RELATED_COURSES);
     } finally {
-      setIsLoading(false);
+      setIsLoadingCourse(false);
     }
   }, [slug]);
 
@@ -126,11 +128,11 @@ export default function CourseDetailsPage() {
     }));
   };
 
-  const getTopicIcon = (type) => {
+  const getTopicIcon = () => {
     return <Play className="w-4 h-4 text-primary" />;
   };
 
-  if (isLoading) {
+  if (isLoadingCourse) {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
