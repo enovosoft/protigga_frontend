@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye, Phone, User } from "lucide-react";
+import { Eye, Phone, Shield, ShieldOff, User } from "lucide-react";
 
 export function UsersTableSkeleton() {
   return (
@@ -82,7 +82,13 @@ export function UsersTableSkeleton() {
   );
 }
 
-export default function UsersTable({ users, startIndex, onView }) {
+export default function UsersTable({
+  users,
+  startIndex,
+  onView,
+  onToggleBlock,
+  currentUser,
+}) {
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -176,21 +182,27 @@ export default function UsersTable({ users, startIndex, onView }) {
                   )}
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
-                  {user.is_blocked ? (
-                    <Badge
-                      variant="destructive"
-                      className="bg-destructive/90 text-background border-destructive text-xs"
-                    >
-                      Yes
-                    </Badge>
-                  ) : (
-                    <Badge
-                      variant="default"
-                      className="bg-success/90 text-background border-success text-xs"
-                    >
-                      No
-                    </Badge>
-                  )}
+                  <Button
+                    variant={user.is_blocked ? "destructive" : "outline"}
+                    size="sm"
+                    onClick={() => onToggleBlock(user)}
+                    disabled={
+                      currentUser && currentUser.user_id === user.user_id
+                    }
+                    className="flex items-center gap-1"
+                  >
+                    {user.is_blocked ? (
+                      <>
+                        <ShieldOff className="w-3 h-3" />
+                        Unblock
+                      </>
+                    ) : (
+                      <>
+                        <Shield className="w-3 h-3" />
+                        Block
+                      </>
+                    )}
+                  </Button>
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">
                   <Badge variant="outline" className="font-medium">
