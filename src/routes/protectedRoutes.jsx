@@ -23,7 +23,7 @@ export const protectedRoutes = (
     <Route
       path="/payment/success"
       element={
-        <ProtectedRoute>
+        <ProtectedRoute roles={["admin", "student"]}>
           <PaymentSuccessPage />
         </ProtectedRoute>
       }
@@ -31,7 +31,7 @@ export const protectedRoutes = (
     <Route
       path="/payment/fail"
       element={
-        <ProtectedRoute>
+        <ProtectedRoute roles={["admin", "student"]}>
           <PaymentFailPage />
         </ProtectedRoute>
       }
@@ -39,7 +39,7 @@ export const protectedRoutes = (
     <Route
       path="/payment/cancel"
       element={
-        <ProtectedRoute>
+        <ProtectedRoute roles={["admin", "student"]}>
           <PaymentCancelPage />
         </ProtectedRoute>
       }

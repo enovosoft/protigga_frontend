@@ -70,6 +70,16 @@ const manualOrderSchema = z.object({
     "REFUNDED",
     "CANCELLED",
   ]),
+  delivery_method: z.enum(["inside_dhaka", "outside_dhaka", "sundarban"]),
+  payment_method: z.enum([
+    "BKASH",
+    "NAGAD",
+    "STRIPE",
+    "SSL_COMMERZ",
+    "CASH",
+    "OTHER",
+    "BANK",
+  ]),
 });
 
 export default function ManualOrderDialog({ onOrderCreated }) {
@@ -94,6 +104,8 @@ export default function ManualOrderDialog({ onOrderCreated }) {
       discount: 0,
       book_order_status: "confirmed",
       payment_status: "SUCCESS",
+      delivery_method: "inside_dhaka",
+      payment_method: "BKASH",
     },
   });
 
@@ -449,6 +461,67 @@ export default function ManualOrderDialog({ onOrderCreated }) {
                         <SelectItem value="FAILED">Failed</SelectItem>
                         <SelectItem value="REFUNDED">Refunded</SelectItem>
                         <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Delivery Method */}
+              <FormField
+                control={form.control}
+                name="delivery_method"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Delivery Method{" "}
+                      <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="inside_dhaka">
+                          Inside Dhaka
+                        </SelectItem>
+                        <SelectItem value="outside_dhaka">
+                          Outside Dhaka
+                        </SelectItem>
+                        <SelectItem value="sundarban">Sundarban</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Payment Method */}
+              <FormField
+                control={form.control}
+                name="payment_method"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Payment Method <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="BKASH">BKASH</SelectItem>
+                        <SelectItem value="NAGAD">NAGAD</SelectItem>
+                        <SelectItem value="STRIPE">STRIPE</SelectItem>
+                        <SelectItem value="SSL_COMMERZ">SSL_COMMERZ</SelectItem>
+                        <SelectItem value="CASH">CASH</SelectItem>
+                        <SelectItem value="OTHER">OTHER</SelectItem>
+                        <SelectItem value="BANK">BANK</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

@@ -60,6 +60,7 @@ export default function CourseEditPage() {
   const [saving, setSaving] = useState(false);
   const [chapters, setChapters] = useState([]);
   const [expandedChapters, setExpandedChapters] = useState(new Set());
+  const [books, setBooks] = useState([]);
 
   // Loading states for chapter and topic operations
   const [savingChapter, setSavingChapter] = useState(false);
@@ -99,6 +100,19 @@ export default function CourseEditPage() {
     title: "",
     youtube_url: "",
   });
+
+  // Fetch books for related book dropdown
+  const fetchBooks = useCallback(async () => {
+    try {
+      const response = await api.get("/books");
+      if (response.data.success) {
+        setBooks(response.data.books || []);
+      }
+    } catch (error) {
+      console.error("Error fetching books:", error);
+      // Don't show error toast for books fetch, just keep empty
+    }
+  }, []);
 
   // Fetch course data
   const fetchCourse = useCallback(
@@ -145,8 +159,9 @@ export default function CourseEditPage() {
   useEffect(() => {
     if (slug) {
       fetchCourse();
+      fetchBooks();
     }
-  }, [slug, fetchCourse]);
+  }, [slug, fetchCourse, fetchBooks]);
 
   // Handle course form changes
   const handleCourseChange = (e) => {
@@ -705,13 +720,40 @@ export default function CourseEditPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="related_book">Related Book</Label>
-                <Input
-                  id="related_book"
-                  name="related_book"
+                <Select
                   value={courseForm.related_book}
-                  onChange={handleCourseChange}
-                  placeholder="Enter related book"
-                />
+                  onValueChange={(value) =>
+                    handleCourseSelectChange("related_book", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a related book (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {courseForm.related_book &&
+                      !books.some(
+                        (book) => book.title === courseForm.related_book
+                      ) && (
+                        <SelectItem value={courseForm.related_book}>
+                          {courseForm.related_book} (previously selected)
+                        </SelectItem>
+                      )}
+                    {books.length > 0 ? (
+                      books.map((book) => (
+                        <SelectItem
+                          key={book.book_id || book.id}
+                          value={book.title}
+                        >
+                          {book.title}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="no-books" disabled>
+                        No books available
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

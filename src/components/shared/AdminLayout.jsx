@@ -102,6 +102,12 @@ const AdminLayout = ({ children }) => {
       icon: BookOpen,
       path: "/admin/courses",
     },
+    {
+      id: "exams",
+      label: "Exams",
+      icon: FileText,
+      path: "/admin/exams",
+    },
   ];
 
   return (
