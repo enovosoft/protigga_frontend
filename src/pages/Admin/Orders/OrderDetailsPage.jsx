@@ -192,6 +192,7 @@ export default function OrderDetailsPage() {
             <CardContent className="space-y-4">
               {order.payment && (
                 <>
+                  {/* Basic Payment Info */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
@@ -227,10 +228,11 @@ export default function OrderDetailsPage() {
 
                   <div className="border-t border-border my-4"></div>
 
+                  {/* Price per Item and Quantity */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
-                        Material Price
+                        Price per Item
                       </label>
                       <p className="font-semibold">
                         {formatPrice(order.payment.meterial_price || 0)}
@@ -238,26 +240,51 @@ export default function OrderDetailsPage() {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
+                        Quantity
+                      </label>
+                      <p className="font-semibold text-lg">{order.quantity}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Delivery Charge
+                      </label>
+                      <p className="font-semibold">
+                        {formatPrice(order.payment.delevery_charge || 0)}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
                         Discount Amount
                       </label>
-                      <p className="font-semibold text-green-600">
+                      <p className="font-semibold text-success">
                         -{formatPrice(order.payment.discount_amount || 0)}
                       </p>
                     </div>
+                  </div>
+
+                  <div className="border-t border-border my-4"></div>
+
+                  {/* Main Payment Calculations */}
+                  <div className="grid grid-cols-3 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
                         Total Amount
                       </label>
                       <p className="font-semibold">
-                        {formatPrice(order.payment.amount || 0)}
+                        {formatPrice(
+                          order.payment.product_price_with_quantity || 0
+                        )}
                       </p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
-                        Paid Amount
+                        Advance Charge
                       </label>
-                      <p className="font-semibold text-green-600">
-                        {formatPrice(order.payment.paid_amount || 0)}
+                      <p className="font-semibold">
+                        {formatPrice(order.payment.advance_charge_amount || 0)}
                       </p>
                     </div>
                     <div>
@@ -268,6 +295,12 @@ export default function OrderDetailsPage() {
                         {formatPrice(order.payment.due_amount || 0)}
                       </p>
                     </div>
+                  </div>
+
+                  <div className="border-t border-border my-4"></div>
+
+                  {/* Customer Related Fields */}
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
                         Will Customer Get Amount
@@ -354,14 +387,13 @@ export default function OrderDetailsPage() {
                 </label>
                 <p className="whitespace-pre-line">{order.address}</p>
               </div>
-              {order.alternative_phone && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    Alternative Phone
-                  </label>
-                  <p>{order.alternative_phone}</p>
-                </div>
-              )}
+
+              <div>
+                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  Alternative Phone
+                </label>
+                <p>{order.alternative_phone || "N/A"}</p>
+              </div>
             </CardContent>
           </Card>
         </div>

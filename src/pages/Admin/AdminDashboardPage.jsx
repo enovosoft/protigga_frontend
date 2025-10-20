@@ -17,7 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAuth } from "@/contexts/AuthContext";
 import api from "@/lib/api";
 import { formatPrice } from "@/lib/helper";
 import {
@@ -32,9 +31,18 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 export default function AdminDashboardPage() {
-  const { user } = useAuth();
   const [financeData, setFinanceData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -320,6 +328,140 @@ export default function AdminDashboardPage() {
                   </>
                 )}
               </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sales Trends */}
+        <div className="space-y-6">
+          <h3 className="text-2xl font-bold text-foreground">Sales Trends</h3>
+
+          {/* Daily Sales */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5" />
+                Daily Sales Trends
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart
+                  data={Object.keys(financeData?.daily_book_sales || {}).map(
+                    (date) => ({
+                      date,
+                      books: financeData?.daily_book_sales?.[date] || 0,
+                      courses: financeData?.daily_course_sales?.[date] || 0,
+                    })
+                  )}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="books"
+                    stroke="#8884d8"
+                    strokeWidth={2}
+                    name="Book Sales"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="courses"
+                    stroke="#82ca9d"
+                    strokeWidth={2}
+                    name="Course Sales"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Weekly Sales */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5" />
+                Weekly Sales Trends
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart
+                  data={Object.keys(financeData?.weekly_book_sales || {}).map(
+                    (week) => ({
+                      week,
+                      books: financeData?.weekly_book_sales?.[week] || 0,
+                      courses: financeData?.weekly_course_sales?.[week] || 0,
+                    })
+                  )}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="week" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="books"
+                    stroke="#ffc658"
+                    strokeWidth={2}
+                    name="Book Sales"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="courses"
+                    stroke="#ff7300"
+                    strokeWidth={2}
+                    name="Course Sales"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Monthly Sales */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5" />
+                Monthly Sales Trends
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart
+                  data={Object.keys(financeData?.monthly_book_sales || {}).map(
+                    (month) => ({
+                      month,
+                      books: financeData?.monthly_book_sales?.[month] || 0,
+                      courses: financeData?.monthly_course_sales?.[month] || 0,
+                    })
+                  )}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="books"
+                    stroke="#8dd1e1"
+                    strokeWidth={2}
+                    name="Book Sales"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="courses"
+                    stroke="#d084d0"
+                    strokeWidth={2}
+                    name="Course Sales"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
         </div>

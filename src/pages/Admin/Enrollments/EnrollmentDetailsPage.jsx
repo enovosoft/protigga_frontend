@@ -317,7 +317,7 @@ export default function EnrollmentDetailsPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
-                        Material Price
+                        Course Price
                       </label>
                       <p className="font-semibold">
                         {formatPrice(enrollment.payment.meterial_price || 0)}
@@ -336,7 +336,9 @@ export default function EnrollmentDetailsPage() {
                         Total Amount
                       </label>
                       <p className="font-semibold">
-                        {formatPrice(enrollment.payment.amount || 0)}
+                        {formatPrice(
+                          enrollment.payment.product_price_with_quantity || 0
+                        )}
                       </p>
                     </div>
                     <div>
@@ -353,26 +355,6 @@ export default function EnrollmentDetailsPage() {
                       </label>
                       <p className="font-semibold text-red-600">
                         {formatPrice(enrollment.payment.due_amount || 0)}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">
-                        Will Customer Get Amount
-                      </label>
-                      <p className="font-medium">
-                        {enrollment.payment.willCustomerGetAmount
-                          ? "Yes"
-                          : "No"}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">
-                        Customer Receivable Amount
-                      </label>
-                      <p className="font-semibold">
-                        {formatPrice(
-                          enrollment.payment.customer_receivable_amount || 0
-                        )}
                       </p>
                     </div>
                     <div>
@@ -467,14 +449,12 @@ export default function EnrollmentDetailsPage() {
                 </div>
               )}
 
-              {enrollment.fb_name && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    Facebook Profile
-                  </label>
-                  {enrollment.fb_name}
-                </div>
-              )}
+              <div>
+                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  Facebook Profile Name
+                </label>
+                {enrollment.fb_name || "N/A"}
+              </div>
 
               <div className="border-t border-border my-4"></div>
             </CardContent>

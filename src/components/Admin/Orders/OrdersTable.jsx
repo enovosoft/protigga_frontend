@@ -114,6 +114,9 @@ export default function OrdersTable({ orders, startIndex, onView }) {
               <TableHead className="font-semibold text-foreground min-w-[80px] sm:table-cell">
                 Status
               </TableHead>
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden sm:table-cell">
+                Method
+              </TableHead>
               <TableHead className="font-semibold text-foreground min-w-[60px] hidden sm:table-cell">
                 Qty
               </TableHead>
