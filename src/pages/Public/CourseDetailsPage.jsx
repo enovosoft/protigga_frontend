@@ -1,23 +1,14 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  DUMMY_COURSE,
-  DUMMY_RELATED_BOOKS,
-  DUMMY_RELATED_COURSES,
-} from "@/config/data";
+import { INSTRUCTORS } from "@/config/data";
 import api from "@/lib/api";
 import { cleanupImageUrls, fetchImageAsBlob } from "@/lib/helper";
 import {
+  Award,
   BarChart,
-  Book,
   BookOpen,
   CheckCircle,
   ChevronDown,
@@ -26,6 +17,7 @@ import {
   Globe,
   Play,
   ShoppingCart,
+  User,
   XCircle,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -35,11 +27,8 @@ export default function CourseDetailsPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
-  const [relatedBooks, setRelatedBooks] = useState([]);
-  const [relatedCourses, setRelatedCourses] = useState([]);
   const [activeTab, setActiveTab] = useState("description");
   const [isLoadingCourse, setIsLoadingCourse] = useState(true);
-  const [isLoadingLectures, setIsLoadingLectures] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [expandedChapters, setExpandedChapters] = useState({});
@@ -65,8 +54,15 @@ export default function CourseDetailsPage() {
           skill_level: courseData.course_details?.skill_level || "Beginner",
           expired_date: courseData.course_details?.expired_date,
           academy_name: courseData.course_details?.academy_name || "",
-          curriculum: DUMMY_COURSE.curriculum, // Use dummy curriculum for now
-          instructor: DUMMY_COURSE.instructor, // Use dummy instructor for now
+          curriculum: courseData.chapters || [], // Use real chapters from API
+          instructor: {
+            name: "Programming Instructor",
+            subject: "Computer Science",
+            experience: "8 years",
+            students: 1500,
+            image: null,
+            bio: "Experienced programming instructor with expertise in multiple programming languages and frameworks. Dedicated to helping students build strong foundations in software development and problem-solving skills.",
+          }, // Custom instructor for this course
         };
 
         setCourse(courseInfo);
@@ -79,17 +75,12 @@ export default function CourseDetailsPage() {
           }
         }
       } else {
-        // Use dummy data for development
-        setCourse(DUMMY_COURSE);
-        setRelatedBooks(DUMMY_RELATED_BOOKS);
-        setRelatedCourses(DUMMY_RELATED_COURSES);
+        console.error("Course not found");
+        setCourse(null);
       }
     } catch (error) {
       console.error("Error fetching course details:", error);
-      // Use dummy data for development
-      setCourse(DUMMY_COURSE);
-      setRelatedBooks(DUMMY_RELATED_BOOKS);
-      setRelatedCourses(DUMMY_RELATED_COURSES);
+      setCourse(null);
     } finally {
       setIsLoadingCourse(false);
     }
@@ -112,24 +103,11 @@ export default function CourseDetailsPage() {
     navigate(`/checkout?course=${slug}`);
   };
 
-  const handleOrderBook = (bookId) => {
-    navigate(`/checkout?book=${bookId}`);
-  };
-
-  const handleCourseClick = (courseId) => {
-    navigate(`/courses/${courseId}`);
-    window.scrollTo(0, 0);
-  };
-
   const toggleChapter = (chapterId) => {
     setExpandedChapters((prev) => ({
       ...prev,
       [chapterId]: !prev[chapterId],
     }));
-  };
-
-  const getTopicIcon = () => {
-    return <Play className="w-4 h-4 text-primary" />;
   };
 
   if (isLoadingCourse) {
@@ -363,13 +341,13 @@ export default function CourseDetailsPage() {
                 {activeTab === "curriculum" && (
                   <div className="space-y-4">
                     {course.curriculum && course.curriculum.length > 0 ? (
-                      course.curriculum.map((chapter) => (
+                      course.curriculum.map((chapter, chapterIndex) => (
                         <div
-                          key={chapter.id}
+                          key={chapterIndex}
                           className="border border-border rounded-lg overflow-hidden"
                         >
                           <button
-                            onClick={() => toggleChapter(chapter.id)}
+                            onClick={() => toggleChapter(chapterIndex)}
                             className="w-full flex items-center justify-between p-4 bg-muted/30 hover:bg-muted/50 transition-colors text-left"
                           >
                             <div className="flex items-center gap-3">
@@ -377,14 +355,14 @@ export default function CourseDetailsPage() {
                                 <BookOpen className="w-4 h-4 text-primary" />
                               </div>
                               <span className="font-medium text-foreground">
-                                {chapter.chapter}
+                                {chapter.title}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-sm text-muted-foreground">
-                                {chapter.topics.length} topics
+                                {chapter.topics?.length || 0} topics
                               </span>
-                              {expandedChapters[chapter.id] ? (
+                              {expandedChapters[chapterIndex] ? (
                                 <ChevronDown className="w-5 h-5 text-muted-foreground" />
                               ) : (
                                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -392,19 +370,19 @@ export default function CourseDetailsPage() {
                             </div>
                           </button>
 
-                          {expandedChapters[chapter.id] && (
+                          {expandedChapters[chapterIndex] && (
                             <div className="border-t border-border">
-                              {chapter.topics.map((topic, index) => (
+                              {chapter.topics?.map((topic, topicIndex) => (
                                 <div
-                                  key={topic.id}
+                                  key={topicIndex}
                                   className={`flex items-center gap-3 p-3 hover:bg-muted/30 transition-colors ${
-                                    index !== chapter.topics.length - 1
+                                    topicIndex !== chapter.topics.length - 1
                                       ? "border-b border-border/50"
                                       : ""
                                   }`}
                                 >
                                   <div className="flex items-center gap-2 flex-1">
-                                    {getTopicIcon(topic.type)}
+                                    <Play className="w-4 h-4 text-primary" />
                                     <span className="text-sm font-medium text-foreground">
                                       {topic.title}
                                     </span>
@@ -427,124 +405,63 @@ export default function CourseDetailsPage() {
                 )}
 
                 {activeTab === "instructor" && (
-                  <div className="space-y-4">
-                    {course.instructor ? (
-                      <div className="flex items-start gap-4">
-                        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-2xl font-bold text-primary">
-                            {course.instructor.name?.charAt(0) || "I"}
-                          </span>
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-semibold text-foreground">
-                            {course.instructor.name || "Instructor"}
-                          </h3>
-                          <p className="text-muted-foreground mt-1">
-                            {course.instructor.bio ||
-                              "Experienced educator dedicated to student success."}
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-muted-foreground">
-                        Instructor information will be updated soon.
-                      </p>
-                    )}
+                  <div className="space-y-6">
+                    {/* Instructor Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {INSTRUCTORS.map((instructor) => (
+                        <Card
+                          key={instructor.id}
+                          className="group hover:shadow-xl transition-all duration-300 hover:border-secondary/50 overflow-hidden"
+                        >
+                          <CardContent className="p-6">
+                            {/* Instructor Image */}
+                            <div className="mb-4">
+                              <div className="relative w-24 h-24 mx-auto">
+                                {instructor.image ? (
+                                  <img
+                                    src={instructor.image}
+                                    alt={instructor.name}
+                                    className="w-full h-full rounded-full object-cover border-4 border-secondary/20 group-hover:border-secondary/40 transition-colors"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center border-4 border-secondary/20 group-hover:border-secondary/40 transition-colors">
+                                    <User className="w-12 h-12 text-primary/60" />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Instructor Info */}
+                            <div className="text-center space-y-3">
+                              <div>
+                                <h4 className="font-semibold text-lg text-foreground group-hover:text-secondary transition-colors">
+                                  {instructor.name}
+                                </h4>
+                                <p className="text-secondary font-medium">
+                                  {instructor.subject}
+                                </p>
+                              </div>
+
+                              <div className="space-y-2 pt-3 border-t border-border">
+                                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                                  <Award className="w-4 h-4 text-secondary" />
+                                  <span>
+                                    {instructor.experience} experience
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                                  <BookOpen className="w-4 h-4 text-secondary" />
+                                  <span>{instructor.students}+ students</span>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
-
-              {/* Related Books */}
-              {relatedBooks.length > 0 && (
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-bold text-foreground">
-                    Related Books
-                  </h2>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {relatedBooks.map((book) => (
-                      <Card
-                        key={book.id}
-                        className="overflow-hidden hover:shadow-lg transition-shadow"
-                      >
-                        <CardHeader className="p-0">
-                          <div className="relative aspect-[3/4] overflow-hidden bg-muted">
-                            {book.book_image ? (
-                              <img
-                                src={book.book_image}
-                                alt={book.title}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <Book className="w-8 h-8 text-muted-foreground" />
-                              </div>
-                            )}
-                          </div>
-                        </CardHeader>
-                        <CardContent className="p-3">
-                          <h4 className="text-sm font-semibold text-foreground line-clamp-2 mb-2">
-                            {book.title}
-                          </h4>
-                          <p className="text-sm font-bold text-primary">
-                            ৳{book.price}
-                          </p>
-                        </CardContent>
-                        <CardFooter className="p-3 pt-0">
-                          <Button
-                            size="sm"
-                            className="w-full text-xs"
-                            onClick={() => handleOrderBook(book.id)}
-                          >
-                            Order
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Related Courses */}
-              {relatedCourses.length > 0 && (
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-bold text-foreground">
-                    Related Courses
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {relatedCourses.map((relatedCourse) => (
-                      <Card
-                        key={relatedCourse.id}
-                        className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                        onClick={() => handleCourseClick(relatedCourse.id)}
-                      >
-                        <CardHeader className="p-0">
-                          <div className="relative aspect-video overflow-hidden bg-muted">
-                            {relatedCourse.thumbnail ? (
-                              <img
-                                src={relatedCourse.thumbnail}
-                                alt={relatedCourse.course_title}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <BookOpen className="w-8 h-8 text-muted-foreground" />
-                              </div>
-                            )}
-                          </div>
-                        </CardHeader>
-                        <CardContent className="p-4">
-                          <h4 className="text-lg font-semibold text-foreground line-clamp-2 mb-2">
-                            {relatedCourse.course_title}
-                          </h4>
-                          <p className="text-xl font-bold text-primary">
-                            ৳{relatedCourse.price}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
