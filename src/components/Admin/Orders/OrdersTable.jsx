@@ -22,23 +22,21 @@ export function OrdersTableSkeleton() {
               <TableHead className="min-w-[100px] sm:min-w-[120px]">
                 Order ID
               </TableHead>
-              <TableHead className="min-w-[100px] hidden sm:table-cell">
+              <TableHead className="min-w-[100px] sm:table-cell">
                 User Name
               </TableHead>
               <TableHead className="min-w-[120px] sm:table-cell">
                 Book Name
               </TableHead>
-              <TableHead className="min-w-[80px] hidden md:table-cell">
+              <TableHead className="min-w-[80px] sm:table-cell">
                 Price
               </TableHead>
-              <TableHead className="min-w-[80px] hidden lg:table-cell">
+              <TableHead className="min-w-[60px] sm:table-cell">Qty</TableHead>
+              <TableHead className="min-w-[80px] sm:table-cell">
                 Status
               </TableHead>
               <TableHead className="min-w-[80px] hidden lg:table-cell">
                 Method
-              </TableHead>
-              <TableHead className="min-w-[60px] hidden md:table-cell">
-                Qty
               </TableHead>
               <TableHead className="text-right w-16">Actions</TableHead>
             </TableRow>
@@ -58,17 +56,17 @@ export function OrdersTableSkeleton() {
                 <TableCell className="sm:table-cell">
                   <Skeleton className="h-4 w-20" />
                 </TableCell>
-                <TableCell className="md:table-cell">
+                <TableCell className="sm:table-cell">
                   <Skeleton className="h-4 w-16" />
                 </TableCell>
-                <TableCell className="lg:table-cell">
-                  <Skeleton className="h-4 w-16" />
-                </TableCell>
-                <TableCell className="lg:table-cell">
-                  <Skeleton className="h-4 w-20" />
-                </TableCell>
-                <TableCell className="md:table-cell">
+                <TableCell className="sm:table-cell">
                   <Skeleton className="h-4 w-8" />
+                </TableCell>
+                <TableCell className="sm:table-cell">
+                  <Skeleton className="h-4 w-16" />
+                </TableCell>
+                <TableCell className="hidden lg:table-cell">
+                  <Skeleton className="h-4 w-20" />
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center justify-end">
@@ -101,27 +99,25 @@ export default function OrdersTable({ orders, startIndex, onView }) {
               <TableHead className="font-semibold text-foreground w-12 sm:w-14">
                 S/N
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] sm:min-w-[120px]">
+              <TableHead className="font-semibold text-foreground min-w-[100px] sm:min-w-[120px] hidden sm:table-cell">
                 Order ID
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] hidden sm:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[100px] sm:table-cell">
                 User Name
               </TableHead>
               <TableHead className="font-semibold text-foreground min-w-[120px] sm:table-cell">
                 Book Name
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[80px] hidden md:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px]">
                 Price
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[80px] hidden lg:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px] sm:table-cell">
                 Status
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[80px] hidden lg:table-cell">
-                Method
-              </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[60px] hidden md:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[60px] hidden sm:table-cell">
                 Qty
               </TableHead>
+
               <TableHead className="text-right font-semibold text-foreground w-16">
                 Actions
               </TableHead>
@@ -136,33 +132,31 @@ export default function OrdersTable({ orders, startIndex, onView }) {
                 <TableCell className="font-medium text-muted-foreground">
                   {startIndex + index + 1}
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <div className="font-mono text-sm text-foreground break-all">
                     {order.order_id}
                   </div>
                 </TableCell>
-                <TableCell className="hidden sm:table-cell">
+                <TableCell>
                   <div className="font-medium text-foreground break-words max-w-[200px]">
                     {order.user?.name || "N/A"}
                   </div>
                 </TableCell>
-                <TableCell className="hidden sm:table-cell">
+                <TableCell>
                   <div className="font-medium text-foreground break-words max-w-[200px]">
                     {order.book?.title || "N/A"}
                   </div>
                 </TableCell>
-                <TableCell className="hidden md:table-cell">
+                <TableCell>
                   <span className="font-medium text-foreground">
                     {formatPrice(order.product_price || 0)}
                   </span>
                 </TableCell>
-                <TableCell className="hidden lg:table-cell">
-                  {getOrderStatusBadge(order.status)}
-                </TableCell>
+                <TableCell>{getOrderStatusBadge(order.status)}</TableCell>
                 <TableCell className="hidden lg:table-cell">
                   {getPaymentMethodBadge(order.payment?.method)}
                 </TableCell>
-                <TableCell className="hidden md:table-cell">
+                <TableCell className="hidden sm:table-cell">
                   <span className="font-medium text-foreground">
                     {order.quantity}
                   </span>

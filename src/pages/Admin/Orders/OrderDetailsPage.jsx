@@ -270,6 +270,24 @@ export default function OrderDetailsPage() {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
+                        Will Customer Get Amount
+                      </label>
+                      <p className="font-medium">
+                        {order.payment.willCustomerGetAmount ? "Yes" : "No"}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Customer Receivable Amount
+                      </label>
+                      <p className="font-semibold">
+                        {formatPrice(
+                          order.payment.customer_receivable_amount || 0
+                        )}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
                         Transaction ID
                       </label>
                       <p className="font-mono text-sm">

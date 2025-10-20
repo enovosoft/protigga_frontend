@@ -1,6 +1,8 @@
 import UserDashboardLayout from "@/components/shared/DashboardLayout";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import api from "@/lib/api";
 import {
   getEnrollmentStatusBadge,
   getPaymentMethodBadge,
@@ -12,23 +14,67 @@ import {
   Calendar,
   CreditCard,
   GraduationCap,
+  Loader2,
   Phone,
+  Shield,
+  ShieldOff,
   User,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export default function EnrollmentDetailsPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const enrollment = location.state?.enrollment || null;
+  const [enrollment, setEnrollment] = useState(
+    location.state?.enrollment || null
+  );
+  const [togglingBlock, setTogglingBlock] = useState(false);
 
   useEffect(() => {
     // If no enrollment data in state, redirect back to enrollments
     if (!enrollment) {
-      navigate("/dashboard", { replace: true });
+      navigate("/admin/enrollments", { replace: true });
     }
   }, [enrollment, navigate]);
+
+  const handleToggleBlock = async () => {
+    if (!enrollment) return;
+
+    setTogglingBlock(true);
+    try {
+      const response = await api.put("/enrollment", {
+        enrollment_id: enrollment.enrollment_id,
+        user_id: enrollment.user_id,
+      });
+
+      if (response.data.success) {
+        // Update the local enrollment state
+        setEnrollment((prev) => ({
+          ...prev,
+          is_blocked: !prev.is_blocked,
+        }));
+        toast.success(
+          enrollment.is_blocked
+            ? "Enrollment unblocked successfully!"
+            : "Enrollment blocked successfully!"
+        );
+      } else {
+        toast.error(
+          response.data.message || "Failed to toggle enrollment block status"
+        );
+      }
+    } catch (error) {
+      console.error("Toggle block error:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to toggle enrollment block status"
+      );
+    } finally {
+      setTogglingBlock(false);
+    }
+  };
 
   if (!enrollment) {
     return (
@@ -62,7 +108,6 @@ export default function EnrollmentDetailsPage() {
               <span className="font-mono">{enrollment.enrollment_id}</span>
             </p>
           </div>
-          {getEnrollmentStatusBadge(enrollment.status)}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -113,7 +158,37 @@ export default function EnrollmentDetailsPage() {
                   </p>
                 </div>
               </div>
-
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Enrollment Status
+                  </label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge
+                      variant={
+                        enrollment.is_blocked ? "destructive" : "success"
+                      }
+                    >
+                      {enrollment.is_blocked ? "Blocked" : "Active"}
+                    </Badge>
+                  </div>
+                </div>
+                <Button
+                  onClick={handleToggleBlock}
+                  disabled={togglingBlock}
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  {togglingBlock ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : enrollment.is_blocked ? (
+                    <ShieldOff className="w-4 h-4" />
+                  ) : (
+                    <Shield className="w-4 h-4" />
+                  )}
+                  {enrollment.is_blocked ? "Unblock" : "Block"}
+                </Button>
+              </div>
               <div className="border-t border-border my-4"></div>
               <div>
                 <label className="text-sm font-medium text-muted-foreground">
@@ -282,6 +357,26 @@ export default function EnrollmentDetailsPage() {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
+                        Will Customer Get Amount
+                      </label>
+                      <p className="font-medium">
+                        {enrollment.payment.willCustomerGetAmount
+                          ? "Yes"
+                          : "No"}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Customer Receivable Amount
+                      </label>
+                      <p className="font-semibold">
+                        {formatPrice(
+                          enrollment.payment.customer_receivable_amount || 0
+                        )}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
                         Transaction ID
                       </label>
                       <p className="font-mono text-sm">
@@ -380,6 +475,8 @@ export default function EnrollmentDetailsPage() {
                   {enrollment.fb_name}
                 </div>
               )}
+
+              <div className="border-t border-border my-4"></div>
             </CardContent>
           </Card>
         </div>

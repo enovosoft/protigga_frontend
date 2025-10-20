@@ -121,7 +121,6 @@ export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
         const coursesData = response.data?.courses || [];
         setCourses(coursesData);
       } else {
-        console.log("API call failed, setting courses to empty array");
         setCourses([]);
       }
     } catch (error) {
@@ -164,13 +163,11 @@ export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
   };
 
   const selectedCourse = useMemo(() => {
-    console.log("selectedCourse useMemo - courses:", courses, "form:", !!form);
     if (!form || !courses) return null;
     const courseId = form.watch("course_id");
     const found = (courses || []).find(
       (course) => course.course_id === courseId
     );
-    console.log("Found course:", found);
     return found;
   }, [courses, form]);
 
@@ -258,15 +255,14 @@ export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {console.log("Rendering courses:", courses) ||
-                          (courses || []).map((course) => (
-                            <SelectItem
-                              key={course.course_id}
-                              value={course.course_id}
-                            >
-                              {course.course_title}
-                            </SelectItem>
-                          ))}
+                        {(courses || []).map((course) => (
+                          <SelectItem
+                            key={course.course_id}
+                            value={course.course_id}
+                          >
+                            {course.course_title}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />

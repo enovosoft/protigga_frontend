@@ -3,8 +3,11 @@ import OrdersTable, {
 } from "@/components/Admin/Orders/OrdersTable";
 import UserDashboardLayout from "@/components/shared/DashboardLayout";
 import Pagination from "@/components/shared/Pagination";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import api from "@/lib/api";
-import { Eye } from "lucide-react";
+import { Eye, Search } from "lucide-react";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -15,13 +18,29 @@ const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 20;
+  const [searchForm, setSearchForm] = useState({
+    book_id: "",
+    start_date: "",
+    end_date: "",
+  });
+  const [searching, setSearching] = useState(false);
 
-  const fetchOrders = async (page = 1) => {
+  const fetchOrders = async (page = 1, searchParams = {}) => {
     setLoading(true);
     try {
-      const response = await api.get(
-        `/orders?page=${page}&limit=${itemsPerPage}`
-      );
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.append("page", page.toString());
+      params.append("page_size", itemsPerPage.toString());
+
+      // Add search parameters if provided
+      if (searchParams.book_id) params.append("book_id", searchParams.book_id);
+      if (searchParams.start_date)
+        params.append("start_date", searchParams.start_date);
+      if (searchParams.end_date)
+        params.append("end_date", searchParams.end_date);
+
+      const response = await api.get(`/orders?${params.toString()}`);
       if (response.data.success) {
         const ordersData = response.data?.orders || [];
         setOrders(ordersData);
@@ -43,8 +62,29 @@ const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
     fetchOrders(currentPage);
   }, [currentPage]);
 
+  useEffect(() => {
+    fetchOrders(currentPage);
+  }, [currentPage]);
+
   const handleView = (order) => {
     navigate(`/admin/orders/${order.id}`, { state: { order } });
+  };
+
+  const handleSearch = async () => {
+    setSearching(true);
+    try {
+      await fetchOrders(1, searchForm);
+      setCurrentPage(1); // Reset to first page when searching
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleSearchChange = (field, value) => {
+    setSearchForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
   const handlePageChange = (page) => {
@@ -53,6 +93,66 @@ const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
 
   const content = (
     <div className="space-y-6">
+      {/* Search Form */}
+      <div className="bg-card rounded-lg border p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+          <div className="md:col-span-1">
+            <Label htmlFor="search_book_id" className="text-sm font-medium">
+              Book ID
+            </Label>
+            <Input
+              id="search_book_id"
+              value={searchForm.book_id}
+              onChange={(e) => handleSearchChange("book_id", e.target.value)}
+              placeholder="Enter book ID"
+              className="mt-1"
+            />
+          </div>
+          <div className="md:col-span-1">
+            <Label htmlFor="search_start_date" className="text-sm font-medium">
+              Start Date
+            </Label>
+            <Input
+              id="search_start_date"
+              type="date"
+              value={searchForm.start_date}
+              onChange={(e) => handleSearchChange("start_date", e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div className="md:col-span-1">
+            <Label htmlFor="search_end_date" className="text-sm font-medium">
+              End Date
+            </Label>
+            <Input
+              id="search_end_date"
+              type="date"
+              value={searchForm.end_date}
+              onChange={(e) => handleSearchChange("end_date", e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div className="md:col-span-1">
+            <Button
+              onClick={handleSearch}
+              disabled={searching}
+              className="flex items-center gap-2 w-full"
+            >
+              {searching ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Searching...
+                </>
+              ) : (
+                <>
+                  <Search className="w-4 h-4" />
+                  Search
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
       {loading ? (
         <OrdersTableSkeleton />
       ) : orders.length === 0 ? (

@@ -26,16 +26,16 @@ export function EnrollmentsTableSkeleton() {
               <TableHead className="min-w-[100px] sm:min-w-[120px]">
                 Enrollment ID
               </TableHead>
-              <TableHead className="min-w-[100px] hidden sm:table-cell">
+              <TableHead className="min-w-[100px] sm:table-cell">
                 User Name
               </TableHead>
               <TableHead className="min-w-[120px] sm:table-cell">
                 Course Name
               </TableHead>
-              <TableHead className="min-w-[80px] hidden md:table-cell">
+              <TableHead className="min-w-[80px] sm:table-cell">
                 Amount
               </TableHead>
-              <TableHead className="min-w-[80px] hidden lg:table-cell">
+              <TableHead className="min-w-[80px] sm:table-cell">
                 Status
               </TableHead>
               <TableHead className="min-w-[80px] hidden lg:table-cell">
@@ -62,16 +62,16 @@ export function EnrollmentsTableSkeleton() {
                 <TableCell className="sm:table-cell">
                   <Skeleton className="h-4 w-20" />
                 </TableCell>
-                <TableCell className="md:table-cell">
+                <TableCell className="sm:table-cell">
                   <Skeleton className="h-4 w-16" />
                 </TableCell>
-                <TableCell className="lg:table-cell">
+                <TableCell className="sm:table-cell">
                   <Skeleton className="h-4 w-16" />
                 </TableCell>
-                <TableCell className="lg:table-cell">
+                <TableCell className="hidden lg:table-cell">
                   <Skeleton className="h-4 w-20" />
                 </TableCell>
-                <TableCell className="lg:table-cell">
+                <TableCell className="hidden lg:table-cell">
                   <Skeleton className="h-4 w-20" />
                 </TableCell>
                 <TableCell>
@@ -102,28 +102,28 @@ export default function EnrollmentsTable({ enrollments, startIndex, onView }) {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50 hover:bg-muted/50">
-              <TableHead className="font-semibold text-foreground w-12 sm:w-14">
+              <TableHead className="font-semibold text-foreground w-14">
                 S/N
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] sm:min-w-[120px]">
+              <TableHead className="font-semibold text-foreground min-w-[100px] sm:min-w-[120px] hidden sm:table-cell">
                 Enrollment ID
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[100px] hidden sm:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[100px] sm:table-cell">
                 User Name
               </TableHead>
               <TableHead className="font-semibold text-foreground min-w-[120px] sm:table-cell">
                 Course Name
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[80px] hidden md:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px] sm:table-cell">
                 Amount
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[80px] hidden lg:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden sm:table-cell">
                 Status
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[80px] hidden lg:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px]">
                 Payment Status
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[80px] hidden lg:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden sm:table-cell">
                 Method
               </TableHead>
               <TableHead className="text-right font-semibold text-foreground w-16">
@@ -140,30 +140,30 @@ export default function EnrollmentsTable({ enrollments, startIndex, onView }) {
                 <TableCell className="font-medium text-muted-foreground">
                   {startIndex + index + 1}
                 </TableCell>
-                <TableCell>
-                  <div className="font-mono text-sm text-foreground break-all">
+                <TableCell className="hidden sm:table-cell">
+                  <div className="font-mono text-sm text-foreground break-all ">
                     {enrollment.enrollment_id}
                   </div>
                 </TableCell>
-                <TableCell className="hidden sm:table-cell">
+                <TableCell>
                   <div className="font-medium text-foreground break-words max-w-[200px]">
                     {enrollment.user?.name || "N/A"}
                   </div>
                 </TableCell>
-                <TableCell className="hidden sm:table-cell">
+                <TableCell>
                   <div className="font-medium text-foreground break-words max-w-[200px]">
                     {enrollment.course?.course_title || "N/A"}
                   </div>
                 </TableCell>
-                <TableCell className="hidden md:table-cell">
+                <TableCell>
                   <span className="font-medium text-foreground">
                     {formatPrice(enrollment.payment?.amount || 0)}
                   </span>
                 </TableCell>
-                <TableCell className="hidden lg:table-cell">
+                <TableCell className="hidden sm:table-cell">
                   {getEnrollmentStatusBadge(enrollment.status)}
                 </TableCell>
-                <TableCell className="hidden lg:table-cell">
+                <TableCell>
                   {getPaymentStatusBadge(enrollment.payment?.status)}
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">

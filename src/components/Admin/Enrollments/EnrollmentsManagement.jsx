@@ -3,8 +3,18 @@ import EnrollmentsTable, {
 } from "@/components/Admin/Enrollments/EnrollmentsTable";
 import UserDashboardLayout from "@/components/shared/DashboardLayout";
 import Pagination from "@/components/shared/Pagination";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import api from "@/lib/api";
-import { Eye } from "lucide-react";
+import { Eye, Search } from "lucide-react";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -18,13 +28,33 @@ const EnrollmentsManagement = forwardRef(function EnrollmentsManagement(
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
+  const [searchForm, setSearchForm] = useState({
+    course_id: "",
+    enrollment_type: "",
+    start_date: "",
+    end_date: "",
+  });
+  const [searching, setSearching] = useState(false);
 
-  const fetchEnrollments = async (page = 1) => {
+  const fetchEnrollments = async (page = 1, searchParams = {}) => {
     setLoading(true);
     try {
-      const response = await api.get(
-        `/enrollments?page=${page}&limit=${itemsPerPage}`
-      );
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.append("page", page.toString());
+      params.append("page_size", itemsPerPage.toString());
+
+      // Add search parameters if provided
+      if (searchParams.course_id)
+        params.append("course_id", searchParams.course_id);
+      if (searchParams.enrollment_type)
+        params.append("enrollment_type", searchParams.enrollment_type);
+      if (searchParams.start_date)
+        params.append("start_date", searchParams.start_date);
+      if (searchParams.end_date)
+        params.append("end_date", searchParams.end_date);
+
+      const response = await api.get(`/enrollments?${params.toString()}`);
       if (response.data.success) {
         const enrollmentsData = response.data?.enrollments || [];
         const totalCount = response.data?.totalCount || enrollmentsData.length;
@@ -52,6 +82,27 @@ const EnrollmentsManagement = forwardRef(function EnrollmentsManagement(
     fetchEnrollments(currentPage);
   }, [currentPage]);
 
+  useEffect(() => {
+    fetchEnrollments(currentPage);
+  }, [currentPage]);
+
+  const handleSearch = async () => {
+    setSearching(true);
+    try {
+      await fetchEnrollments(1, searchForm);
+      setCurrentPage(1); // Reset to first page when searching
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleSearchChange = (field, value) => {
+    setSearchForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   const handleView = (enrollment) => {
     navigate(`/admin/enrollments/${enrollment.id}`, { state: { enrollment } });
   };
@@ -63,6 +114,88 @@ const EnrollmentsManagement = forwardRef(function EnrollmentsManagement(
 
   const content = (
     <div className="space-y-6">
+      {/* Search Form */}
+      <div className="bg-card rounded-lg border p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+          <div className="sm:col-span-1">
+            <Label htmlFor="search_course_id" className="text-sm font-medium">
+              Course ID
+            </Label>
+            <Input
+              id="search_course_id"
+              value={searchForm.course_id}
+              onChange={(e) => handleSearchChange("course_id", e.target.value)}
+              placeholder="Enter course ID"
+              className="mt-1"
+            />
+          </div>
+          <div className="sm:col-span-1">
+            <Label
+              htmlFor="search_enrollment_type"
+              className="text-sm font-medium"
+            >
+              Enrollment Type
+            </Label>
+            <Select
+              value={searchForm.enrollment_type}
+              onValueChange={(value) =>
+                handleSearchChange("enrollment_type", value)
+              }
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hybrid">Hybrid</SelectItem>
+                <SelectItem value="online">Online</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="sm:col-span-1 lg:col-span-1">
+            <Label htmlFor="search_start_date" className="text-sm font-medium">
+              Start Date
+            </Label>
+            <Input
+              id="search_start_date"
+              type="date"
+              value={searchForm.start_date}
+              onChange={(e) => handleSearchChange("start_date", e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div className="sm:col-span-1 lg:col-span-1">
+            <Label htmlFor="search_end_date" className="text-sm font-medium">
+              End Date
+            </Label>
+            <Input
+              id="search_end_date"
+              type="date"
+              value={searchForm.end_date}
+              onChange={(e) => handleSearchChange("end_date", e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div className="sm:col-span-2 lg:col-span-1">
+            <Button
+              onClick={handleSearch}
+              disabled={searching}
+              className="flex items-center gap-2 w-full"
+            >
+              {searching ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Searching...
+                </>
+              ) : (
+                <>
+                  <Search className="w-4 h-4" />
+                  Search
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
       {loading ? (
         <EnrollmentsTableSkeleton />
       ) : enrollments.length === 0 ? (

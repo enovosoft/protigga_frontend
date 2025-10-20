@@ -1,8 +1,105 @@
 import AdminLayout from "@/components/shared/AdminLayout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useAuth } from "@/contexts/AuthContext";
+import api from "@/lib/api";
+import { formatPrice } from "@/lib/helper";
+import {
+  AlertCircle,
+  BarChart3,
+  BookOpen,
+  DollarSign,
+  Eye,
+  GraduationCap,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function AdminDashboardPage() {
   const { user } = useAuth();
+  const [financeData, setFinanceData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFinanceData = async () => {
+      try {
+        const response = await api.get("/finance");
+        if (response.data.success) {
+          setFinanceData(response.data);
+        } else {
+          toast.error(response.data.message || "Failed to load finance data");
+        }
+      } catch (error) {
+        console.error("Finance data fetch error:", error);
+        toast.error("Failed to load finance data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFinanceData();
+  }, []);
+
+  const metrics = [
+    {
+      title: "Total Book Sales",
+      value: financeData
+        ? formatPrice(financeData.total_book_sell_amount)
+        : "0",
+      icon: BookOpen,
+      description: "Revenue from book sales",
+    },
+    {
+      title: "Total Course Sales",
+      value: financeData
+        ? formatPrice(financeData.total_course_sell_amount)
+        : "0",
+      icon: GraduationCap,
+      description: "Revenue from course sales",
+    },
+    {
+      title: "Average Order Value",
+      value: financeData ? formatPrice(financeData.average_order_value) : "0",
+      icon: DollarSign,
+      description: "Average value per order",
+    },
+    {
+      title: "Revenue Growth",
+      value: financeData ? `${financeData.revenue_growth}%` : "0%",
+      icon: TrendingUp,
+      description: "Growth from last period",
+    },
+    {
+      title: "Pending Book Orders",
+      value: financeData ? financeData.pending_book_orders : 0,
+      icon: AlertCircle,
+      description: "Orders awaiting fulfillment",
+    },
+    {
+      title: "Inactive Course Orders",
+      value: financeData ? financeData.inactive_course_orders : 0,
+      icon: Users,
+      description: "Inactive course enrollments",
+    },
+  ];
 
   return (
     <AdminLayout>
@@ -11,13 +108,221 @@ export default function AdminDashboardPage() {
           <h2 className="text-3xl font-bold text-foreground">
             Admin Dashboard
           </h2>
-          <p className="text-muted-foreground mt-2">
-            Welcome back {user?.name || "admin"}, Manage your platform and study
-            materials
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        {/* Metrics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {loading
+            ? // Skeleton loaders for metrics
+              Array.from({ length: 6 }).map((_, index) => (
+                <Card key={index}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-4" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-8 w-16 mb-2" />
+                    <Skeleton className="h-3 w-32" />
+                  </CardContent>
+                </Card>
+              ))
+            : // Actual metrics
+              metrics.map((metric, index) => (
+                <Card key={index}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      {metric.title}
+                    </CardTitle>
+                    <metric.icon className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{metric.value}</div>
+                    <p className="text-xs text-muted-foreground">
+                      {metric.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+        </div>
+
+        {/* Sales Overview */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Book Sales Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5" />
+                Book Sales Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {loading ? (
+                  // Skeleton loaders for book sales
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-16" />
+                      </div>
+                      <Skeleton className="h-4 w-16" />
+                    </div>
+                  ))
+                ) : (
+                  // Actual book sales data
+                  <>
+                    {financeData?.book_sales?.slice(0, 5).map((book) => (
+                      <div
+                        key={book.book_id}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex-1">
+                          <p className="text-sm font-medium truncate">
+                            {book.book_name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {book.total_orders} orders
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium">
+                            {formatPrice(book.total_amount)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="w-full">
+                          <Eye className="w-4 h-4 mr-2" />
+                          View All Books
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl">
+                        <DialogHeader>
+                          <DialogTitle>Book Sales Details</DialogTitle>
+                        </DialogHeader>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Book Name</TableHead>
+                              <TableHead>Total Orders</TableHead>
+                              <TableHead>Total Amount</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {financeData?.book_sales?.map((book) => (
+                              <TableRow key={book.book_id}>
+                                <TableCell className="font-medium">
+                                  {book.book_name}
+                                </TableCell>
+                                <TableCell>{book.total_orders}</TableCell>
+                                <TableCell>
+                                  {formatPrice(book.total_amount)}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Course Sales Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5" />
+                Course Sales Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {loading ? (
+                  // Skeleton loaders for course sales
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-16" />
+                      </div>
+                      <Skeleton className="h-4 w-16" />
+                    </div>
+                  ))
+                ) : (
+                  // Actual course sales data
+                  <>
+                    {financeData?.course_sales?.slice(0, 5).map((course) => (
+                      <div
+                        key={course.course_id}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex-1">
+                          <p className="text-sm font-medium truncate">
+                            {course.course_name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {course.total_orders} orders
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium">
+                            {formatPrice(course.total_amount)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="w-full">
+                          <Eye className="w-4 h-4 mr-2" />
+                          View All Courses
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl">
+                        <DialogHeader>
+                          <DialogTitle>Course Sales Details</DialogTitle>
+                        </DialogHeader>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Course Name</TableHead>
+                              <TableHead>Total Orders</TableHead>
+                              <TableHead>Total Amount</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {financeData?.course_sales?.map((course) => (
+                              <TableRow key={course.course_id}>
+                                <TableCell className="font-medium">
+                                  {course.course_name}
+                                </TableCell>
+                                <TableCell>{course.total_orders}</TableCell>
+                                <TableCell>
+                                  {formatPrice(course.total_amount)}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </DialogContent>
+                    </Dialog>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </AdminLayout>
   );
