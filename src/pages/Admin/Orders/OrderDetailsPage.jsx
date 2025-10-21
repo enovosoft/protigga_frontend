@@ -268,10 +268,13 @@ export default function OrderDetailsPage() {
                   <div className="border-t border-border my-4"></div>
 
                   {/* Main Payment Calculations */}
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
-                        Total Amount
+                        Total Amount{" "}
+                        <span className="text-xs">
+                          (advance + delivery + discount)
+                        </span>
                       </label>
                       <p className="font-semibold">
                         {formatPrice(order.payment.amount || 0)}
