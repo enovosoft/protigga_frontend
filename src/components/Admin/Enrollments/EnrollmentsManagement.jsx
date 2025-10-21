@@ -48,7 +48,12 @@ const EnrollmentsManagement = forwardRef(function EnrollmentsManagement(
       if (searchParams.course_id)
         params.append("course_id", searchParams.course_id);
       if (searchParams.enrollment_type)
-        params.append("enrollment_type", searchParams.enrollment_type);
+        params.append(
+          "enrollment_type",
+          searchParams.enrollment_type === "both"
+            ? ""
+            : searchParams.enrollment_type
+        );
       if (searchParams.start_date)
         params.append("start_date", searchParams.start_date);
       if (searchParams.end_date)
