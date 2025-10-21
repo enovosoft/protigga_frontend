@@ -379,8 +379,8 @@ export default function CheckoutForm() {
         );
       } else {
         toast.error(
-          error?.response?.data?.errors[0]?.message ||
-            error.response?.data?.message ||
+          error.response?.data?.message ||
+            error?.response?.data?.errors[0]?.message ||
             "An unexpected error occurred"
         );
       }

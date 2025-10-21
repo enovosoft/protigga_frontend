@@ -274,9 +274,7 @@ export default function OrderDetailsPage() {
                         Total Amount
                       </label>
                       <p className="font-semibold">
-                        {formatPrice(
-                          order.payment.product_price_with_quantity || 0
-                        )}
+                        {formatPrice(order.payment.amount || 0)}
                       </p>
                     </div>
                     <div>
