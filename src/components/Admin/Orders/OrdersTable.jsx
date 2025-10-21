@@ -29,7 +29,7 @@ export function OrdersTableSkeleton() {
                 Book Name
               </TableHead>
               <TableHead className="min-w-[80px] sm:table-cell">
-                Price
+                Amount
               </TableHead>
               <TableHead className="min-w-[60px] sm:table-cell">Qty</TableHead>
               <TableHead className="min-w-[80px] sm:table-cell">
@@ -109,7 +109,7 @@ export default function OrdersTable({ orders, startIndex, onView }) {
                 Book Name
               </TableHead>
               <TableHead className="font-semibold text-foreground min-w-[80px]">
-                Price
+                Amount
               </TableHead>
               <TableHead className="font-semibold text-foreground min-w-[80px] sm:table-cell">
                 Status
@@ -152,7 +152,7 @@ export default function OrdersTable({ orders, startIndex, onView }) {
                 </TableCell>
                 <TableCell>
                   <span className="font-medium text-foreground">
-                    {formatPrice(order.product_price || 0)}
+                    {formatPrice(order?.payment?.amount || 0)}
                   </span>
                 </TableCell>
                 <TableCell>{getOrderStatusBadge(order.status)}</TableCell>

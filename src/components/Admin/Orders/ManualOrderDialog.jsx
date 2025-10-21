@@ -39,9 +39,14 @@ const manualOrderSchema = z.object({
       /^\+8801\d{9}$/,
       "Phone must be a valid Bangladesh number (+8801xxxxxxxx)"
     ),
-  // product_name removed - taken from selected book
-  product_price: z.number().min(0, "Price must be positive"),
-  quantity: z.number().min(1, "Quantity must be at least 1"),
+  product_price: z
+    .number("Product Price is required")
+    .min(0, "Price must be positive"),
+  quantity: z
+    .number("Quantity is required")
+    .min(1, "Quantity must be at least 1"),
+  discount_amount: z.number().min(0, "Discount must be positive").default(0),
+  paid_amount: z.number().min(0, "Paid amount must be positive").default(0),
   address: z.string().min(1, "Address is required"),
   Txn_ID: z.string().min(1, "Transaction ID is required"),
   book_id: z.string().min(1, "Book selection is required"),
@@ -53,8 +58,7 @@ const manualOrderSchema = z.object({
     )
     .optional()
     .or(z.literal("")),
-  discount_amount: z.number().min(0, "Discount must be positive").default(0),
-  paid_amount: z.number().min(0, "Paid amount must be positive").default(0),
+
   // after_discounted_amount removed; not required
   // discount percentage removed; only discount_amount is used
   book_order_status: z.enum(["confirmed", "pending", "failed", "cancelled"]),
@@ -164,8 +168,7 @@ export default function ManualOrderDialog({ onOrderCreated }) {
 
   useEffect(() => {
     if (selectedBook) {
-      // product_name is derived; no need to set
-      form.setValue("product_price", selectedBook.price || 0);
+      form.setValue("product_price", selectedBook.price);
     }
   }, [selectedBook, form]);
 
@@ -263,7 +266,7 @@ export default function ManualOrderDialog({ onOrderCreated }) {
                         step="1"
                         {...field}
                         onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value) || 0)
+                          field.onChange(parseFloat(e.target.value))
                         }
                       />
                     </FormControl>
@@ -286,7 +289,30 @@ export default function ManualOrderDialog({ onOrderCreated }) {
                         type="number"
                         {...field}
                         onChange={(e) =>
-                          field.onChange(parseInt(e.target.value) || 1)
+                          field.onChange(parseInt(e.target.value))
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="discount_amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Discount Amount{" "}
+                      <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="1"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value))
                         }
                       />
                     </FormControl>
@@ -307,7 +333,7 @@ export default function ManualOrderDialog({ onOrderCreated }) {
                         step="0.01"
                         {...field}
                         onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value) || 0)
+                          field.onChange(parseFloat(e.target.value))
                         }
                       />
                     </FormControl>
