@@ -148,6 +148,7 @@ const EnrollmentsManagement = forwardRef(function EnrollmentsManagement(
               <SelectContent>
                 <SelectItem value="hybrid">Hybrid</SelectItem>
                 <SelectItem value="online">Online</SelectItem>
+                <SelectItem value="both">Both</SelectItem>
               </SelectContent>
             </Select>
           </div>

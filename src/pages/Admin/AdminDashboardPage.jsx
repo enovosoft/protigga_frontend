@@ -8,6 +8,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -26,6 +28,7 @@ import {
   DollarSign,
   Eye,
   GraduationCap,
+  Search,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -45,11 +48,23 @@ import {
 export default function AdminDashboardPage() {
   const [financeData, setFinanceData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchForm, setSearchForm] = useState({
+    start_date: "",
+    end_date: "",
+  });
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
-    const fetchFinanceData = async () => {
+    const fetchFinanceData = async (params = {}) => {
+      setLoading(true);
       try {
-        const response = await api.get("/finance");
+        // Build query parameters
+        const queryParams = new URLSearchParams();
+        if (params.start_date)
+          queryParams.append("start_date", params.start_date);
+        if (params.end_date) queryParams.append("end_date", params.end_date);
+
+        const response = await api.get(`/finance?${queryParams.toString()}`);
         if (response.data.success) {
           setFinanceData(response.data);
         } else {
@@ -109,6 +124,42 @@ export default function AdminDashboardPage() {
     },
   ];
 
+  const handleSearch = async () => {
+    setSearching(true);
+    setLoading(true);
+    try {
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (searchForm.start_date.trim())
+        params.append("start_date", searchForm.start_date.trim());
+      if (searchForm.end_date.trim())
+        params.append("end_date", searchForm.end_date.trim());
+
+      const response = await api.get(`/finance?${params.toString()}`);
+      if (response.data.success) {
+        setFinanceData(response.data);
+        toast.success(
+          response.data.message || "Finance data loaded successfully"
+        );
+      } else {
+        toast.error(response.data.message || "Failed to load finance data");
+      }
+    } catch (error) {
+      console.error("Finance data fetch error:", error);
+      toast.error("Failed to load finance data");
+    } finally {
+      setSearching(false);
+      setLoading(false);
+    }
+  };
+
+  const handleSearchChange = (field, value) => {
+    setSearchForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -116,6 +167,60 @@ export default function AdminDashboardPage() {
           <h2 className="text-3xl font-bold text-foreground">
             Admin Dashboard
           </h2>
+        </div>
+
+        {/* Search Form */}
+        <div className="bg-card rounded-lg border p-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-4 items-end">
+            <div className="flex-1">
+              <Label
+                htmlFor="search_start_date"
+                className="text-sm font-medium"
+              >
+                Start Date
+              </Label>
+              <Input
+                id="search_start_date"
+                type="date"
+                value={searchForm.start_date}
+                onChange={(e) =>
+                  handleSearchChange("start_date", e.target.value)
+                }
+                className="mt-1"
+              />
+            </div>
+            <div className="flex-1">
+              <Label htmlFor="search_end_date" className="text-sm font-medium">
+                End Date
+              </Label>
+              <Input
+                id="search_end_date"
+                type="date"
+                value={searchForm.end_date}
+                onChange={(e) => handleSearchChange("end_date", e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Button
+                onClick={handleSearch}
+                disabled={searching}
+                className="flex items-center gap-2"
+              >
+                {searching ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Searching...
+                  </>
+                ) : (
+                  <>
+                    <Search className="w-4 h-4" />
+                    Search
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Metrics Cards */}

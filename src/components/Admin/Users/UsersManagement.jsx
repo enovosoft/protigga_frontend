@@ -81,6 +81,18 @@ export default function UsersManagement({ useLayout = true }) {
   };
 
   const handleSearch = async () => {
+    // If all fields are empty, fetch all users
+    if (
+      !searchForm.user_id.trim() &&
+      !searchForm.name.trim() &&
+      !searchForm.phone.trim()
+    ) {
+      setSearching(true);
+      await fetchUsers();
+      setCurrentPage(1);
+      setSearching(false);
+      return;
+    }
     // Build query parameters
     const params = new URLSearchParams();
     if (searchForm.user_id.trim())
@@ -88,11 +100,6 @@ export default function UsersManagement({ useLayout = true }) {
     if (searchForm.name.trim()) params.append("name", searchForm.name.trim());
     if (searchForm.phone.trim())
       params.append("phone", searchForm.phone.trim());
-
-    if (params.toString() === "") {
-      toast.error("Please enter at least one search criteria");
-      return;
-    }
 
     setSearching(true);
     try {
