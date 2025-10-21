@@ -39,7 +39,7 @@ const manualOrderSchema = z.object({
       /^\+8801\d{9}$/,
       "Phone must be a valid Bangladesh number (+8801xxxxxxxx)"
     ),
-  product_name: z.string().min(1, "Product name is required"),
+  // product_name removed - taken from selected book
   product_price: z.number().min(0, "Price must be positive"),
   quantity: z.number().min(1, "Quantity must be at least 1"),
   address: z.string().min(1, "Address is required"),
@@ -54,14 +54,9 @@ const manualOrderSchema = z.object({
     .optional()
     .or(z.literal("")),
   discount_amount: z.number().min(0, "Discount must be positive").default(0),
-  due_amount: z.number().min(0, "Due amount must be positive").default(0),
-  after_discounted_amount: z
-    .number()
-    .min(0, "After discount amount must be positive"),
-  discount: z
-    .number()
-    .min(0, "Discount percentage must be positive")
-    .default(0),
+  paid_amount: z.number().min(0, "Paid amount must be positive").default(0),
+  // after_discounted_amount removed; not required
+  // discount percentage removed; only discount_amount is used
   book_order_status: z.enum(["confirmed", "pending", "failed", "cancelled"]),
   payment_status: z.enum([
     "PENDING",
@@ -91,7 +86,6 @@ export default function ManualOrderDialog({ onOrderCreated }) {
     resolver: zodResolver(manualOrderSchema),
     defaultValues: {
       phone: "",
-      product_name: "",
       product_price: 0,
       quantity: 1,
       address: "",
@@ -99,9 +93,7 @@ export default function ManualOrderDialog({ onOrderCreated }) {
       book_id: "",
       alternative_phone: "",
       discount_amount: 0,
-      due_amount: 0,
-      after_discounted_amount: 0,
-      discount: 0,
+      paid_amount: 0,
       book_order_status: "confirmed",
       payment_status: "SUCCESS",
       delivery_method: "inside_dhaka",
@@ -130,9 +122,24 @@ export default function ManualOrderDialog({ onOrderCreated }) {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const response = await api.post("/manual/book-order", { ...data });
+      const payload = { ...data };
+      payload["inside_dhaka"] = false;
+      payload["outside_dhaka"] = false;
+      payload["sundarban_courier"] = false;
+
+      if (data.delivery_method === "inside_dhaka") {
+        payload["inside_dhaka"] = true;
+      } else if (data.delivery_method === "outside_dhaka") {
+        payload["outside_dhaka"] = true;
+      } else if (data.delivery_method === "sundarban") {
+        payload["sundarban_courier"] = true;
+      }
+
+      const response = await api.post("/manual/book-order", payload);
       if (response.data.success) {
-        toast.success("Manual order created successfully");
+        toast.success(
+          response.data?.message || "Manual order created successfully"
+        );
         setOpen(false);
         form.reset();
         if (onOrderCreated) {
@@ -157,7 +164,7 @@ export default function ManualOrderDialog({ onOrderCreated }) {
 
   useEffect(() => {
     if (selectedBook) {
-      form.setValue("product_name", selectedBook.title || "");
+      // product_name is derived; no need to set
       form.setValue("product_price", selectedBook.price || 0);
     }
   }, [selectedBook, form]);
@@ -241,23 +248,6 @@ export default function ManualOrderDialog({ onOrderCreated }) {
                 )}
               />
 
-              {/* Product Name (Auto-filled) */}
-              <FormField
-                control={form.control}
-                name="product_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Product Name <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} readOnly />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               {/* Product Price */}
               <FormField
                 control={form.control}
@@ -270,7 +260,7 @@ export default function ManualOrderDialog({ onOrderCreated }) {
                     <FormControl>
                       <Input
                         type="number"
-                        step="0.01"
+                        step="1"
                         {...field}
                         onChange={(e) =>
                           field.onChange(parseFloat(e.target.value) || 0)
@@ -305,82 +295,12 @@ export default function ManualOrderDialog({ onOrderCreated }) {
                 )}
               />
 
-              {/* Discount */}
               <FormField
                 control={form.control}
-                name="discount"
+                name="paid_amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Discount (%)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value) || 0)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Discount Amount */}
-              <FormField
-                control={form.control}
-                name="discount_amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Discount Amount</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value) || 0)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* After Discounted Amount */}
-              <FormField
-                control={form.control}
-                name="after_discounted_amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      After Discount Amount{" "}
-                      <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value) || 0)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Due Amount */}
-              <FormField
-                control={form.control}
-                name="due_amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Due Amount</FormLabel>
+                    <FormLabel>Paid Amount</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -517,7 +437,6 @@ export default function ManualOrderDialog({ onOrderCreated }) {
                       <SelectContent>
                         <SelectItem value="BKASH">BKASH</SelectItem>
                         <SelectItem value="NAGAD">NAGAD</SelectItem>
-                        <SelectItem value="STRIPE">STRIPE</SelectItem>
                         <SelectItem value="SSL_COMMERZ">SSL_COMMERZ</SelectItem>
                         <SelectItem value="CASH">CASH</SelectItem>
                         <SelectItem value="OTHER">OTHER</SelectItem>

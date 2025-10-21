@@ -453,11 +453,26 @@ export default function AdminDashboardPage() {
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart
                   data={Object.keys(financeData?.daily_book_sales || {}).map(
-                    (date) => ({
-                      date,
-                      books: financeData?.daily_book_sales?.[date] || 0,
-                      courses: financeData?.daily_course_sales?.[date] || 0,
-                    })
+                    (date) => {
+                      const bookVal = financeData?.daily_book_sales?.[date];
+                      const courseVal = financeData?.daily_course_sales?.[date];
+
+                      const books =
+                        bookVal && typeof bookVal === "object"
+                          ? Object.values(bookVal).reduce((a, b) => a + b, 0)
+                          : bookVal || 0;
+
+                      const courses =
+                        courseVal && typeof courseVal === "object"
+                          ? Object.values(courseVal).reduce((a, b) => a + b, 0)
+                          : courseVal || 0;
+
+                      return {
+                        date,
+                        books,
+                        courses,
+                      };
+                    }
                   )}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
@@ -496,11 +511,27 @@ export default function AdminDashboardPage() {
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart
                   data={Object.keys(financeData?.weekly_book_sales || {}).map(
-                    (week) => ({
-                      week,
-                      books: financeData?.weekly_book_sales?.[week] || 0,
-                      courses: financeData?.weekly_course_sales?.[week] || 0,
-                    })
+                    (week) => {
+                      const bookVal = financeData?.weekly_book_sales?.[week];
+                      const courseVal =
+                        financeData?.weekly_course_sales?.[week];
+
+                      const books =
+                        bookVal && typeof bookVal === "object"
+                          ? Object.values(bookVal).reduce((a, b) => a + b, 0)
+                          : bookVal || 0;
+
+                      const courses =
+                        courseVal && typeof courseVal === "object"
+                          ? Object.values(courseVal).reduce((a, b) => a + b, 0)
+                          : courseVal || 0;
+
+                      return {
+                        week,
+                        books,
+                        courses,
+                      };
+                    }
                   )}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
@@ -539,11 +570,27 @@ export default function AdminDashboardPage() {
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart
                   data={Object.keys(financeData?.monthly_book_sales || {}).map(
-                    (month) => ({
-                      month,
-                      books: financeData?.monthly_book_sales?.[month] || 0,
-                      courses: financeData?.monthly_course_sales?.[month] || 0,
-                    })
+                    (month) => {
+                      const bookVal = financeData?.monthly_book_sales?.[month];
+                      const courseVal =
+                        financeData?.monthly_course_sales?.[month];
+
+                      const books =
+                        bookVal && typeof bookVal === "object"
+                          ? Object.values(bookVal).reduce((a, b) => a + b, 0)
+                          : bookVal || 0;
+
+                      const courses =
+                        courseVal && typeof courseVal === "object"
+                          ? Object.values(courseVal).reduce((a, b) => a + b, 0)
+                          : courseVal || 0;
+
+                      return {
+                        month,
+                        books,
+                        courses,
+                      };
+                    }
                   )}
                 >
                   <CartesianGrid strokeDasharray="3 3" />

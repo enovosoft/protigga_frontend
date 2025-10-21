@@ -273,7 +273,7 @@ export default function OrderDetailsPage() {
                       <label className="text-sm font-medium text-muted-foreground">
                         Total Amount{" "}
                         <span className="text-xs">
-                          (advance + delivery + discount)
+                          (Advance + Delivery + Discount)
                         </span>
                       </label>
                       <p className="font-semibold">
@@ -330,14 +330,35 @@ export default function OrderDetailsPage() {
                     </div>
                   </div>
 
-                  {order.payment.purpose && (
+                  <div className="border-t border-border my-4"></div>
+
+                  {/* Additional Card Properties */}
+                  <div className="grid grid-cols-3 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
-                        Purpose
+                        Card Type
                       </label>
-                      <p>{order.payment.purpose}</p>
+                      <p className="font-medium">
+                        {order.payment.card_type || "N/A"}
+                      </p>
                     </div>
-                  )}
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Card Issuer
+                      </label>
+                      <p className="font-medium">
+                        {order.payment.card_issuer || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Withdrawal Amount
+                      </label>
+                      <p className="font-semibold">
+                        {formatPrice(order.payment.store_amount || 0)}
+                      </p>
+                    </div>
+                  </div>
 
                   {order.payment.remarks && (
                     <div>

@@ -385,7 +385,7 @@ export default function CustomerInformation({
             type="submit"
             className="w-full h-11 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
           >
-            Pay now ৳{paymentType === "sslcommerz" ? totalAmount : 260}
+            Pay now ৳{paymentType === "sslcommerz" ? totalAmount : totalAmount}
           </Button>
         </form>
       </CardContent>

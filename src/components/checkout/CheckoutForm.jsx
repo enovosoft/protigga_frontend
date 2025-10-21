@@ -269,7 +269,7 @@ export default function CheckoutForm() {
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: value?.trim(),
     }));
 
     // Clear validation error for this field when user starts typing
