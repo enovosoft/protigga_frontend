@@ -100,6 +100,18 @@ export default function AdminDashboardPage() {
       description: "Revenue from course sales",
     },
     {
+      title: "Total Sales",
+      value: financeData ? formatPrice(financeData.total_sell) : "0",
+      icon: DollarSign,
+      description: "Combined revenue from books and courses",
+    },
+    {
+      title: "Total Withdrawable Amount",
+      value: financeData ? formatPrice(financeData.withrawable) : "0",
+      icon: Banknote,
+      description: "Total amount available for withdrawal from Payment Gateway",
+    },
+    {
       title: "Average Order Value",
       value: financeData ? formatPrice(financeData.average_order_value) : "0",
       icon: DollarSign,
@@ -123,12 +135,7 @@ export default function AdminDashboardPage() {
       icon: Users,
       description: "Inactive course enrollments",
     },
-    {
-      title: "Total Withdrawable Amount",
-      value: financeData ? formatPrice(financeData.withrawable) : "0",
-      icon: Banknote,
-      description: "Total amount available for withdrawal from Payment Gateway",
-    },
+
     {
       title: "Total Book Sales",
       value: financeData
@@ -150,6 +157,24 @@ export default function AdminDashboardPage() {
         : 0,
       icon: GraduationCap,
       description: "Total number of course sales",
+    },
+    {
+      title: "Number of Unique Book Sales",
+      value: financeData
+        ? financeData.book_sales?.filter((item) => item.total_orders > 0).length
+        : 0,
+      icon: BookOpen,
+      description: "Number of unique book sales",
+    },
+
+    {
+      title: "Number of Unique Course Sales",
+      value: financeData
+        ? financeData.course_sales?.filter((item) => item.total_orders > 0)
+            .length
+        : 0,
+      icon: GraduationCap,
+      description: "Number of unique course sales",
     },
   ];
 
