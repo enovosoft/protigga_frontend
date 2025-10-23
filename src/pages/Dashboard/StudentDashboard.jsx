@@ -1,7 +1,7 @@
 import Loading from "@/components/shared/Loading";
 import StudentDashboardLayout from "@/components/shared/StudentDashboardLayout";
 import { useStoreState } from "easy-peasy";
-import { Book, CreditCard, FileText, GraduationCap, User } from "lucide-react";
+import { Book, CreditCard, GraduationCap, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function StudentDashboard() {
@@ -16,22 +16,22 @@ export default function StudentDashboard() {
       onClick: () => navigate("/dashboard/enrollments"),
     },
     {
-      title: "Study Notes",
-      description: "Review and manage your study materials.",
-      icon: FileText,
-      onClick: () => navigate("/notes"),
-    },
-    {
-      title: "Books",
-      description: "Browse and purchase educational books.",
+      title: "Books Order",
+      description: "See your book orders. ",
       icon: Book,
-      onClick: () => navigate("/books"),
+      onClick: () => navigate("/dashboard/books"),
     },
     {
       title: "Payment History",
       description: "View your payment history and receipts.",
       icon: CreditCard,
-      onClick: () => navigate("/dashboard/payment"),
+      onClick: () => navigate("/dashboard/payments"),
+    },
+    {
+      title: "Exams",
+      description: "View your exam schedule and get exam links.",
+      icon: CreditCard,
+      onClick: () => navigate("/dashboard/exams"),
     },
     {
       title: "My Profile",

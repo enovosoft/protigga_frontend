@@ -19,7 +19,7 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 
 const VideoPlayer = ({
@@ -677,4 +677,4 @@ const VideoPlayer = ({
   );
 };
 
-export default memo(VideoPlayer);
+export default VideoPlayer;

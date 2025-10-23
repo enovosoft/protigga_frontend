@@ -22,7 +22,7 @@ export default function CoursePage() {
   const [selectedTopic, setSelectedTopic] = useState(null);
 
   useEffect(() => {
-    if (slug && !course) {
+    if ((slug && !course) || slug !== course?.slug) {
       fetchCourseDetails(slug);
     }
   }, [slug, course, fetchCourseDetails]);
@@ -32,18 +32,17 @@ export default function CoursePage() {
     if (course?.chapters?.length > 0) {
       const firstChapter = course.chapters[0];
 
-      // Expand first chapter by default
-      setExpandedChapters((prev) => ({
-        ...prev,
+      // Reset expanded chapters and expand first chapter by default
+      setExpandedChapters({
         [firstChapter.chapter_id]: true,
-      }));
+      });
 
-      // Select first topic if available and no topic is selected
-      if (!selectedTopic && firstChapter.topics?.length > 0) {
+      // Always select first topic when course changes
+      if (firstChapter.topics?.length > 0) {
         setSelectedTopic(firstChapter.topics[0]);
       }
     }
-  }, [course, selectedTopic]);
+  }, [course]);
 
   const toggleChapter = (chapterId) => {
     setExpandedChapters((prev) => ({
@@ -244,6 +243,7 @@ export default function CoursePage() {
             <CardContent className="space-y-4  p-1 lg:p-4">
               {/* Video Content Area */}
               <VideoPlayer
+                key={selectedTopic?.chapter_topic_id || "no-topic"}
                 url={selectedTopic?.youtube_url}
                 title={selectedTopic?.title}
                 onNext={handleNextTopic}
