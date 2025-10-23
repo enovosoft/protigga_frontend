@@ -2,12 +2,12 @@ import api from "@/lib/api";
 import { action, thunk } from "easy-peasy";
 
 const studentStore = {
-  data: null,
   enrollments: [],
-  payments: [],
   bookOrders: [],
+  payments: [],
   exams: [],
   profile: null,
+  course: null,
   loading: false,
   error: null,
   isFetched: false,
@@ -23,61 +23,60 @@ const studentStore = {
     state.isFetched = payload;
   }),
 
-  setUserData: action((state, payload) => {
+  setCourse: action((state, payload) => {
+    state.course = payload;
+  }),
+  setFetchData: action((state, payload) => {
     state.data = payload.user || null;
 
     state.profile = {
-      id: payload.user?.id || null,
       user_id: payload.user?.user_id || "",
       name: payload.user?.name || "",
       phone: payload.user?.phone || "",
-      is_verified: payload.user?.is_verified || false,
-      is_blocked: payload.user?.is_blocked || false,
-      createdAt: payload.user?.createdAt || "",
-      updatedAt: payload.user?.updatedAt || "",
     };
 
-    payload.user?.book_orders?.forEach((order) => {
-      state.bookOrders.push({
-        type: "book_order",
-        order_id: order.payment.book_order_id || "",
-        Txt_id: order.payment.Txn_ID || "",
-        status: order.payment.status || "",
-        amount: order.payment.product_price_with_quantity || 0,
-        delivery_charge: order.payment.delevery_charge || 0,
-        advance_charge: order.payment.advance_charge_amount || 0,
-        discount_amount: order.payment.discount_amount || 0,
-        customer_receivable_amount:
-          order.payment.customer_receivable_amount || 0,
-        card_type: order.payment.card_type || "",
-        card_issuer: order.payment.card_issuer || "",
-        transition_time: order.payment.createdAt || "",
-        book_name: order.book.title || "",
-        book_price: order.book.price || 0,
-      });
-    });
+    state.enrollments = (payload.user?.enrollments || [])
+      .filter((enrollment) => enrollment.payment?.status === "SUCCESS")
+      .map((enrollment) => ({
+        name: enrollment.course?.course_title || "",
+        thumbnail: enrollment.course?.thumbnail || "",
+        id: enrollment.course?.course_id || "",
+        slug: enrollment.course?.slug || "",
+        batch: enrollment.course?.batch || "",
+      }));
 
-    // Enrollments
-    state.enrollments = payload.user?.enrollments.map((enrollment) => {});
+    // Payments: combine from enrollments and book_orders
+    const enrollmentPayments = (payload.user?.enrollments || [])
+      .map((enrollment) => enrollment.payment)
+      .filter(Boolean);
 
-    // Exams (extracted from enrollments)
+    const bookOrderPayments = (payload.user?.book_orders || [])
+      .map((order) => order.payment)
+      .filter(Boolean);
+
+    state.payments = [...enrollmentPayments, ...bookOrderPayments];
+
+    // Exams: extract from enrollments
     state.exams = (payload.user?.enrollments || []).flatMap(
       (enrollment) => enrollment.course?.exams || []
     );
+
+    // Book Orders: keep as is
+    state.bookOrders = payload.user?.book_orders || [];
   }),
 
-  fetchUserDetails: thunk(async (actions) => {
+  fetchStudentDetails: thunk(async (actions) => {
     actions.setLoading(true);
     actions.setError(null);
     try {
       const response = await api.get("/user/details");
       if (response.data?.success) {
-        actions.setUserData(response.data);
+        actions.setFetchData(response.data);
       } else {
         actions.setError(response.data?.message || "Failed to load user");
       }
     } catch (err) {
-      actions.setError(err.message || "Failed to load user");
+      actions.setError(err.data?.message || "Failed to load user");
     } finally {
       actions.setLoading(false);
       actions.setFetched(true);
@@ -96,6 +95,23 @@ const studentStore = {
       }
     } catch (err) {
       actions.setError(err.message || "Failed to change password");
+    } finally {
+      actions.setLoading(false);
+    }
+  }),
+
+  fetchCourseDetails: thunk(async (actions, slug) => {
+    actions.setLoading(true);
+    actions.setError(null);
+    try {
+      const response = await api.get(`/control/course/${slug}`);
+      if (response.data?.success) {
+        actions.setCourse(response.data.course);
+      } else {
+        actions.setError(response.data?.message || "Failed to load course");
+      }
+    } catch (err) {
+      actions.setError(err.message || "Failed to load course");
     } finally {
       actions.setLoading(false);
     }

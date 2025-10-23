@@ -1,3 +1,4 @@
+import { StoreProvider, store } from "@/store";
 import { CookiesProvider } from "react-cookie";
 import { Toaster } from "react-hot-toast";
 import { Navigate, BrowserRouter as Router, Routes } from "react-router-dom";
@@ -28,39 +29,41 @@ function AuthRoute({ children }) {
 function App() {
   return (
     <CookiesProvider>
-      <AuthProvider>
-        <Router>
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: "var(--card)",
-                color: "var(--foreground)",
-                border: "1px solid var(--border)",
-              },
-              success: {
-                iconTheme: {
-                  primary: "var(--success)",
-                  secondary: "var(--success-foreground)",
+      <StoreProvider store={store}>
+        <AuthProvider>
+          <Router>
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: "var(--card)",
+                  color: "var(--foreground)",
+                  border: "1px solid var(--border)",
                 },
-              },
-              error: {
-                iconTheme: {
-                  primary: "var(--destructive)",
-                  secondary: "var(--destructive-foreground)",
+                success: {
+                  iconTheme: {
+                    primary: "var(--success)",
+                    secondary: "var(--success-foreground)",
+                  },
                 },
-              },
-            }}
-          />
-          <Routes>
-            {publicRoutes}
-            {authRoutes}
-            {protectedRoutes}
-            {adminRoutes}
-          </Routes>
-        </Router>
-      </AuthProvider>
+                error: {
+                  iconTheme: {
+                    primary: "var(--destructive)",
+                    secondary: "var(--destructive-foreground)",
+                  },
+                },
+              }}
+            />
+            <Routes>
+              {publicRoutes}
+              {authRoutes}
+              {protectedRoutes}
+              {adminRoutes}
+            </Routes>
+          </Router>
+        </AuthProvider>
+      </StoreProvider>
     </CookiesProvider>
   );
 }
