@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import api from "@/lib/api";
-import { cleanupImageUrls, fetchImageAsBlob } from "@/lib/helper";
 import { BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -19,20 +18,11 @@ export default function CoursesPage() {
   const [courses, setCourses] = useState([]);
   const [batches, setBatches] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [imageErrors, setImageErrors] = useState({});
-  const [imageUrls, setImageUrls] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchCourses();
   }, []);
-
-  // Cleanup object URLs on unmount
-  useEffect(() => {
-    return () => {
-      cleanupImageUrls(imageUrls);
-    };
-  }, [imageUrls]);
 
   const fetchCourses = async () => {
     try {
@@ -46,26 +36,6 @@ export default function CoursesPage() {
           ...new Set(coursesData.map((course) => course.batch)),
         ].filter(Boolean);
         setBatches(uniqueBatches);
-
-        // Load images asynchronously in the background (non-blocking)
-        coursesData.forEach(async (course) => {
-          if (course.thumbnail) {
-            try {
-              const blobUrl = await fetchImageAsBlob(course.thumbnail);
-              if (blobUrl) {
-                setImageUrls((prev) => ({
-                  ...prev,
-                  [course.slug || course.id]: blobUrl,
-                }));
-              }
-            } catch (error) {
-              console.error(
-                `Failed to load image for course ${course.course_title}:`,
-                error
-              );
-            }
-          }
-        });
       } else {
         toast.error("Failed to load courses");
       }
@@ -75,10 +45,6 @@ export default function CoursesPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleImageError = (courseId) => {
-    setImageErrors((prev) => ({ ...prev, [courseId]: true }));
   };
 
   const handleEnroll = (slug) => {
@@ -161,16 +127,12 @@ export default function CoursesPage() {
                           className="overflow-hidden hover:shadow-lg transition-shadow"
                         >
                           <CardHeader className="p-0">
-                            <div className="relative aspect-video overflow-hidden bg-muted">
-                              {imageUrls[course.slug || course.id] &&
-                              !imageErrors[course.slug || course.id] ? (
+                            <div className="relative aspect-auto overflow-hidden bg-muted">
+                              {course.thumbnail ? (
                                 <img
-                                  src={imageUrls[course.slug || course.id]}
+                                  src={course.thumbnail}
                                   alt={course.course_title}
                                   className="w-full h-full object-cover"
-                                  onError={() =>
-                                    handleImageError(course.slug || course.id)
-                                  }
                                 />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center">

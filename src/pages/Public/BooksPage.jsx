@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import apiInstance from "@/lib/api";
-import { cleanupImageUrls, fetchImageAsBlob } from "@/lib/helper";
 import { Book, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -19,45 +18,22 @@ export default function BooksPage() {
   const navigate = useNavigate();
   const [books, setBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [imageErrors, setImageErrors] = useState({});
-  const [imageUrls, setImageUrls] = useState({});
 
   useEffect(() => {
     fetchBooks();
   }, []);
-
-  // Cleanup object URLs on unmount
-  useEffect(() => {
-    return () => {
-      cleanupImageUrls(imageUrls);
-    };
-  }, [imageUrls]);
 
   const fetchBooks = async () => {
     try {
       const response = await apiInstance.get("/books");
       const booksData = response.data.books || [];
       setBooks(booksData);
-
-      // Fetch images as blobs to bypass CORS
-      for (const book of booksData) {
-        if (book.book_image) {
-          const objectUrl = await fetchImageAsBlob(book.book_image);
-          if (objectUrl) {
-            setImageUrls((prev) => ({ ...prev, [book.slug]: objectUrl }));
-          }
-        }
-      }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to load books");
       console.error("Error fetching books:", error);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleImageError = (bookId) => {
-    setImageErrors((prev) => ({ ...prev, [bookId]: true }));
   };
 
   const handleOrderNow = (bookSlug) => {
@@ -117,13 +93,12 @@ export default function BooksPage() {
                       className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
                     >
                       <CardHeader className="p-0">
-                        <div className="relative aspect-square overflow-hidden bg-muted">
-                          {book.book_image && !imageErrors[book.slug] ? (
+                        <div className="relative aspect-auto overflow-hidden bg-muted">
+                          {book.book_image ? (
                             <img
-                              src={imageUrls[book.slug] || book.book_image}
+                              src={book.book_image}
                               alt={book.title}
-                              className="w-full h-full object-cover"
-                              onError={() => handleImageError(book.slug)}
+                              className="w-full h-full object-cover "
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">

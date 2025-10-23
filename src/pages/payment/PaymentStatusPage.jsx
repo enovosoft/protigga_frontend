@@ -35,10 +35,6 @@ const PaymentStatusPage = ({ status = "success" }) => {
   const IconComponent = config.icon;
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigate("/dashboard");
-    }, 5000);
-
     const countdownTimer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -49,6 +45,9 @@ const PaymentStatusPage = ({ status = "success" }) => {
       });
     }, 1000);
 
+    const timer = setTimeout(() => {
+      navigate("/dashboard");
+    }, 6000);
     return () => {
       clearTimeout(timer);
       clearInterval(countdownTimer);
@@ -59,10 +58,10 @@ const PaymentStatusPage = ({ status = "success" }) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader className="text-center relative">
+      <Card className="w-full max-w-md mx-auto relative">
+        <CardHeader className="text-center ">
           {/* Progress Bar */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-muted rounded-t-lg overflow-hidden">
+          <div className="absolute -bottom-2 left-0 w-full h-1 bg-muted rounded-b-lg overflow-hidden">
             <div
               className="h-full bg-primary transition-all duration-1000 ease-linear"
               style={{ width: `${progressPercentage}%` }}
@@ -78,7 +77,7 @@ const PaymentStatusPage = ({ status = "success" }) => {
         </CardHeader>
         <CardContent className="text-center">
           <p className="text-muted-foreground mb-6">{config.message}</p>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-secondary font-bold">
             Redirecting in {timeLeft} second{timeLeft !== 1 ? "s" : ""}...
           </div>
         </CardContent>

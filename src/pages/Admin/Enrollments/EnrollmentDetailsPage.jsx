@@ -328,7 +328,7 @@ export default function EnrollmentDetailsPage() {
                         Discount Amount
                       </label>
                       <p className="font-semibold text-green-600">
-                        -{formatPrice(enrollment.payment.discount_amount || 0)}
+                        {formatPrice(enrollment.payment.discount_amount || 0)}
                       </p>
                     </div>
                     <div>
@@ -336,9 +336,7 @@ export default function EnrollmentDetailsPage() {
                         Total Amount
                       </label>
                       <p className="font-semibold">
-                        {formatPrice(
-                          enrollment.payment.product_price_with_quantity || 0
-                        )}
+                        {formatPrice(enrollment.payment.amount || 0)}
                       </p>
                     </div>
                     <div>
@@ -363,6 +361,33 @@ export default function EnrollmentDetailsPage() {
                       </label>
                       <p className="font-mono text-sm">
                         {enrollment.payment.Txn_ID}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Card Type
+                      </label>
+                      <p className="font-medium">
+                        {enrollment.payment.card_type || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Card Issuer
+                      </label>
+                      <p className="font-medium">
+                        {enrollment.payment.card_issuer || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Withdrawal Amount
+                      </label>
+                      <p className="font-semibold">
+                        {formatPrice(enrollment.payment.store_amount || 0)}
                       </p>
                     </div>
                   </div>

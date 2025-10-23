@@ -3,9 +3,7 @@ import { ProtectedRoute } from "../components/routing/ProtectedRoute";
 
 import Dashboard from "../pages/Dashboard/Dashboard";
 
-import PaymentCancelPage from "../pages/payment/PaymentCancelPage";
-import PaymentFailPage from "../pages/payment/PaymentFailPage";
-import PaymentSuccessPage from "../pages/payment/PaymentSuccessPage";
+import PaymentStatusPage from "../pages/payment/PaymentStatusPage";
 
 export const protectedRoutes = (
   <>
@@ -24,7 +22,7 @@ export const protectedRoutes = (
       path="/payment/success"
       element={
         <ProtectedRoute roles={["admin", "student"]}>
-          <PaymentSuccessPage />
+          <PaymentStatusPage status="success" />
         </ProtectedRoute>
       }
     />
@@ -32,7 +30,7 @@ export const protectedRoutes = (
       path="/payment/fail"
       element={
         <ProtectedRoute roles={["admin", "student"]}>
-          <PaymentFailPage />
+          <PaymentStatusPage status="fail" />
         </ProtectedRoute>
       }
     />
@@ -40,7 +38,7 @@ export const protectedRoutes = (
       path="/payment/cancel"
       element={
         <ProtectedRoute roles={["admin", "student"]}>
-          <PaymentCancelPage />
+          <PaymentStatusPage status="cancel" />
         </ProtectedRoute>
       }
     />

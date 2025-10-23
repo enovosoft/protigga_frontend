@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { PAYMENT_DELIVERY_OPTIONS } from "@/config/checkout/data";
 import { useCallback } from "react";
 import { z } from "zod";
+import Loading from "../shared/Loading";
 
 // Zod schema for checkout form validation
 const bookCheckoutSchema = z.object({
@@ -80,8 +81,9 @@ export default function CheckoutForm() {
   const { isAuthenticated, user, isAuthLoading } = useAuth();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
   const [product, setProduct] = useState(null);
-  const [productType, setProductType] = useState(null); // "book" or "course"
+
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoData, setPromoData] = useState(null);
@@ -89,7 +91,6 @@ export default function CheckoutForm() {
   const [deliveryFee, setDeliveryFee] = useState(80); // Default to inside_dhaka price
   const [quantity, setQuantity] = useState(1);
   const [validationErrors, setValidationErrors] = useState({});
-
   // Form state
   const [formData, setFormData] = useState({ ...initialFormData });
 
@@ -108,17 +109,26 @@ export default function CheckoutForm() {
         const sslOption = PAYMENT_DELIVERY_OPTIONS.find(
           (option) => option.value === "sslcommerz"
         );
-        setDeliveryFee(sslOption?.deliveryCharge || 60);
+        setDeliveryFee(sslOption?.deliveryCharge);
       } else if (paymentType === "cod") {
         // COD delivery fee based on district
-        const isDhaka = formData.district?.toLowerCase() === "dhaka";
-        setDeliveryFee(isDhaka ? 80 : 160);
+        const isDhaka = formData.district?.toLowerCase().trim() === "dhaka";
+
+        const CodPayment = PAYMENT_DELIVERY_OPTIONS.find(
+          (option) => option.value === "cod"
+        );
+
+        const deliveryCharge = isDhaka
+          ? CodPayment?.insideDhakaDeliveryCharge
+          : CodPayment?.outsideDhakaDeliveryCharge;
+        setDeliveryFee(deliveryCharge);
       }
     } else {
       // Courses have no delivery fee
       setDeliveryFee(0);
     }
   }, [paymentType, formData.district, isBook]);
+
   const fetchProductDetails = useCallback(async () => {
     if (courseId) {
       // Handle course checkout (existing logic)
@@ -127,7 +137,6 @@ export default function CheckoutForm() {
         if (response.data) {
           const course = response.data.course;
           setProduct(course);
-          setProductType("course");
           setPaymentType("sslcommerz"); // Default to SSL Commerz for courses
         } else {
           toast.error("Course not found");
@@ -146,7 +155,6 @@ export default function CheckoutForm() {
         if (response.data.success && response.data.book) {
           const book = response.data.book;
           setProduct(book);
-          setProductType("book");
           // Keep default payment type (cod) for books
         } else {
           toast.error("Book not found");
@@ -269,7 +277,7 @@ export default function CheckoutForm() {
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: value?.trim(),
+      [field]: value,
     }));
 
     // Clear validation error for this field when user starts typing
@@ -319,7 +327,6 @@ export default function CheckoutForm() {
       schema.parse(formData);
       setValidationErrors({}); // Clear any previous errors
 
-      // Prepare data in the new format
       const orderData = {
         meterial_type: isBook ? "book" : "course",
         delevery_type: isBook
@@ -329,11 +336,11 @@ export default function CheckoutForm() {
           : "none",
         inside_dhaka: isBook
           ? paymentType === "cod" &&
-            formData.district?.toLowerCase() === "dhaka"
+            formData.district?.toLowerCase().trim() === "dhaka"
           : false,
         outside_dhaka: isBook
           ? paymentType === "cod" &&
-            formData.district?.toLowerCase() !== "dhaka"
+            formData.district?.toLowerCase().trim() !== "dhaka"
           : false,
         sundarban_courier: isBook ? paymentType === "sslcommerz" : false,
         meterial_details: {
@@ -352,7 +359,7 @@ export default function CheckoutForm() {
         orderData.meterial_details.fb_name = formData.facebook_profile_link;
       }
 
-      setIsLoading(true);
+      setIsPaymentProcessing(true);
       const response = await apiInstance.post("/payment/init", orderData);
       if (response.data.success) {
         toast.success(response.data?.message || "Order placed successfully!");
@@ -385,7 +392,7 @@ export default function CheckoutForm() {
         );
       }
     } finally {
-      setIsLoading(false);
+      setIsPaymentProcessing(false);
     }
   };
 
@@ -565,6 +572,7 @@ export default function CheckoutForm() {
           />
         </div>
       </div>
+      {isPaymentProcessing && <Loading text="Processing Payment" />}
     </main>
   );
 }

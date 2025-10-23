@@ -385,7 +385,13 @@ export default function CustomerInformation({
             type="submit"
             className="w-full h-11 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
           >
-            Pay now ৳{paymentType === "sslcommerz" ? totalAmount : totalAmount}
+            {/* Pay now ৳{paymentType === "sslcommerz" ? totalAmount : totalAmount} */}
+            Pay now ৳
+            {paymentType === "sslcommerz"
+              ? totalAmount
+              : PAYMENT_DELIVERY_OPTIONS.find(
+                  (option) => option.value === paymentType
+                )?.advancePayment + deliveryFee}
           </Button>
         </form>
       </CardContent>

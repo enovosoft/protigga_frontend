@@ -56,6 +56,14 @@ export default function OrderSummary({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="p-3 overflow-hidden ">
+          <img
+            src={product.book_image || product.thumbnail}
+            alt={product.title}
+            className="w-full aspect-auto rounded-2xl transition-transform object-cover "
+            srcset=""
+          />
+        </div>
         <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg border border-border/50">
           <div className="p-3 bg-primary/10 rounded-lg">
             {isBook ? (
@@ -175,7 +183,7 @@ export default function OrderSummary({
                 {paymentType === "sslcommerz" &&
                   `Sundarban Courier (৳${deliveryFee})`}
                 {paymentType === "cod" &&
-                  (district?.toLowerCase() === "dhaka"
+                  (district?.toLowerCase().trim() === "dhaka"
                     ? `Inside Dhaka (৳${deliveryFee})`
                     : `Outside Dhaka (৳${deliveryFee})`)}
               </span>

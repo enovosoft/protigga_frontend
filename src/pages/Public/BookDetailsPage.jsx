@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Book, ShoppingCart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
@@ -14,9 +14,6 @@ export default function BookDetailsPage() {
   const navigate = useNavigate();
   const [book, setBook] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [imageError, setImageError] = useState(false);
-  const [imageUrl, setImageUrl] = useState(null);
-  const [imageAspectRatio, setImageAspectRatio] = useState("square");
 
   const fetchBookDetails = useCallback(async () => {
     try {
@@ -24,53 +21,10 @@ export default function BookDetailsPage() {
       if (response.data.success) {
         const bookData = response.data.book;
         setBook({
-          id: bookData.id,
-          book_id: bookData.book_id,
-          title: bookData.title,
-          price: bookData.price,
-          book_image: bookData.thumbnail,
-          slug: bookData.slug,
-          description: bookData.details?.description || "",
-          writter: bookData.details?.academy_name || "Protigga Academy",
-          language: bookData.details?.language || "Bangla",
-          batch: bookData.batch,
-          createdAt: bookData.createdAt,
-          updatedAt: bookData.updatedAt,
+          ...bookData,
         });
-
-        // Fetch image as blob to bypass CORS and detect dimensions
-        if (bookData.thumbnail) {
-          try {
-            const imageResponse = await fetch(bookData.thumbnail);
-            if (imageResponse.ok) {
-              const blob = await imageResponse.blob();
-              const objectUrl = URL.createObjectURL(blob);
-              setImageUrl(objectUrl);
-
-              // Detect image dimensions for aspect ratio
-              const img = new Image();
-              img.onload = () => {
-                const aspectRatio = img.width / img.height;
-                if (aspectRatio > 1.2) {
-                  setImageAspectRatio("video"); // Landscape
-                } else if (aspectRatio < 0.8) {
-                  setImageAspectRatio("portrait"); // Portrait
-                } else {
-                  setImageAspectRatio("square"); // Square
-                }
-                URL.revokeObjectURL(objectUrl);
-              };
-              img.src = objectUrl;
-            }
-          } catch (error) {
-            console.error(
-              `Failed to fetch image for ${bookData.title}:`,
-              error
-            );
-          }
-        }
       } else {
-        toast.error("Course not found");
+        toast.error("Book not found");
         navigate("/books");
       }
     } catch (error) {
@@ -90,10 +44,6 @@ export default function BookDetailsPage() {
     if (book) {
       navigate(`/checkout?book=${book.slug}`);
     }
-  };
-
-  const handleImageError = () => {
-    setImageError(true);
   };
 
   if (isLoading) {
@@ -163,7 +113,7 @@ export default function BookDetailsPage() {
   if (!book) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Course not found</p>
+        <p className="text-muted-foreground">Book not found</p>
       </div>
     );
   }
@@ -181,27 +131,12 @@ export default function BookDetailsPage() {
               <div className="sticky top-6">
                 <Card className="overflow-hidden">
                   <CardHeader className="p-0">
-                    <div
-                      className={`relative overflow-hidden bg-muted ${
-                        imageAspectRatio === "video"
-                          ? "aspect-video"
-                          : imageAspectRatio === "portrait"
-                          ? "aspect-[3/4]"
-                          : "aspect-square"
-                      }`}
-                    >
-                      {book.book_image && !imageError ? (
-                        <img
-                          src={imageUrl || book.book_image}
-                          alt={book.title}
-                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-110 cursor-zoom-in"
-                          onError={handleImageError}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Book className="w-24 h-24 text-muted-foreground" />
-                        </div>
-                      )}
+                    <div className="relative overflow-hidden bg-muted aspect-auto">
+                      <img
+                        src={book.book_image}
+                        alt={book.title}
+                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-110 cursor-zoom-in"
+                      />
                     </div>
                   </CardHeader>
                 </Card>

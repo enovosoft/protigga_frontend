@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { INSTRUCTORS } from "@/config/data";
 import api from "@/lib/api";
-import { cleanupImageUrls, fetchImageAsBlob } from "@/lib/helper";
+import { formatDistanceToNow } from "date-fns";
 import {
   Award,
   BarChart,
@@ -29,8 +29,6 @@ export default function CourseDetailsPage() {
   const [course, setCourse] = useState(null);
   const [activeTab, setActiveTab] = useState("description");
   const [isLoadingCourse, setIsLoadingCourse] = useState(true);
-  const [imageError, setImageError] = useState(false);
-  const [imageUrl, setImageUrl] = useState(null);
   const [expandedChapters, setExpandedChapters] = useState({});
 
   const fetchCourseDetails = useCallback(async () => {
@@ -67,13 +65,7 @@ export default function CourseDetailsPage() {
 
         setCourse(courseInfo);
 
-        // Load image if available
-        if (courseData.thumbnail) {
-          const blobUrl = await fetchImageAsBlob(courseData.thumbnail);
-          if (blobUrl) {
-            setImageUrl(blobUrl);
-          }
-        }
+        // Load image if available - removed fetchImageAsBlob
       } else {
         console.error("Course not found");
         setCourse(null);
@@ -85,15 +77,6 @@ export default function CourseDetailsPage() {
       setIsLoadingCourse(false);
     }
   }, [slug]);
-
-  // Cleanup image URLs on unmount
-  useEffect(() => {
-    return () => {
-      if (imageUrl) {
-        cleanupImageUrls({ courseImage: imageUrl });
-      }
-    };
-  }, [imageUrl]);
 
   useEffect(() => {
     fetchCourseDetails();
@@ -185,13 +168,12 @@ export default function CourseDetailsPage() {
               <div className="sticky top-6">
                 <Card className="overflow-hidden">
                   <CardHeader className="p-0">
-                    <div className="relative aspect-video overflow-hidden bg-muted">
-                      {imageUrl && !imageError ? (
+                    <div className="relative aspect-auto overflow-hidden bg-muted">
+                      {course.thumbnail ? (
                         <img
-                          src={imageUrl}
+                          src={course.thumbnail}
                           alt={course.course_title}
                           className="w-full h-full object-cover"
-                          onError={() => setImageError(true)}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
@@ -260,7 +242,9 @@ export default function CourseDetailsPage() {
                           Expiry
                         </span>
                         <span className="font-medium text-foreground">
-                          {course.expiry ? `${course.expiry} days` : "Lifetime"}
+                          {course.expiry
+                            ? `${formatDistanceToNow(course.expiry)}`
+                            : "N/A"}
                         </span>
                       </div>
 
@@ -270,7 +254,7 @@ export default function CourseDetailsPage() {
                           Skill Level
                         </span>
                         <span className="font-medium text-foreground capitalize">
-                          {course.skill_level || "All Levels"}
+                          {course.skill_level || "N/A"}
                         </span>
                       </div>
 
@@ -280,7 +264,7 @@ export default function CourseDetailsPage() {
                           Language
                         </span>
                         <span className="font-medium text-foreground">
-                          {course.language || "Bangla"}
+                          {course.language || "N/A"}
                         </span>
                       </div>
                     </div>

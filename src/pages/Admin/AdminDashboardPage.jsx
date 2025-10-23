@@ -23,6 +23,7 @@ import api from "@/lib/api";
 import { formatPrice } from "@/lib/helper";
 import {
   AlertCircle,
+  Banknote,
   BarChart3,
   BookOpen,
   DollarSign,
@@ -121,6 +122,34 @@ export default function AdminDashboardPage() {
       value: financeData ? financeData.inactive_course_orders : 0,
       icon: Users,
       description: "Inactive course enrollments",
+    },
+    {
+      title: "Total Withdrawable Amount",
+      value: financeData ? formatPrice(financeData.withrawable) : "0",
+      icon: Banknote,
+      description: "Total amount available for withdrawal from Payment Gateway",
+    },
+    {
+      title: "Total Book Sales",
+      value: financeData
+        ? financeData.book_sales?.reduce(
+            (acc, item) => acc + item.total_orders,
+            0
+          )
+        : 0,
+      icon: BookOpen,
+      description: "Total number of book sales",
+    },
+    {
+      title: "Total Course Sales",
+      value: financeData
+        ? financeData.course_sales?.reduce(
+            (acc, item) => acc + item.total_orders,
+            0
+          )
+        : 0,
+      icon: GraduationCap,
+      description: "Total number of course sales",
     },
   ];
 
