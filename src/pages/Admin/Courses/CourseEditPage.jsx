@@ -223,7 +223,10 @@ export default function CourseEditPage() {
     }
 
     try {
-      const response = await api.put(`/course/${slug}`, courseForm);
+      const response = await api.put(`/course/${slug}`, {
+        ...courseForm,
+        expired_date: `${courseForm.expired_date}T00:00:00.000Z`,
+      });
       if (response.data.success) {
         toast.success("Course details updated successfully");
         // Update local course data
@@ -366,6 +369,15 @@ export default function CourseEditPage() {
     }
     if (!topicForm.youtube_url.trim()) {
       toast.error("YouTube URL is required");
+      return;
+    }
+
+    // Validate YouTube URL format
+    const youtubeUrlPattern = /^https:\/\/www\.youtube\.com\/watch\?v=[\w-]+$/;
+    if (!youtubeUrlPattern.test(topicForm.youtube_url.trim())) {
+      toast.error(
+        "Please enter a valid YouTube URL in the format: https://www.youtube.com/watch?v=VIDEO_ID"
+      );
       return;
     }
 
@@ -1081,8 +1093,12 @@ export default function CourseEditPage() {
                       youtube_url: e.target.value,
                     }))
                   }
-                  placeholder="https://youtu.be/..."
+                  placeholder="https://www.youtube.com/watch?v=VIDEO_ID"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Enter a valid YouTube URL in the format:
+                  https://www.youtube.com/watch?v=VIDEO_ID
+                </p>
               </div>
             </div>
             <DialogFooter>

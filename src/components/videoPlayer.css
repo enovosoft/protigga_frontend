@@ -1,0 +1,144 @@
+/* Video Player Container */
+.react-player-wrapper {
+  position: relative;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0;
+}
+
+.react-player-wrapper > div {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* YouTube iframe styling */
+.react-player-wrapper iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+}
+
+/* Hide YouTube overlay elements - comprehensive list */
+.ytp-chrome-top,
+.ytp-chrome-bottom,
+.ytp-gradient-top,
+.ytp-gradient-bottom,
+.ytp-progress-bar-container,
+.ytp-chrome-controls,
+.ytp-cards-teaser,
+.ytp-endscreen-content,
+.ytp-ce-element,
+.ytp-watermark,
+.ytp-pause-overlay,
+.ytp-scroll-min,
+.ytp-suggested-action,
+.ytp-videowall-still,
+.ytp-endscreen-next,
+.ytp-info-panel-compact,
+.ytp-title,
+.ytp-title-channel,
+.ytp-title-expanded-overlay,
+.ytp-share-panel,
+.ytp-watch-later-title,
+.ytp-watch-later-button,
+.ytp-share-button,
+.ytp-more-button,
+.ytp-impression-link,
+.ytp-videowall-still-info-content,
+.ytp-videowall-still-info-title,
+.ytp-cards-button,
+.ytp-cards-teaser,
+.ytp-info-panel,
+.ytp-hover-progress,
+.ytp-cued-thumbnail-overlay,
+.ytp-paid-content-overlay,
+.ytp-ad-overlay-container,
+.ytp-ad-text,
+.ytp-ad-skip-button-container,
+.ytp-ad-skip-button,
+.ytp-flyout-cta,
+.ytp-suggested-action-badge,
+.iv-drawer,
+.iv-click-target,
+.iv-close-button,
+.video-ads,
+.ytp-contextmenu {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Ensure video container maintains aspect ratio */
+.aspect-video {
+  aspect-ratio: 16 / 9;
+}
+
+/* Make video larger on smaller screens */
+@media (max-width: 1024px) {
+  .aspect-video {
+    min-height: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .aspect-video {
+    min-height: 200px;
+  }
+}
+
+@media (max-width: 640px) {
+  .aspect-video {
+    min-height: 180px;
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/* Responsive video controls */
+@media (max-width: 768px) {
+  .video-controls {
+    padding: 0.5rem !important;
+  }
+
+  .video-controls button {
+    width: 2rem !important;
+    height: 2rem !important;
+    padding: 0.25rem !important;
+  }
+
+  .video-controls svg {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .video-controls {
+    padding: 0.25rem !important;
+  }
+
+  .video-controls button {
+    width: 1.75rem !important;
+    height: 1.75rem !important;
+    padding: 0.2rem !important;
+  }
+
+  .video-controls svg {
+    width: 0.875rem !important;
+    height: 0.875rem !important;
+  }
+}
+
+/* Fullscreen video styling */
+.react-player-wrapper.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999;
+  background: black;
+}

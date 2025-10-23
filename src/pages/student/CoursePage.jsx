@@ -6,11 +6,11 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Skeleton } from "@/components/ui/skeleton";
+import VideoPlayer from "@/components/VideoPlayer";
 import { useStoreActions, useStoreState } from "easy-peasy";
 import { ChevronDown, ChevronRight, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-
 export default function CoursePage() {
   const location = useLocation();
   const slug = location.state?.slug;
@@ -27,6 +27,24 @@ export default function CoursePage() {
     }
   }, [slug, course, fetchCourseDetails]);
 
+  // Set default expanded chapter and selected topic
+  useEffect(() => {
+    if (course?.chapters?.length > 0) {
+      const firstChapter = course.chapters[0];
+
+      // Expand first chapter by default
+      setExpandedChapters((prev) => ({
+        ...prev,
+        [firstChapter.chapter_id]: true,
+      }));
+
+      // Select first topic if available and no topic is selected
+      if (!selectedTopic && firstChapter.topics?.length > 0) {
+        setSelectedTopic(firstChapter.topics[0]);
+      }
+    }
+  }, [course, selectedTopic]);
+
   const toggleChapter = (chapterId) => {
     setExpandedChapters((prev) => ({
       ...prev,
@@ -36,6 +54,86 @@ export default function CoursePage() {
 
   const handleTopicSelect = (topic) => {
     setSelectedTopic(topic);
+  };
+
+  // Get all topics in order for navigation
+  const getAllTopics = () => {
+    if (!course?.chapters) return [];
+
+    const allTopics = [];
+    course.chapters.forEach((chapter) => {
+      if (chapter.topics) {
+        chapter.topics.forEach((topic) => {
+          allTopics.push(topic);
+        });
+      }
+    });
+    return allTopics;
+  };
+
+  const getCurrentTopicIndex = () => {
+    if (!selectedTopic) return -1;
+    const allTopics = getAllTopics();
+    return allTopics.findIndex(
+      (topic) => topic.chapter_topic_id === selectedTopic.chapter_topic_id
+    );
+  };
+
+  const handleNextTopic = () => {
+    const allTopics = getAllTopics();
+    const currentIndex = getCurrentTopicIndex();
+
+    if (currentIndex >= 0 && currentIndex < allTopics.length - 1) {
+      const nextTopic = allTopics[currentIndex + 1];
+      setSelectedTopic(nextTopic);
+
+      // Find and expand the chapter containing the next topic
+      const nextChapter = course.chapters.find((chapter) =>
+        chapter.topics?.some(
+          (topic) => topic.chapter_topic_id === nextTopic.chapter_topic_id
+        )
+      );
+      if (nextChapter) {
+        setExpandedChapters((prev) => ({
+          ...prev,
+          [nextChapter.chapter_id]: true,
+        }));
+      }
+    }
+  };
+
+  const handlePreviousTopic = () => {
+    const allTopics = getAllTopics();
+    const currentIndex = getCurrentTopicIndex();
+
+    if (currentIndex > 0) {
+      const previousTopic = allTopics[currentIndex - 1];
+      setSelectedTopic(previousTopic);
+
+      // Find and expand the chapter containing the previous topic
+      const previousChapter = course.chapters.find((chapter) =>
+        chapter.topics?.some(
+          (topic) => topic.chapter_topic_id === previousTopic.chapter_topic_id
+        )
+      );
+      if (previousChapter) {
+        setExpandedChapters((prev) => ({
+          ...prev,
+          [previousChapter.chapter_id]: true,
+        }));
+      }
+    }
+  };
+
+  const hasNextTopic = () => {
+    const currentIndex = getCurrentTopicIndex();
+    const allTopics = getAllTopics();
+    return currentIndex >= 0 && currentIndex < allTopics.length - 1;
+  };
+
+  const hasPreviousTopic = () => {
+    const currentIndex = getCurrentTopicIndex();
+    return currentIndex > 0;
   };
 
   if (loading) {
@@ -143,19 +241,16 @@ export default function CoursePage() {
             <CardHeader>
               <CardTitle>{course.course_title}</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4  p-1 lg:p-4">
               {/* Video Content Area */}
-              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/25">
-                <div className="text-center">
-                  <Play className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">Video content</p>
-                  {selectedTopic && (
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Selected: {selectedTopic.title}
-                    </p>
-                  )}
-                </div>
-              </div>
+              <VideoPlayer
+                url={selectedTopic?.youtube_url}
+                title={selectedTopic?.title}
+                onNext={handleNextTopic}
+                onPrevious={handlePreviousTopic}
+                hasNext={hasNextTopic()}
+                hasPrevious={hasPreviousTopic()}
+              />
 
               {/* Topic Title and Description */}
               <div className="border-t pt-4">
@@ -164,19 +259,6 @@ export default function CoursePage() {
                     ? selectedTopic.title
                     : "Select a topic to view content"}
                 </h3>
-                {selectedTopic && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">
-                      Topic content and description will appear here
-                    </p>
-                    {selectedTopic.youtube_url && (
-                      <p className="text-sm">
-                        <span className="font-medium">Video URL:</span>{" "}
-                        {selectedTopic.youtube_url}
-                      </p>
-                    )}
-                  </div>
-                )}
               </div>
             </CardContent>
           </Card>

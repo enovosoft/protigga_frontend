@@ -353,7 +353,7 @@ export default function CourseDialog({
                     name="batch"
                     value={formData.batch}
                     onChange={handleChange}
-                    placeholder="HSC 26"
+                    placeholder="HSC26"
                     required
                     className="w-full h-10 sm:h-11"
                   />
