@@ -347,7 +347,7 @@ export default function CheckoutForm() {
           product_id: isBook ? product.book_id : product.course_id,
           quantity: quantity,
           enrollment_type: "online", // Default to online, can be changed to hybrid later
-          promo_code_id: promoApplied ? promoData?.promo_code_id : "",
+          promo_code_id: promoApplied ? promoData?.promocode_id : "",
         },
         address: `${formData.address}, ${formData.city}, ${formData.district}, ${formData.division}, ${formData.zipCode}`,
         alternative_phone: formData.alternative_phone || "",

@@ -33,7 +33,7 @@ export function EnrollmentsTableSkeleton() {
                 Course Name
               </TableHead>
               <TableHead className="min-w-[80px] sm:table-cell">
-                Amount
+                Price
               </TableHead>
               <TableHead className="min-w-[80px] sm:table-cell">
                 Status
@@ -115,7 +115,7 @@ export default function EnrollmentsTable({ enrollments, startIndex, onView }) {
                 Course Name
               </TableHead>
               <TableHead className="font-semibold text-foreground min-w-[80px] sm:table-cell">
-                Amount
+                Price
               </TableHead>
               <TableHead className="font-semibold text-foreground min-w-[80px] hidden sm:table-cell">
                 Status
@@ -157,7 +157,9 @@ export default function EnrollmentsTable({ enrollments, startIndex, onView }) {
                 </TableCell>
                 <TableCell>
                   <span className="font-medium text-foreground">
-                    {formatPrice(enrollment.payment?.amount || 0)}
+                    {formatPrice(
+                      enrollment.payment?.product_price_with_quantity || 0
+                    )}
                   </span>
                 </TableCell>
                 <TableCell className="hidden sm:table-cell">

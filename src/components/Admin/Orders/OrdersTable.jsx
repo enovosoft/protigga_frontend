@@ -152,7 +152,9 @@ export default function OrdersTable({ orders, startIndex, onView }) {
                 </TableCell>
                 <TableCell>
                   <span className="font-medium text-foreground">
-                    {formatPrice(order?.payment?.amount || 0)}
+                    {formatPrice(
+                      order?.payment?.product_price_with_quantity || 0
+                    )}
                   </span>
                 </TableCell>
                 <TableCell>{getOrderStatusBadge(order.status)}</TableCell>

@@ -272,12 +272,12 @@ export default function OrderDetailsPage() {
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
                         Total Amount{" "}
-                        <span className="text-xs">
-                          (Advance + Delivery + Discount)
-                        </span>
+                        <span className="text-xs">(Price with quantity)</span>
                       </label>
                       <p className="font-semibold">
-                        {formatPrice(order.payment.amount || 0)}
+                        {formatPrice(
+                          order.payment.product_price_with_quantity || 0
+                        )}
                       </p>
                     </div>
                     <div>

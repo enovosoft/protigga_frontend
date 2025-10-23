@@ -52,15 +52,7 @@ export default function CourseDetailsPage() {
           skill_level: courseData.course_details?.skill_level || "Beginner",
           expired_date: courseData.course_details?.expired_date,
           academy_name: courseData.course_details?.academy_name || "",
-          curriculum: courseData.chapters || [], // Use real chapters from API
-          instructor: {
-            name: "Programming Instructor",
-            subject: "Computer Science",
-            experience: "8 years",
-            students: 1500,
-            image: null,
-            bio: "Experienced programming instructor with expertise in multiple programming languages and frameworks. Dedicated to helping students build strong foundations in software development and problem-solving skills.",
-          }, // Custom instructor for this course
+          curriculum: courseData.chapters || [],
         };
 
         setCourse(courseInfo);
@@ -242,8 +234,8 @@ export default function CourseDetailsPage() {
                           Expiry
                         </span>
                         <span className="font-medium text-foreground">
-                          {course.expiry
-                            ? `${formatDistanceToNow(course.expiry)}`
+                          {course?.expired_date
+                            ? `${formatDistanceToNow(course.expired_date)}`
                             : "N/A"}
                         </span>
                       </div>

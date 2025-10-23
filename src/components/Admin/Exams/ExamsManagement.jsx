@@ -73,7 +73,9 @@ export default function ExamsManagement({ useLayout = true }) {
 
     setDeleting(true);
     try {
-      const response = await api.delete(`/exam/${examToDelete.exam_id}`);
+      const response = await api.delete(`/exam/`, {
+        data: { exam_id: examToDelete.exam_id },
+      });
 
       toast.success(response.data?.message || "Exam deleted successfully!");
       setDeleteDialogOpen(false);

@@ -1,7 +1,9 @@
 import UserDashboardLayout from "@/components/shared/DashboardLayout";
+import Loading from "@/components/shared/Loading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import api from "@/lib/api";
 import {
   getEnrollmentStatusBadge,
@@ -13,6 +15,7 @@ import {
   ArrowLeft,
   Calendar,
   CreditCard,
+  Edit,
   GraduationCap,
   Loader2,
   Phone,
@@ -31,6 +34,9 @@ export default function EnrollmentDetailsPage() {
     location.state?.enrollment || null
   );
   const [togglingBlock, setTogglingBlock] = useState(false);
+  const [editingExpiry, setEditingExpiry] = useState(false);
+  const [selectedExpiryDate, setSelectedExpiryDate] = useState("");
+  const [savingChanges, setSavingChanges] = useState(false);
 
   useEffect(() => {
     // If no enrollment data in state, redirect back to enrollments
@@ -43,36 +49,69 @@ export default function EnrollmentDetailsPage() {
     if (!enrollment) return;
 
     setTogglingBlock(true);
+    // Toggle the block status locally
+    setEnrollment((prev) => ({
+      ...prev,
+      is_blocked: !prev.is_blocked,
+    }));
+
+    // Save the changes
+    await handleSaveChanges();
+    setTogglingBlock(false);
+  };
+
+  const handleSaveChanges = async () => {
+    if (!enrollment) return;
+
+    setSavingChanges(true);
     try {
-      const response = await api.put("/enrollment", {
+      const payload = {
         enrollment_id: enrollment.enrollment_id,
         user_id: enrollment.user_id,
-      });
+        is_blocked: enrollment.is_blocked,
+      };
+
+      // Add expiry_date if it was edited or always include current
+      if (selectedExpiryDate) {
+        // Format to yyyy-mm-ddT00:00:00Z
+        const date = new Date(selectedExpiryDate);
+        const formattedDate = date
+          .toISOString()
+          .replace(/T\d{2}:\d{2}:\d{2}/, "T00:00:00");
+        payload.expiry_date = formattedDate;
+      } else {
+        // Send current expiry_date
+        payload.expiry_date = enrollment.expiry_date;
+      }
+
+      const response = await api.put("/enrollment", payload);
 
       if (response.data.success) {
-        // Update the local enrollment state
-        setEnrollment((prev) => ({
-          ...prev,
-          is_blocked: !prev.is_blocked,
-        }));
-        toast.success(
-          enrollment.is_blocked
-            ? "Enrollment unblocked successfully!"
-            : "Enrollment blocked successfully!"
-        );
+        if (selectedExpiryDate) {
+          setEnrollment((prev) => ({
+            ...prev,
+            expiry_date: new Date(selectedExpiryDate).toISOString(),
+          }));
+          setEditingExpiry(false);
+          setSelectedExpiryDate("");
+          toast.success("Expiry date updated successfully!");
+        } else {
+          toast.success(
+            enrollment.is_blocked
+              ? "Enrollment blocked successfully!"
+              : "Enrollment unblocked successfully!"
+          );
+        }
       } else {
-        toast.error(
-          response.data.message || "Failed to toggle enrollment block status"
-        );
+        toast.error(response.data.message || "Failed to update enrollment");
       }
     } catch (error) {
-      console.error("Toggle block error:", error);
+      console.error("Save changes error:", error);
       toast.error(
-        error.response?.data?.message ||
-          "Failed to toggle enrollment block status"
+        error.response?.data?.message || "Failed to update enrollment"
       );
     } finally {
-      setTogglingBlock(false);
+      setSavingChanges(false);
     }
   };
 
@@ -140,7 +179,7 @@ export default function EnrollmentDetailsPage() {
                     Status
                   </label>
                   <div className="mt-1">
-                    {getEnrollmentStatusBadge(enrollment.enrollment_status)}
+                    {getEnrollmentStatusBadge(enrollment.status)}
                   </div>
                 </div>
                 <div>
@@ -207,14 +246,64 @@ export default function EnrollmentDetailsPage() {
                 <label className="text-sm font-medium text-muted-foreground">
                   Expiry Date
                 </label>
-                <p className="flex items-center gap-2 text-sm">
-                  <Calendar className="w-4 h-4" />
-                  <span> {formatDate(enrollment.expiry_date)}</span> |
-                  <span className="text-primary/70">
-                    {" "}
-                    {getRelativeTime(enrollment.expiry_date)}
-                  </span>
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  {editingExpiry ? (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="datetime-local"
+                        value={selectedExpiryDate}
+                        onChange={(e) => setSelectedExpiryDate(e.target.value)}
+                        className="w-auto"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={handleSaveChanges}
+                        disabled={savingChanges}
+                      >
+                        {savingChanges ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          "Save"
+                        )}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setEditingExpiry(false);
+                          setSelectedExpiryDate("");
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="flex items-center gap-2 text-sm">
+                        <Calendar className="w-4 h-4" />
+                        <span> {formatDate(enrollment.expiry_date)}</span> |
+                        <span className="text-primary/70">
+                          {" "}
+                          {getRelativeTime(enrollment.expiry_date)}
+                        </span>
+                      </p>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          setEditingExpiry(true);
+                          setSelectedExpiryDate(
+                            new Date(enrollment.expiry_date)
+                              .toISOString()
+                              .slice(0, 16)
+                          );
+                        }}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -336,7 +425,9 @@ export default function EnrollmentDetailsPage() {
                         Total Amount
                       </label>
                       <p className="font-semibold">
-                        {formatPrice(enrollment.payment.amount || 0)}
+                        {formatPrice(
+                          enrollment.payment.product_price_with_quantity || 0
+                        )}
                       </p>
                     </div>
                     <div>
@@ -486,6 +577,7 @@ export default function EnrollmentDetailsPage() {
           </Card>
         </div>
       </div>
+      {savingChanges && <Loading text="Saving changes" />}
     </UserDashboardLayout>
   );
 }
