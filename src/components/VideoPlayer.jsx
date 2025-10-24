@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Slider } from "@/components/ui/slider";
+} from '@/components/ui/dropdown-menu';
+import { Slider } from '@/components/ui/slider';
 import {
   ChevronLeft,
   ChevronRight,
@@ -18,9 +18,9 @@ import {
   Settings,
   Volume2,
   VolumeX,
-} from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
-import ReactPlayer from "react-player";
+} from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import ReactPlayer from 'react-player';
 
 const VideoPlayer = ({
   url,
@@ -48,8 +48,8 @@ const VideoPlayer = ({
     if (!url) return null;
 
     // Handle youtu.be format
-    if (url.includes("youtu.be/")) {
-      const videoId = url.split("youtu.be/")[1].split("?")[0];
+    if (url.includes('youtu.be/')) {
+      const videoId = url.split('youtu.be/')[1].split('?')[0];
       return `https://www.youtube.com/watch?v=${videoId}`;
     }
 
@@ -70,7 +70,7 @@ const VideoPlayer = ({
 
   // Inject CSS to hide YouTube elements
   useEffect(() => {
-    const style = document.createElement("style");
+    const style = document.createElement('style');
     style.textContent = `
       .ytp-chrome-top,
       .ytp-pause-overlay,
@@ -105,24 +105,24 @@ const VideoPlayer = ({
       // Prevent default behavior and handle shortcuts only when video player is focused
       if (
         !containerRef.current?.contains(document.activeElement) &&
-        !containerRef.current?.matches(":hover")
+        !containerRef.current?.matches(':hover')
       ) {
         return;
       }
 
       switch (e.code) {
-        case "Space":
+        case 'Space':
           e.preventDefault();
           setPlaying((prev) => !prev);
           break;
-        case "ArrowLeft":
+        case 'ArrowLeft':
           e.preventDefault();
           if (playerRef.current) {
             const currentTime = playerRef.current.currentTime || 0;
             playerRef.current.currentTime = Math.max(0, currentTime - 10);
           }
           break;
-        case "ArrowRight":
+        case 'ArrowRight':
           e.preventDefault();
           if (playerRef.current) {
             const currentTime = playerRef.current.currentTime || 0;
@@ -132,20 +132,20 @@ const VideoPlayer = ({
             );
           }
           break;
-        case "ArrowUp":
+        case 'ArrowUp':
           e.preventDefault();
           setVolume((prev) => Math.min(1, prev + 0.1));
           setMuted(false);
           break;
-        case "ArrowDown":
+        case 'ArrowDown':
           e.preventDefault();
           setVolume((prev) => Math.max(0, prev - 0.1));
           break;
-        case "KeyM":
+        case 'KeyM':
           e.preventDefault();
           setMuted((prev) => !prev);
           break;
-        case "KeyF":
+        case 'KeyF':
           e.preventDefault();
           if (!isFullscreen && containerRef.current) {
             if (containerRef.current.requestFullscreen) {
@@ -158,8 +158,8 @@ const VideoPlayer = ({
       }
     };
 
-    document.addEventListener("keydown", handleKeyPress);
-    return () => document.removeEventListener("keydown", handleKeyPress);
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
   }, [duration, isFullscreen]);
 
   // Handle fullscreen change events
@@ -175,23 +175,23 @@ const VideoPlayer = ({
     };
 
     // Add all possible fullscreen change event listeners
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
-    document.addEventListener("mozfullscreenchange", handleFullscreenChange);
-    document.addEventListener("MSFullscreenChange", handleFullscreenChange);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
     return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener(
-        "webkitfullscreenchange",
+        'webkitfullscreenchange',
         handleFullscreenChange
       );
       document.removeEventListener(
-        "mozfullscreenchange",
+        'mozfullscreenchange',
         handleFullscreenChange
       );
       document.removeEventListener(
-        "MSFullscreenChange",
+        'MSFullscreenChange',
         handleFullscreenChange
       );
     };
@@ -201,11 +201,11 @@ const VideoPlayer = ({
 
   // Inject CSS to hide YouTube overlays
   useEffect(() => {
-    const styleId = "youtube-overlay-hider";
+    const styleId = 'youtube-overlay-hider';
     let style = document.getElementById(styleId);
 
     if (!style) {
-      style = document.createElement("style");
+      style = document.createElement('style');
       style.id = styleId;
       style.textContent = `
         .ytp-chrome-top, .ytp-chrome-bottom, .ytp-gradient-top, .ytp-gradient-bottom,
@@ -266,7 +266,7 @@ const VideoPlayer = ({
     let durationValue = newDuration;
 
     // If it's an event object, try to extract duration
-    if (newDuration && typeof newDuration === "object" && newDuration.target) {
+    if (newDuration && typeof newDuration === 'object' && newDuration.target) {
       durationValue = newDuration.target.duration;
     }
 
@@ -359,7 +359,7 @@ const VideoPlayer = ({
 
   const formatTime = (seconds) => {
     if (!seconds || isNaN(seconds) || seconds < 0) {
-      return "0:00";
+      return '0:00';
     }
 
     const hours = Math.floor(seconds / 3600);
@@ -367,11 +367,11 @@ const VideoPlayer = ({
     const secs = Math.floor(seconds % 60);
 
     if (hours > 0) {
-      return `${hours}:${mins.toString().padStart(2, "0")}:${secs
+      return `${hours}:${mins.toString().padStart(2, '0')}:${secs
         .toString()
-        .padStart(2, "0")}`;
+        .padStart(2, '0')}`;
     } else {
-      return `${mins}:${secs.toString().padStart(2, "0")}`;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
   };
 
@@ -404,14 +404,14 @@ const VideoPlayer = ({
       ref={containerRef}
       className={`relative bg-black overflow-hidden w-full ${
         isFullscreen
-          ? "fixed inset-0 z-50 w-screen h-screen"
-          : "aspect-video min-h-60 sm:min-h-72 md:min-h-auto"
+          ? 'fixed inset-0 z-50 w-screen h-screen'
+          : 'aspect-video min-h-60 sm:min-h-72 md:min-h-auto'
       }`}
       onMouseMove={() => setShowControls(true)}
       onMouseLeave={() => playing && setShowControls(false)}
       style={{
-        minHeight: isFullscreen ? "100vh" : "auto",
-        height: isFullscreen ? "100vh" : "auto",
+        minHeight: isFullscreen ? '100vh' : 'auto',
+        height: isFullscreen ? '100vh' : 'auto',
       }}
     >
       {/* Debug info */}
@@ -471,7 +471,7 @@ const VideoPlayer = ({
                 end: undefined,
               },
               embedOptions: {
-                host: "https://www.youtube-nocookie.com",
+                host: 'https://www.youtube-nocookie.com',
               },
             },
           }}
@@ -481,7 +481,7 @@ const VideoPlayer = ({
       {/* Custom Controls */}
       <div
         className={`absolute inset-0 transition-opacity duration-300 ${
-          showControls ? "opacity-100" : "opacity-0"
+          showControls ? 'opacity-100' : 'opacity-0'
         }`}
       >
         {/* Play/Pause Overlay */}
@@ -623,7 +623,7 @@ const VideoPlayer = ({
                     variant="ghost"
                     size="sm"
                     className={`text-white hover:bg-white/20 ${
-                      isFullscreen ? "flex" : "hidden md:flex"
+                      isFullscreen ? 'flex' : 'hidden md:flex'
                     } w-12 h-8 p-0.5 flex-shrink-0`}
                     title="Playback Speed"
                   >
@@ -632,7 +632,7 @@ const VideoPlayer = ({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className={`z-[9999] ${isFullscreen ? "relative" : ""}`}
+                  className={`z-[9999] ${isFullscreen ? 'relative' : ''}`}
                   side="top"
                   align="center"
                 >
@@ -640,7 +640,7 @@ const VideoPlayer = ({
                     <DropdownMenuItem
                       key={rate}
                       onClick={() => setPlaybackRate(rate)}
-                      className={rate === playbackRate ? "bg-accent" : ""}
+                      className={rate === playbackRate ? 'bg-accent' : ''}
                     >
                       {rate}x
                     </DropdownMenuItem>
@@ -654,7 +654,7 @@ const VideoPlayer = ({
                 size="sm"
                 onClick={handleFullscreen}
                 className="text-white hover:bg-white/20 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 p-0.5 sm:p-1 flex-shrink-0"
-                title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+                title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
               >
                 {isFullscreen ? (
                   <Minimize className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" />
