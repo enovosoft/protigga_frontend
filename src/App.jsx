@@ -3,9 +3,9 @@ import { CookiesProvider } from "react-cookie";
 import { Toaster } from "react-hot-toast";
 import { Navigate, BrowserRouter as Router, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { protectedRoutes } from "./pages/student/protectedRoutes";
 import { adminRoutes } from "./routes/adminRoutes";
 import { authRoutes } from "./routes/authRoutes";
-import { protectedRoutes } from "./routes/protectedRoutes";
 import { publicRoutes } from "./routes/publicRoutes";
 
 // Auth Route Component - Redirects to dashboard if already authenticated

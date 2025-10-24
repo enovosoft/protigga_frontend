@@ -27,8 +27,6 @@ const studentStore = {
     state.course = payload;
   }),
   setFetchData: action((state, payload) => {
-    state.data = payload.user || null;
-
     state.profile = {
       user_id: payload.user?.user_id || "",
       name: payload.user?.name || "",
@@ -47,11 +45,14 @@ const studentStore = {
 
     // Payments: combine from enrollments and book_orders
     const enrollmentPayments = (payload.user?.enrollments || [])
-      .map((enrollment) => enrollment.payment)
+      .map((enrollment) => ({
+        ...enrollment.payment,
+        payment_type: "enrollment",
+      }))
       .filter(Boolean);
 
     const bookOrderPayments = (payload.user?.book_orders || [])
-      .map((order) => order.payment)
+      .map((order) => ({ ...order.payment, payment_type: "book_order" }))
       .filter(Boolean);
 
     state.payments = [...enrollmentPayments, ...bookOrderPayments];

@@ -1,12 +1,15 @@
 import { Route } from "react-router-dom";
-import { ProtectedRoute } from "../components/routing/ProtectedRoute";
+import { ProtectedRoute } from "../../components/routing/ProtectedRoute";
 
-import Dashboard from "../pages/Dashboard/Dashboard";
+import Dashboard from "../Dashboard/Dashboard";
 
 import CoursePage from "@/pages/student/CoursePage";
 import EnrollmentsPage from "@/pages/student/EnrollmentsPage";
+import ExamPage from "@/pages/student/ExamPage";
+import PaymentDetailsPage from "@/pages/student/PaymentDetailsPage";
+import PaymentHistoryPage from "@/pages/student/PaymentHistoryPage";
 import ProfilePage from "@/pages/student/ProfilePage";
-import PaymentStatusPage from "../pages/payment/PaymentStatusPage";
+import PaymentStatusPage from "../payment/PaymentStatusPage";
 
 export const protectedRoutes = (
   <>
@@ -66,6 +69,30 @@ export const protectedRoutes = (
       element={
         <ProtectedRoute roles={["student"]}>
           <CoursePage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/dashboard/payments"
+      element={
+        <ProtectedRoute roles={["student"]}>
+          <PaymentHistoryPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/dashboard/payments/:transactionId"
+      element={
+        <ProtectedRoute roles={["student"]}>
+          <PaymentDetailsPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/dashboard/exams"
+      element={
+        <ProtectedRoute roles={["student"]}>
+          <ExamPage />
         </ProtectedRoute>
       }
     />

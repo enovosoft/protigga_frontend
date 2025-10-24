@@ -23,6 +23,11 @@ const StudentDashboardLayout = ({ children }) => {
     }
   }, [isFetched, loading, fetchStudentDetails]);
 
+  // Scroll to top when route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   const handleCloseError = () => {
     setError(null);
   };

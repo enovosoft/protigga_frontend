@@ -180,7 +180,7 @@ export const getEnrollmentStatusBadge = (status) => {
     },
   };
 
-  const config = statusConfig[status] || {
+  const config = statusConfig[status.toUpperCase()] || {
     variant: "secondary",
     label: status,
     className: "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-100",

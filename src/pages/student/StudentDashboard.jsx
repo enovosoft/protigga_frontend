@@ -19,7 +19,10 @@ export default function StudentDashboard() {
       title: "Books Order",
       description: "See your book orders. ",
       icon: Book,
-      onClick: () => navigate("/dashboard/books"),
+      onClick: () =>
+        navigate("/dashboard/payments", {
+          state: { filterType: "book_order" },
+        }),
     },
     {
       title: "Payment History",
