@@ -177,21 +177,6 @@ const ExamPage = () => {
                         {selectedExam.exam_description}
                       </p>
                     </div>
-                    <div>
-                      <strong className="text-sm text-muted-foreground">
-                        Exam Link
-                      </strong>
-                      <p>
-                        <a
-                          href={selectedExam.exam_link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:text-primary/80 underline break-all text-sm"
-                        >
-                          {selectedExam.exam_link}
-                        </a>
-                      </p>
-                    </div>
                   </div>
 
                   <div className="space-y-4">

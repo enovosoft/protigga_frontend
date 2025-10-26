@@ -59,8 +59,6 @@ const manualOrderSchema = z.object({
     .optional()
     .or(z.literal("")),
 
-  // after_discounted_amount removed; not required
-  // discount percentage removed; only discount_amount is used
   book_order_status: z.enum(["confirmed", "pending", "failed", "cancelled"]),
   payment_status: z.enum([
     "PENDING",

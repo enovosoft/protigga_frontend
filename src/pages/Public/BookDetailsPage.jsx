@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import ImageFallback from "@/components/shared/ImageFallback";
 import apiInstance from "@/lib/api";
 export default function BookDetailsPage() {
   const { slug } = useParams();
@@ -132,10 +133,10 @@ export default function BookDetailsPage() {
                 <Card className="overflow-hidden">
                   <CardHeader className="p-0">
                     <div className="relative overflow-hidden bg-muted aspect-auto">
-                      <img
+                      <ImageFallback
                         src={book.book_image}
                         alt={book.title}
-                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-110 cursor-zoom-in"
+                        className=" transition-transform duration-300 hover:scale-110 cursor-zoom-in min-h-80"
                       />
                     </div>
                   </CardHeader>

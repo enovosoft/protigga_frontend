@@ -10,14 +10,17 @@ import apiInstance from "@/lib/api";
 import { Book, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import ImageFallback from "@/components/shared/ImageFallback";
+import { BookOpen } from "lucide-react";
+import { Link } from "react-router-dom";
 export default function BooksPage() {
-  const navigate = useNavigate();
   const [books, setBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [batches, setBatches] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("all");
 
   useEffect(() => {
     fetchBooks();
@@ -28,16 +31,17 @@ export default function BooksPage() {
       const response = await apiInstance.get("/books");
       const booksData = response.data.books || [];
       setBooks(booksData);
+      // extract unique batches and preserve order
+      const uniqueBatches = Array.from(
+        new Set(booksData.map((b) => b.batch).filter(Boolean))
+      );
+      setBatches(uniqueBatches);
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to load books");
       console.error("Error fetching books:", error);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleOrderNow = (bookSlug) => {
-    navigate(`/books/${bookSlug}`);
   };
 
   return (
@@ -77,7 +81,33 @@ export default function BooksPage() {
             </div>
           ) : (
             <>
-              {" "}
+              {/* Filter controls */}
+              <div className="flex justify-center gap-3 mb-8 flex-wrap">
+                <button
+                  className={`px-4 py-2 rounded-md font-medium ${
+                    activeFilter === "all"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-transparent border border-border"
+                  }`}
+                  onClick={() => setActiveFilter("all")}
+                >
+                  All Books
+                </button>
+                {batches.map((batch) => (
+                  <button
+                    key={batch}
+                    className={`px-4 py-2 rounded-md font-medium ${
+                      activeFilter === batch
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-transparent border border-border"
+                    }`}
+                    onClick={() => setActiveFilter(batch)}
+                  >
+                    {batch}
+                  </button>
+                ))}
+              </div>
+
               {books.length === 0 ? (
                 <div className="text-center py-16">
                   <Book className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
@@ -86,50 +116,147 @@ export default function BooksPage() {
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {books.map((book) => (
-                    <Card
-                      key={book.slug}
-                      className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
-                    >
-                      <CardHeader className="p-0">
-                        <div className="relative aspect-auto overflow-hidden bg-muted">
-                          {book.book_image ? (
-                            <img
-                              src={book.book_image}
-                              alt={book.title}
-                              className="w-full h-full object-cover "
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Book className="w-16 h-16 text-muted-foreground" />
+                <div className="space-y-12">
+                  {activeFilter === "all"
+                    ? batches.map((batch) => {
+                        const batchBooks = books.filter(
+                          (b) => b.batch === batch
+                        );
+                        if (!batchBooks.length) return null;
+                        return (
+                          <div key={batch}>
+                            <h2 className="text-2xl font-semibold mb-4">
+                              {batch}
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                              {batchBooks.map((book) => (
+                                <Card
+                                  key={book.slug}
+                                  className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
+                                >
+                                  <CardHeader className="p-0 relative">
+                                    <div className="relative aspect-auto overflow-hidden bg-muted">
+                                      <ImageFallback
+                                        src={book.book_image}
+                                        alt={book.title}
+                                      />
+                                      {book.batch && (
+                                        <div className="absolute top-3 right-3">
+                                          <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                                            <BookOpen className="w-3 h-3" />
+                                            {book.batch}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </CardHeader>
+
+                                  <CardContent className="p-4 flex-1">
+                                    <h3 className="text-lg font-semibold text-foreground mb-3 line-clamp-2">
+                                      {book.title}
+                                    </h3>
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-xl font-bold text-primary">
+                                        ৳{book.price}
+                                      </span>
+                                    </div>
+                                  </CardContent>
+
+                                  <CardFooter className="p-4 pt-0">
+                                    {book.stock === 0 ? (
+                                      <button
+                                        disabled
+                                        className="w-full bg-muted text-muted-foreground py-2 rounded-md cursor-not-allowed"
+                                      >
+                                        Stock Out
+                                      </button>
+                                    ) : (
+                                      <Link
+                                        to={`/books/${book.slug}`}
+                                        className="w-full"
+                                      >
+                                        <Button className="w-full">
+                                          <ShoppingCart className="w-4 h-4 mr-2" />
+                                          Order Now
+                                        </Button>
+                                      </Link>
+                                    )}
+                                  </CardFooter>
+                                </Card>
+                              ))}
                             </div>
-                          )}
-                        </div>
-                      </CardHeader>
+                          </div>
+                        );
+                      })
+                    : (() => {
+                        const filtered = books.filter(
+                          (b) => b.batch === activeFilter
+                        );
+                        return (
+                          <div>
+                            <h2 className="text-2xl font-semibold mb-4">
+                              {activeFilter}
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                              {filtered.map((book) => (
+                                <Card
+                                  key={book.slug}
+                                  className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
+                                >
+                                  <CardHeader className="p-0 relative">
+                                    <div className="relative aspect-auto overflow-hidden bg-muted">
+                                      <ImageFallback
+                                        src={book.book_image}
+                                        alt={book.title}
+                                      />
+                                      {book.batch && (
+                                        <div className="absolute top-3 right-3">
+                                          <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                                            <BookOpen className="w-3 h-3" />
+                                            {book.batch}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </CardHeader>
 
-                      <CardContent className="p-4 flex-1">
-                        <h3 className="text-lg font-semibold text-foreground mb-3 line-clamp-2">
-                          {book.title}
-                        </h3>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xl font-bold text-primary">
-                            ৳{book.price}
-                          </span>
-                        </div>
-                      </CardContent>
+                                  <CardContent className="p-4 flex-1">
+                                    <h3 className="text-lg font-semibold text-foreground mb-3 line-clamp-2">
+                                      {book.title}
+                                    </h3>
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-xl font-bold text-primary">
+                                        ৳{book.price}
+                                      </span>
+                                    </div>
+                                  </CardContent>
 
-                      <CardFooter className="p-4 pt-0">
-                        <Button
-                          className="w-full"
-                          onClick={() => handleOrderNow(book.slug)}
-                        >
-                          <ShoppingCart className="w-4 h-4 mr-2" />
-                          Order Now
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  ))}
+                                  <CardFooter className="p-4 pt-0">
+                                    {book.stock === 0 ? (
+                                      <button
+                                        disabled
+                                        className="w-full bg-muted text-muted-foreground py-2 rounded-md cursor-not-allowed"
+                                      >
+                                        Stock Out
+                                      </button>
+                                    ) : (
+                                      <Link
+                                        to={`/books/${book.slug}`}
+                                        className="w-full"
+                                      >
+                                        <Button className="w-full">
+                                          <ShoppingCart className="w-4 h-4 mr-2" />{" "}
+                                          Order Now
+                                        </Button>
+                                      </Link>
+                                    )}
+                                  </CardFooter>
+                                </Card>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })()}
                 </div>
               )}
             </>

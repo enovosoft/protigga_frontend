@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import apiInstance from "@/lib/api";
 import {
   ArrowLeft,
   ChevronLeft,
@@ -16,14 +17,17 @@ import pdfWorker from "pdfjs-dist/build/pdf.worker?url";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Document, Page, pdfjs } from "react-pdf";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 // Set up PDF.js worker with CDN - matching react-pdf version
 pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 export default function NotesViewPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { note } = location.state || {};
+  const { slug } = useParams();
+  const { note: noteFromState } = location.state || {};
+
+  const [note, setNote] = useState(noteFromState || null);
 
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
@@ -49,12 +53,40 @@ export default function NotesViewPage() {
     }
   };
   useEffect(() => {
-    if (!note) {
-      toast.error("Note not found");
-      navigate("/notes");
-      return;
-    }
-    setLoading(false);
+    const fetchNote = async () => {
+      if (!slug) {
+        toast.error("Note not found");
+        navigate("/notes");
+        return;
+      }
+
+      // If note is already available from state, use it
+      if (noteFromState) {
+        setNote(noteFromState);
+        setLoading(false);
+        return;
+      }
+
+      // Otherwise, fetch from API
+      try {
+        setLoading(true);
+        const response = await apiInstance.get(`/notes/${slug}`);
+        if (response.data?.note) {
+          setNote(response.data.note);
+        } else {
+          throw new Error("Note not found");
+        }
+      } catch (error) {
+        console.error("Error fetching note:", error);
+        toast.error("Note not found");
+        navigate("/notes");
+        return;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNote();
 
     // Auto-disable dual mode on non-XL screens
     const handleResize = () => {
@@ -67,7 +99,7 @@ export default function NotesViewPage() {
     handleResize(); // Check initial size
 
     return () => window.removeEventListener("resize", handleResize);
-  }, [note, navigate]);
+  }, [slug, noteFromState, navigate]);
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
@@ -149,31 +181,55 @@ export default function NotesViewPage() {
         </div>
 
         {loading ? (
-          <div className="container mx-auto px-4 py-8">
-            <div className="mb-6">
-              <div className="mb-4">
-                <Skeleton className="h-10 w-32" />
-              </div>
-              <div className="bg-card p-6 rounded-lg border">
-                <div className="space-y-3">
-                  <Skeleton className="h-8 w-64" />
-                  <Skeleton className="h-4 w-full" />
+          <>
+            {/* PDF Controls Skeleton */}
+            <div className="bg-card p-4 rounded-lg border mb-6">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                {/* Page Navigation Skeleton */}
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-8 w-20" />
+                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="h-8 w-20" />
+                </div>
+
+                {/* Zoom / Rotate / Dual Controls Skeleton */}
+                <div className="flex items-center gap-2 flex-wrap justify-center">
+                  <Skeleton className="h-8 w-8" />
+                  <Skeleton className="h-6 w-12" />
+                  <Skeleton className="h-8 w-8" />
+                  <Skeleton className="h-8 w-12" />
+                  <Skeleton className="h-8 w-20" />
+                  <Skeleton className="h-8 w-24" />
                 </div>
               </div>
             </div>
-            <div className="bg-card p-6 rounded-lg border">
+
+            {/* PDF Viewer Skeleton */}
+            <div className="bg-card p-4 rounded-lg border overflow-hidden">
               <div className="flex justify-center">
-                <div className="w-full max-w-4xl">
-                  <Skeleton className="h-64 w-full mb-4" />
-                  <div className="flex justify-center gap-4">
-                    <Skeleton className="h-8 w-20" />
-                    <Skeleton className="h-8 w-24" />
-                    <Skeleton className="h-8 w-20" />
+                <div className="pdf-container flex gap-4 w-full max-w-full">
+                  <div className="flex-1 w-full min-w-0">
+                    <div className="flex justify-center">
+                      <div className="max-w-full">
+                        <Skeleton className="h-96 w-full max-w-4xl mx-auto" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+
+            {/* Page Input Skeleton */}
+            <div className="mt-6 text-center">
+              <div className="inline-flex flex-col sm:flex-row items-center gap-2">
+                <Skeleton className="h-4 w-20" />
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-8 w-16" />
+                  <Skeleton className="h-4 w-12" />
+                </div>
+              </div>
+            </div>
+          </>
         ) : (
           <>
             {" "}

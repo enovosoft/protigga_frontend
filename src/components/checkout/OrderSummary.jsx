@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BookOpen, ShoppingCart, Tag } from "lucide-react";
+import ImageFallback from "../shared/ImageFallback";
 
 export default function OrderSummary({
   product = null,
@@ -57,11 +58,10 @@ export default function OrderSummary({
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="p-3 overflow-hidden ">
-          <img
+          <ImageFallback
             src={product.book_image || product.thumbnail}
             alt={product.title}
-            className="w-full aspect-auto rounded-2xl transition-transform object-cover "
-            srcset=""
+            className="w-full  rounded-2xl transition-transform object-cover "
           />
         </div>
         <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg border border-border/50">
@@ -87,7 +87,6 @@ export default function OrderSummary({
           </div>
         </div>
 
-        {/* Promo Code Section - moved under product name */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Tag className="w-4 h-4 text-primary" />

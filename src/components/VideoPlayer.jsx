@@ -1,14 +1,12 @@
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Slider } from '@/components/ui/slider';
+} from "@/components/ui/dropdown-menu";
+import { Slider } from "@/components/ui/slider";
 import {
-  ChevronLeft,
-  ChevronRight,
   FastForward,
   Maximize,
   Minimize,
@@ -18,18 +16,11 @@ import {
   Settings,
   Volume2,
   VolumeX,
-} from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import ReactPlayer from 'react-player';
+} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import ReactPlayer from "react-player";
 
-const VideoPlayer = ({
-  url,
-  title,
-  onNext,
-  onPrevious,
-  hasNext = false,
-  hasPrevious = false,
-}) => {
+const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
   const playerRef = useRef(null);
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.8);
@@ -48,29 +39,58 @@ const VideoPlayer = ({
     if (!url) return null;
 
     // Handle youtu.be format
-    if (url.includes('youtu.be/')) {
-      const videoId = url.split('youtu.be/')[1].split('?')[0];
+    if (url.includes("youtu.be/")) {
+      const videoId = url.split("youtu.be/")[1].split("?")[0];
       return `https://www.youtube.com/watch?v=${videoId}`;
     }
 
     return url;
   }, [url]);
 
-  // Reset player state when URL changes
+  // Load saved progress when topic changes
   useEffect(() => {
-    if (normalizedUrl) {
-      setPlaying(true); // Enable autoplay
-      setPlayed(0);
-      setDuration(0);
-      setSeeking(false);
-      setShowControls(true);
-      setPlayerReady(false);
+    if (courseSlug && topicId) {
+      const savedProgress = localStorage.getItem(`video_progress_${courseSlug}_${topicId}`);
+      if (savedProgress) {
+        const { progress, completed } = JSON.parse(savedProgress);
+        setPlayed(progress);
+        // If video was completed, don't autoplay
+        if (completed) {
+          setPlaying(false);
+        }
+      } else {
+        setPlayed(0);
+        setPlaying(true);
+      }
     }
-  }, [normalizedUrl]);
+  }, [courseSlug, topicId]);
+
+  // Save progress periodically and on video end
+  const saveProgress = (progress, completed = false) => {
+    if (courseSlug && topicId) {
+      const progressData = {
+        progress,
+        completed,
+        lastWatched: Date.now()
+      };
+      localStorage.setItem(`video_progress_${courseSlug}_${topicId}`, JSON.stringify(progressData));
+      
+      // Call the callback if provided
+      if (onProgressUpdate) {
+        onProgressUpdate(topicId, progress, completed);
+      }
+    }
+  };
+
+  // Handle video end
+  const handleEnded = () => {
+    setPlaying(false);
+    saveProgress(1, true); // Mark as completed
+  };
 
   // Inject CSS to hide YouTube elements
   useEffect(() => {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
       .ytp-chrome-top,
       .ytp-pause-overlay,
@@ -105,24 +125,24 @@ const VideoPlayer = ({
       // Prevent default behavior and handle shortcuts only when video player is focused
       if (
         !containerRef.current?.contains(document.activeElement) &&
-        !containerRef.current?.matches(':hover')
+        !containerRef.current?.matches(":hover")
       ) {
         return;
       }
 
       switch (e.code) {
-        case 'Space':
+        case "Space":
           e.preventDefault();
           setPlaying((prev) => !prev);
           break;
-        case 'ArrowLeft':
+        case "ArrowLeft":
           e.preventDefault();
           if (playerRef.current) {
             const currentTime = playerRef.current.currentTime || 0;
             playerRef.current.currentTime = Math.max(0, currentTime - 10);
           }
           break;
-        case 'ArrowRight':
+        case "ArrowRight":
           e.preventDefault();
           if (playerRef.current) {
             const currentTime = playerRef.current.currentTime || 0;
@@ -132,20 +152,20 @@ const VideoPlayer = ({
             );
           }
           break;
-        case 'ArrowUp':
+        case "ArrowUp":
           e.preventDefault();
           setVolume((prev) => Math.min(1, prev + 0.1));
           setMuted(false);
           break;
-        case 'ArrowDown':
+        case "ArrowDown":
           e.preventDefault();
           setVolume((prev) => Math.max(0, prev - 0.1));
           break;
-        case 'KeyM':
+        case "KeyM":
           e.preventDefault();
           setMuted((prev) => !prev);
           break;
-        case 'KeyF':
+        case "KeyF":
           e.preventDefault();
           if (!isFullscreen && containerRef.current) {
             if (containerRef.current.requestFullscreen) {
@@ -158,8 +178,8 @@ const VideoPlayer = ({
       }
     };
 
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
+    document.addEventListener("keydown", handleKeyPress);
+    return () => document.removeEventListener("keydown", handleKeyPress);
   }, [duration, isFullscreen]);
 
   // Handle fullscreen change events
@@ -175,23 +195,23 @@ const VideoPlayer = ({
     };
 
     // Add all possible fullscreen change event listeners
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+    document.addEventListener("MSFullscreenChange", handleFullscreenChange);
 
     return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
       document.removeEventListener(
-        'webkitfullscreenchange',
+        "webkitfullscreenchange",
         handleFullscreenChange
       );
       document.removeEventListener(
-        'mozfullscreenchange',
+        "mozfullscreenchange",
         handleFullscreenChange
       );
       document.removeEventListener(
-        'MSFullscreenChange',
+        "MSFullscreenChange",
         handleFullscreenChange
       );
     };
@@ -201,11 +221,11 @@ const VideoPlayer = ({
 
   // Inject CSS to hide YouTube overlays
   useEffect(() => {
-    const styleId = 'youtube-overlay-hider';
+    const styleId = "youtube-overlay-hider";
     let style = document.getElementById(styleId);
 
     if (!style) {
-      style = document.createElement('style');
+      style = document.createElement("style");
       style.id = styleId;
       style.textContent = `
         .ytp-chrome-top, .ytp-chrome-bottom, .ytp-gradient-top, .ytp-gradient-bottom,
@@ -253,10 +273,26 @@ const VideoPlayer = ({
   const handleProgress = (state) => {
     if (!seeking) {
       // For ReactPlayer v3, check different progress state formats
+      let currentProgress = 0;
       if (state.played !== undefined && !isNaN(state.played)) {
+        currentProgress = state.played;
         setPlayed(state.played);
       } else if (state.playedSeconds !== undefined && duration > 0) {
-        setPlayed(state.playedSeconds / duration);
+        currentProgress = state.playedSeconds / duration;
+        setPlayed(currentProgress);
+      }
+      
+      // Save progress every 5 seconds if playing
+      if (playing && duration > 0 && Math.floor(currentProgress * duration) % 5 === 0) {
+        saveProgress(currentProgress);
+      }
+      
+      // Mark as completed when 90% watched
+      if (currentProgress >= 0.9 && courseSlug && topicId) {
+        const savedData = localStorage.getItem(`video_progress_${courseSlug}_${topicId}`);
+        if (!savedData || !JSON.parse(savedData).completed) {
+          saveProgress(currentProgress, true);
+        }
       }
     }
   };
@@ -266,7 +302,7 @@ const VideoPlayer = ({
     let durationValue = newDuration;
 
     // If it's an event object, try to extract duration
-    if (newDuration && typeof newDuration === 'object' && newDuration.target) {
+    if (newDuration && typeof newDuration === "object" && newDuration.target) {
       durationValue = newDuration.target.duration;
     }
 
@@ -293,17 +329,8 @@ const VideoPlayer = ({
     }
   };
 
-  const handleNextTopic = () => {
-    if (onNext && hasNext) {
-      onNext();
-    }
-  };
-
-  const handlePreviousTopic = () => {
-    if (onPrevious && hasPrevious) {
-      onPrevious();
-    }
-  };
+  // navigation (next/previous) is handled by the parent (CoursePage)
+  // VideoPlayer no longer renders next/previous controls in its control bar.
 
   const handleSkipBack = () => {
     if (playerRef.current) {
@@ -359,7 +386,7 @@ const VideoPlayer = ({
 
   const formatTime = (seconds) => {
     if (!seconds || isNaN(seconds) || seconds < 0) {
-      return '0:00';
+      return "0:00";
     }
 
     const hours = Math.floor(seconds / 3600);
@@ -367,11 +394,11 @@ const VideoPlayer = ({
     const secs = Math.floor(seconds % 60);
 
     if (hours > 0) {
-      return `${hours}:${mins.toString().padStart(2, '0')}:${secs
+      return `${hours}:${mins.toString().padStart(2, "0")}:${secs
         .toString()
-        .padStart(2, '0')}`;
+        .padStart(2, "0")}`;
     } else {
-      return `${mins}:${secs.toString().padStart(2, '0')}`;
+      return `${mins}:${secs.toString().padStart(2, "0")}`;
     }
   };
 
@@ -404,14 +431,14 @@ const VideoPlayer = ({
       ref={containerRef}
       className={`relative bg-black overflow-hidden w-full ${
         isFullscreen
-          ? 'fixed inset-0 z-50 w-screen h-screen'
-          : 'aspect-video min-h-60 sm:min-h-72 md:min-h-auto'
+          ? "fixed inset-0 z-50 w-screen h-screen"
+          : "aspect-video min-h-60 sm:min-h-72 md:min-h-auto"
       }`}
       onMouseMove={() => setShowControls(true)}
       onMouseLeave={() => playing && setShowControls(false)}
       style={{
-        minHeight: isFullscreen ? '100vh' : 'auto',
-        height: isFullscreen ? '100vh' : 'auto',
+        minHeight: isFullscreen ? "100vh" : "auto",
+        height: isFullscreen ? "100vh" : "auto",
       }}
     >
       {/* Debug info */}
@@ -433,6 +460,7 @@ const VideoPlayer = ({
           playbackRate={playbackRate}
           onProgress={handleProgress}
           onDurationChange={handleDuration}
+          onEnded={handleEnded}
           onTimeUpdate={(e) => {
             if (!seeking && e.target) {
               const currentTime = e.target.currentTime || 0;
@@ -471,7 +499,7 @@ const VideoPlayer = ({
                 end: undefined,
               },
               embedOptions: {
-                host: 'https://www.youtube-nocookie.com',
+                host: "https://www.youtube-nocookie.com",
               },
             },
           }}
@@ -481,7 +509,7 @@ const VideoPlayer = ({
       {/* Custom Controls */}
       <div
         className={`absolute inset-0 transition-opacity duration-300 ${
-          showControls ? 'opacity-100' : 'opacity-0'
+          showControls ? "opacity-100" : "opacity-0"
         }`}
       >
         {/* Play/Pause Overlay */}
@@ -497,9 +525,9 @@ const VideoPlayer = ({
         </div>
 
         {/* Bottom Controls */}
-        <div className="absolute  bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3 sm:p-4">
           {/* Progress Bar */}
-          <div className="lg:mb-2">
+          <div className="mb-2 sm:mb-3">
             <Slider
               value={[played * 100]}
               onValueChange={handleSeekChange}
@@ -524,12 +552,12 @@ const VideoPlayer = ({
                 variant="ghost"
                 size="sm"
                 onClick={handlePlayPause}
-                className="text-white hover:bg-white/20 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 p-0.5 sm:p-1 flex-shrink-0"
+                className="text-white hover:bg-white/20 w-11 h-11 sm:w-12 sm:h-12 p-1 flex-shrink-0"
               >
                 {playing ? (
-                  <Pause className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" />
+                  <Pause className="w-5 h-5 sm:w-6 sm:h-6" />
                 ) : (
-                  <Play className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" />
+                  <Play className="w-5 h-5 sm:w-6 sm:h-6 ml-0.5" />
                 )}
               </Button>
 
@@ -538,11 +566,11 @@ const VideoPlayer = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleSkipBack}
-                className="text-white hover:bg-white/20 relative w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 p-0.5 sm:p-1 flex-shrink-0"
+                className="text-white hover:bg-white/20 relative w-10 h-10 sm:w-11 sm:h-11 p-1 flex-shrink-0"
                 title="Rewind 10 seconds"
               >
-                <Rewind className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" />
-                <span className="absolute text-[7px] sm:text-[8px] md:text-xs font-bold -bottom-1 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+                <Rewind className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="absolute text-[11px] md:text-xs  font-bold -bottom-0.5 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
                   10
                 </span>
               </Button>
@@ -552,61 +580,20 @@ const VideoPlayer = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleSkipForward}
-                className="text-white hover:bg-white/20 relative w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 p-0.5 sm:p-1 flex-shrink-0"
+                className="text-white hover:bg-white/20 relative w-10 h-10 sm:w-11 sm:h-11 p-1 flex-shrink-0"
                 title="Fast forward 10 seconds"
               >
-                <FastForward className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" />
-                <span className="absolute text-[7px] sm:text-[8px] md:text-xs font-bold -bottom-1 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+                <FastForward className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="absolute text-[11px] md:text-xs  font-bold -bottom-0.5 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
                   10
                 </span>
-              </Button>
-
-              {/* Separator */}
-              <div className="w-px h-6 bg-white/20 mx-0.5 sm:mx-1"></div>
-
-              {/* Previous Topic */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handlePreviousTopic}
-                disabled={!hasPrevious}
-                className="text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 p-0.5 sm:p-1 flex-shrink-0"
-                title="Previous Topic"
-              >
-                <ChevronLeft className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" />
-              </Button>
-
-              {/* Next Topic */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleNextTopic}
-                disabled={!hasNext}
-                className="text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 p-0.5 sm:p-1 flex-shrink-0"
-                title="Next Topic"
-              >
-                <ChevronRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" />
               </Button>
             </div>
 
             {/* Right Controls - Volume, Settings, Fullscreen */}
             <div className="flex items-center gap-1 sm:gap-2">
-              {/* Volume */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleMute}
-                className="text-white hover:bg-white/20 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 p-0.5 sm:p-1 flex-shrink-0"
-              >
-                {muted || volume === 0 ? (
-                  <VolumeX className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" />
-                ) : (
-                  <Volume2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" />
-                )}
-              </Button>
-
-              {/* Volume Slider - Hidden on small screens */}
-              <div className="w-12 sm:w-14 md:w-20 hidden sm:block">
+              {/* Volume Slider - Hidden on mobile, shown on larger screens */}
+              <div className="w-16 sm:w-20 md:w-24 hidden md:block">
                 <Slider
                   value={[muted ? 0 : volume * 100]}
                   onValueChange={handleVolumeChange}
@@ -616,50 +603,86 @@ const VideoPlayer = ({
                 />
               </div>
 
-              {/* Speed Control - Hidden on small screens, visible in fullscreen */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`text-white hover:bg-white/20 ${
-                      isFullscreen ? 'flex' : 'hidden md:flex'
-                    } w-12 h-8 p-0.5 flex-shrink-0`}
-                    title="Playback Speed"
-                  >
-                    <Settings className="w-4 h-4 mr-1" />
-                    <span className="text-xs">{playbackRate}x</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className={`z-[9999] ${isFullscreen ? 'relative' : ''}`}
-                  side="top"
-                  align="center"
-                >
-                  {playbackRates.map((rate) => (
-                    <DropdownMenuItem
-                      key={rate}
-                      onClick={() => setPlaybackRate(rate)}
-                      className={rate === playbackRate ? 'bg-accent' : ''}
+              {/* Volume - Always visible */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleMute}
+                className="text-white hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 p-1 flex-shrink-0"
+              >
+                {muted || volume === 0 ? (
+                  <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" />
+                ) : (
+                  <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                )}
+              </Button>
+
+              {/* Speed control  */}
+              {!isFullscreen && (
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/20 w-auto min-w-[48px] h-8 px-2 flex-shrink-0"
+                      title="Playback Speed"
                     >
-                      {rate}x
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                      <Settings className="w-4 h-4 mr-1" />
+                      <span className="text-xs font-medium">
+                        {playbackRate}x
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className={`z-[999999] min-w-[120px] ${
+                      isFullscreen
+                        ? "bg-black/90 border-white/20 text-white"
+                        : "bg-popover/95 backdrop-blur-sm"
+                    }`}
+                    side="top"
+                    align="center"
+                    sideOffset={12}
+                    avoidCollisions={true}
+                    sticky="always"
+                    onCloseAutoFocus={(e) => e.preventDefault()}
+                  >
+                    {playbackRates.map((rate) => (
+                      <DropdownMenuItem
+                        key={rate}
+                        onClick={() => setPlaybackRate(rate)}
+                        className={`cursor-pointer text-center justify-center ${
+                          isFullscreen
+                            ? `hover:bg-white/20 ${
+                                rate === playbackRate
+                                  ? "bg-white/30 text-white font-semibold"
+                                  : "text-white/80"
+                              }`
+                            : `hover:bg-accent/50 ${
+                                rate === playbackRate
+                                  ? "bg-accent text-accent-foreground font-semibold"
+                                  : "text-popover-foreground"
+                              }`
+                        }`}
+                      >
+                        {rate}x
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
 
               {/* Fullscreen */}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleFullscreen}
-                className="text-white hover:bg-white/20 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 p-0.5 sm:p-1 flex-shrink-0"
-                title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+                className="text-white hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 p-1 flex-shrink-0"
+                title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
               >
                 {isFullscreen ? (
-                  <Minimize className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" />
+                  <Minimize className="w-4 h-4 sm:w-5 sm:h-5" />
                 ) : (
-                  <Maximize className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" />
+                  <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />
                 )}
               </Button>
             </div>

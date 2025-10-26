@@ -1,4 +1,5 @@
 import StudentDashboardLayout from "@/components/shared/StudentDashboardLayout";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Collapsible,
@@ -8,8 +9,16 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import VideoPlayer from "@/components/VideoPlayer";
 import { useStoreActions, useStoreState } from "easy-peasy";
-import { ChevronDown, ChevronRight, Play } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Clapperboard,
+  Play,
+  Video,
+  Check,
+} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 export default function CoursePage() {
   const location = useLocation();
@@ -20,6 +29,7 @@ export default function CoursePage() {
 
   const [expandedChapters, setExpandedChapters] = useState({});
   const [selectedTopic, setSelectedTopic] = useState(null);
+  const [videoProgress, setVideoProgress] = useState({});
 
   useEffect(() => {
     if ((slug && !course) || slug !== course?.slug) {
@@ -27,22 +37,29 @@ export default function CoursePage() {
     }
   }, [slug, course, fetchCourseDetails]);
 
-  // Set default expanded chapter and selected topic
+  // Load video progress for all topics
+  const loadVideoProgress = useCallback(() => {
+    if (course?.chapters && slug) {
+      const progress = {};
+      course.chapters.forEach(chapter => {
+        if (chapter.topics) {
+          chapter.topics.forEach(topic => {
+            const saved = localStorage.getItem(`video_progress_${slug}_${topic.chapter_topic_id}`);
+            if (saved) {
+              progress[topic.chapter_topic_id] = JSON.parse(saved);
+            }
+          });
+        }
+      });
+      setVideoProgress(progress);
+    }
+  }, [course, slug]);
+
   useEffect(() => {
     if (course?.chapters?.length > 0) {
-      const firstChapter = course.chapters[0];
-
-      // Reset expanded chapters and expand first chapter by default
-      setExpandedChapters({
-        [firstChapter.chapter_id]: true,
-      });
-
-      // Always select first topic when course changes
-      if (firstChapter.topics?.length > 0) {
-        setSelectedTopic(firstChapter.topics[0]);
-      }
+      loadVideoProgress();
     }
-  }, [course]);
+  }, [course, slug, loadVideoProgress]);
 
   const toggleChapter = (chapterId) => {
     setExpandedChapters((prev) => ({
@@ -190,43 +207,122 @@ export default function CoursePage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Play className="w-5 h-5" />
+                <Clapperboard className="w-5 h-5" />
                 Course Content
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              {course.chapters?.map((chapter) => (
+            <CardContent className="space-y-3 p-2">
+              {course.chapters?.map((chapter, chapterIndex) => (
                 <Collapsible
                   key={chapter.chapter_id}
                   open={expandedChapters[chapter.chapter_id]}
                   onOpenChange={() => toggleChapter(chapter.chapter_id)}
                 >
-                  <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-muted rounded-lg transition-colors">
-                    <span className="font-medium text-left text-sm">
-                      {chapter.title}
-                    </span>
-                    {expandedChapters[chapter.chapter_id] ? (
-                      <ChevronDown className="w-4 h-4 flex-shrink-0" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 flex-shrink-0" />
-                    )}
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="space-y-1 pl-4">
-                    {chapter.topics?.map((topic) => (
-                      <div
-                        key={topic.chapter_topic_id}
-                        className={`flex items-center gap-2 p-2 hover:bg-muted rounded cursor-pointer transition-colors ${
-                          selectedTopic?.chapter_topic_id ===
-                          topic.chapter_topic_id
-                            ? "bg-primary/10 text-primary"
-                            : ""
-                        }`}
-                        onClick={() => handleTopicSelect(topic)}
-                      >
-                        <Play className="w-4 h-4 flex-shrink-0" />
-                        <span className="text-sm truncate">{topic.title}</span>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-accent/50 rounded-xl transition-all duration-200 border border-transparent hover:border-border/50 group">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                        <Play className="w-4 h-4 text-primary" />
                       </div>
-                    ))}
+                      <span className="font-bold text-left text-sm text-foreground group-hover:text-primary transition-colors truncate">
+                        {chapter.title}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                        {chapter.topics?.length || 0} lectures
+                      </span>
+                      {expandedChapters[chapter.chapter_id] ? (
+                        <ChevronDown className="w-4 h-4 flex-shrink-0 text-primary" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
+                      )}
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-1 pl-4 pt-2 pb-2">
+                    {chapter.topics?.map((topic, topicIndex) => {
+                      // Calculate global topic number
+                      let globalTopicNumber = 1;
+                      for (let i = 0; i < chapterIndex; i++) {
+                        globalTopicNumber +=
+                          course.chapters[i].topics?.length || 0;
+                      }
+                      globalTopicNumber += topicIndex;
+
+                      const isSelected =
+                        selectedTopic?.chapter_topic_id ===
+                        topic.chapter_topic_id;
+
+                      const topicProgress = videoProgress[topic.chapter_topic_id];
+                      const isCompleted = topicProgress?.completed;
+                      const progressPercent = topicProgress?.progress || 0;
+
+                      return (
+                        <div
+                          key={topic.chapter_topic_id}
+                          className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all duration-200 group border ${
+                            isSelected
+                              ? "bg-primary/15 border-primary/20 shadow-md ring-1 ring-primary/10"
+                              : "hover:bg-accent/40 hover:border-accent/60 border-transparent hover:shadow-sm"
+                          }`}
+                          onClick={() => handleTopicSelect(topic)}
+                        >
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              <Video
+                                className={`w-4 h-4 transition-colors duration-200 ${
+                                  isSelected
+                                    ? "text-primary"
+                                    : isCompleted
+                                    ? "text-green-600"
+                                    : "text-muted-foreground group-hover:text-primary"
+                                }`}
+                              />
+                              <span
+                                className={`text-sm font-semibold transition-colors duration-200 ${
+                                  isSelected
+                                    ? "text-primary"
+                                    : isCompleted
+                                    ? "text-green-600"
+                                    : "text-foreground group-hover:text-primary"
+                                }`}
+                              >
+                                {globalTopicNumber}.
+                              </span>
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <span
+                                className={`text-sm font-medium block truncate transition-colors duration-200 ${
+                                  isSelected
+                                    ? "text-primary"
+                                    : isCompleted
+                                    ? "text-green-600"
+                                    : "text-foreground group-hover:text-primary"
+                                }`}
+                              >
+                                {topic.title}
+                              </span>
+                              {/* Progress bar */}
+                              {progressPercent > 0 && !isCompleted && (
+                                <div className="w-full bg-muted rounded-full h-1 mt-1">
+                                  <div
+                                    className="bg-primary h-1 rounded-full transition-all duration-300"
+                                    style={{ width: `${progressPercent * 100}%` }}
+                                  ></div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            {isCompleted && (
+                              <Check className="w-4 h-4 text-green-600" />
+                            )}
+                            {isSelected && (
+                              <Play className="w-3 h-3 text-primary fill-primary" />
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </CollapsibleContent>
                 </Collapsible>
               ))}
@@ -246,11 +342,34 @@ export default function CoursePage() {
                 key={selectedTopic?.chapter_topic_id || "no-topic"}
                 url={selectedTopic?.youtube_url}
                 title={selectedTopic?.title}
-                onNext={handleNextTopic}
-                onPrevious={handlePreviousTopic}
-                hasNext={hasNextTopic()}
-                hasPrevious={hasPreviousTopic()}
+                courseSlug={slug}
+                topicId={selectedTopic?.chapter_topic_id}
+                onProgressUpdate={() => {
+                  // Refresh progress indicators
+                  loadVideoProgress();
+                }}
               />
+
+              {/* Navigation Controls */}
+              <div className="flex items-center justify-between gap-3 pt-3">
+                <Button
+                  onClick={handlePreviousTopic}
+                  disabled={!hasPreviousTopic()}
+                  variant="outline"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    Previous <span className="hidden md:inline">Lecture</span>
+                  </span>
+                </Button>
+
+                <Button onClick={handleNextTopic} disabled={!hasNextTopic()}>
+                  <span className="text-sm font-medium">
+                    Next <span className="hidden md:inline">Lecture</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
 
               {/* Topic Title and Description */}
               <div className="border-t pt-4">

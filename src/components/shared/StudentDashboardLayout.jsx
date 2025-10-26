@@ -35,7 +35,7 @@ const StudentDashboardLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-background">
       {/* Student Dashboard Header */}
-      <div className="px-4 py-4 bg-card border">
+      <div className="px-4 py-4 bg-card border print:hidden">
         <div className="flex items-center justify-between container mx-auto">
           <div className="flex items-center gap-4">
             <Link to="/" className="flex items-center gap-2">
@@ -71,7 +71,7 @@ const StudentDashboardLayout = ({ children }) => {
 
       {/* Back Button - Hide on dashboard page */}
       {location.pathname !== "/dashboard" && (
-        <div className="p-4">
+        <div className="p-4 print:hidden">
           <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
@@ -102,7 +102,7 @@ const StudentDashboardLayout = ({ children }) => {
       </main>
       {loading && <Loading text="Preparing your journey" />}
 
-      <Footer />
+      <Footer className="print:hidden" />
     </div>
   );
 };

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPaymentStatusBadge } from "@/lib/badgeUtils";
 import { formatDate } from "@/lib/helper";
 import { useStoreState } from "easy-peasy";
-import { Eye } from "lucide-react";
+import { CreditCard, Eye } from "lucide-react";
 import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -81,110 +81,116 @@ const PaymentHistoryPage = () => {
           </CardHeader>
 
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-muted-foreground">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
-                      S/N
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground hidden md:table-cell">
-                      Txn ID
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground hidden lg:table-cell">
-                      Date
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
-                      Type
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
-                      Item
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">
-                      Amount
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
-                      Status
-                    </th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {displayPayments.map((entry, index) => {
-                    const itemName =
-                      entry.meta?.book?.title ||
-                      (entry.payment.course_enrollment
-                        ? student?.enrollments?.find(
-                            (e) =>
-                              e.id === entry.payment.course_enrollment.course_id
-                          )?.name
-                        : "—");
-
-                    return (
-                      <tr
-                        key={entry.txnId + index}
-                        className="hover:bg-muted/50 transition-colors"
-                      >
-                        <td className="px-4 py-3 text-sm">{index + 1}</td>
-                        <td className="px-4 py-3 text-sm font-mono hidden md:table-cell">
-                          {entry.txnId || "—"}
-                        </td>
-                        <td className="px-4 py-3 text-sm hidden lg:table-cell">
-                          {formatDate(entry.date)}
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          {entry.type === "book_order" ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              Book Order
-                            </span>
-                          ) : entry.type === "enrollment" ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              Enrollment
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                              {entry.type.replace("_", " ")}
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-sm">{itemName}</td>
-                        <td className="px-4 py-3 text-sm text-right">
-                          {entry.payment.paid_amount
-                            ? `${entry.payment.paid_amount} ${
-                                entry.payment.currency || "BDT"
-                              }`
-                            : "—"}
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          {getPaymentStatusBadge(entry.payment.status)}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleView(entry.txnId)}
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                  {displayPayments.length === 0 && (
+            {displayPayments.length === 0 ? (
+              <Card className="b-0">
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <CreditCard className="w-16 h-16 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">
+                    No Transactions Found
+                  </h3>
+                  <p className="text-muted-foreground text-center">
+                    You haven't made any payments yet. Your transaction history
+                    will appear here once you make a purchase.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full divide-y divide-muted-foreground">
+                  <thead>
                     <tr>
-                      <td
-                        colSpan={8}
-                        className="px-4 py-6 text-center text-sm text-muted-foreground"
-                      >
-                        No transactions found.
-                      </td>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                        S/N
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground hidden md:table-cell">
+                        Txn ID
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground hidden lg:table-cell">
+                        Date
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                        Type
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                        Item
+                      </th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">
+                        Amount
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                        Status
+                      </th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">
+                        Actions
+                      </th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {displayPayments.map((entry, index) => {
+                      const itemName =
+                        entry.meta?.book?.title ||
+                        (entry.payment.course_enrollment
+                          ? student?.enrollments?.find(
+                              (e) =>
+                                e.id ===
+                                entry.payment.course_enrollment.course_id
+                            )?.name
+                          : "—");
+
+                      return (
+                        <tr
+                          key={entry.txnId + index}
+                          className="hover:bg-muted/50 transition-colors"
+                        >
+                          <td className="px-4 py-3 text-sm">{index + 1}</td>
+                          <td className="px-4 py-3 text-sm font-mono hidden md:table-cell">
+                            {entry.txnId || "—"}
+                          </td>
+                          <td className="px-4 py-3 text-sm hidden lg:table-cell">
+                            {formatDate(entry.date)}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            {entry.type === "book_order" ? (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                Book Order
+                              </span>
+                            ) : entry.type === "enrollment" ? (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Enrollment
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                {entry.type.replace("_", " ")}
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-sm">{itemName}</td>
+                          <td className="px-4 py-3 text-sm text-right">
+                            {entry.payment.paid_amount
+                              ? `${entry.payment.paid_amount} ${
+                                  entry.payment.currency || "BDT"
+                                }`
+                              : "—"}
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            {getPaymentStatusBadge(entry.payment.status)}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleView(entry.txnId)}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

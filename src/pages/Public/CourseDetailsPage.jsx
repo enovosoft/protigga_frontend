@@ -1,5 +1,6 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import ImageFallback from "@/components/shared/ImageFallback";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -56,8 +57,6 @@ export default function CourseDetailsPage() {
         };
 
         setCourse(courseInfo);
-
-        // Load image if available - removed fetchImageAsBlob
       } else {
         console.error("Course not found");
         setCourse(null);
@@ -161,17 +160,10 @@ export default function CourseDetailsPage() {
                 <Card className="overflow-hidden">
                   <CardHeader className="p-0">
                     <div className="relative aspect-auto overflow-hidden bg-muted">
-                      {course.thumbnail ? (
-                        <img
-                          src={course.thumbnail}
-                          alt={course.course_title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <BookOpen className="w-12 h-12 text-muted-foreground" />
-                        </div>
-                      )}
+                      <ImageFallback
+                        src={course.thumbnail}
+                        className="min-h-60 duration-300 hover:scale-110 cursor-zoom-in"
+                      />
                       {/* Batch Tag */}
                       {course.batch && (
                         <div className="absolute top-3 right-3">

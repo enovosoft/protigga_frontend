@@ -1,13 +1,28 @@
 import Loading from "@/components/shared/Loading";
 import StudentDashboardLayout from "@/components/shared/StudentDashboardLayout";
 import { useStoreState } from "easy-peasy";
-import { Book, CreditCard, GraduationCap, User } from "lucide-react";
+import {
+  AlertTriangle,
+  Book,
+  CreditCard,
+  GraduationCap,
+  User,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
 
-  const { loading } = useStoreState((state) => state.student);
+  const { loading, exams } = useStoreState((state) => state.student);
+
+  // Check for ongoing exams
+  const ongoingExams =
+    exams?.filter((exam) => {
+      const now = new Date();
+      const startTime = new Date(exam.exam_start_time);
+      const endTime = new Date(exam.exam_end_time);
+      return now >= startTime && now <= endTime;
+    }) || [];
   const studentCards = [
     {
       title: "My Courses",
@@ -72,6 +87,31 @@ export default function StudentDashboard() {
                 courses, notes, and books.
               </p>
             </div>
+
+            {/* Ongoing Exam Notification */}
+            {ongoingExams.length > 0 && (
+              <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="w-5 h-5 text-yellow-600" />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-yellow-800">
+                      Ongoing Exam{ongoingExams.length > 1 ? "s" : ""}
+                    </h3>
+                    <p className="text-sm text-yellow-700">
+                      You have {ongoingExams.length} exam
+                      {ongoingExams.length > 1 ? "s" : ""} currently in
+                      progress.
+                      <button
+                        onClick={() => navigate("/dashboard/exams")}
+                        className="ml-2 text-yellow-800 underline hover:text-yellow-900 font-medium"
+                      >
+                        View Exam{ongoingExams.length > 1 ? "s" : ""}
+                      </button>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {studentCards.map((card, index) => {

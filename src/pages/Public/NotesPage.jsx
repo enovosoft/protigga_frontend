@@ -1,14 +1,6 @@
-import { useState, useEffect } from "react";
-import {
-  FileText,
-  Loader2,
-  Eye,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
-import toast from "react-hot-toast";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import apiInstance from "@/lib/api";
 import {
   Card,
   CardContent,
@@ -16,17 +8,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import apiInstance from "@/lib/api";
+import { ChevronLeft, ChevronRight, Eye, FileText } from "lucide-react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 export default function NotesPage() {
   const [notes, setNotes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const notesPerPage = 9;
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchNotes();
@@ -43,11 +36,6 @@ export default function NotesPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleView = (note) => {
-    // Navigate to note view page with note data in state
-    navigate("/notes/view", { state: { note } });
   };
 
   // Pagination logic
@@ -86,10 +74,11 @@ export default function NotesPage() {
           <>
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-primary font-primary mb-2">
-                প্রতিজ্ঞা Notes
+                Notes
               </h1>
               <p className="text-muted-foreground">
-                Access comprehensive study notes for your HSC preparation
+                Browse our collection of educational notes to support your
+                studies
               </p>
             </div>
 
@@ -120,13 +109,12 @@ export default function NotesPage() {
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <Button
-                          onClick={() => handleView(note)}
-                          className="w-full gap-2"
-                        >
-                          <Eye className="w-4 h-4" />
-                          View Note
-                        </Button>
+                        <Link to={`/notes/${note.slug}`} state={{ note }}>
+                          <Button className="w-full gap-2">
+                            <Eye className="w-4 h-4" />
+                            View Note
+                          </Button>
+                        </Link>
                       </CardContent>
                     </Card>
                   ))}

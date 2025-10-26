@@ -1,5 +1,6 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import ImageFallback from "@/components/shared/ImageFallback";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,13 +13,13 @@ import api from "@/lib/api";
 import { BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState([]);
   const [batches, setBatches] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
+  const [activeFilter, setActiveFilter] = useState("all");
 
   useEffect(() => {
     fetchCourses();
@@ -45,10 +46,6 @@ export default function CoursesPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleEnroll = (slug) => {
-    navigate(`/courses/${slug}`);
   };
 
   if (isLoading) {
@@ -100,6 +97,29 @@ export default function CoursesPage() {
             </p>
           </div>
 
+          {/* Filter Buttons */}
+          {courses.length > 0 && (
+            <div className="flex justify-center gap-3 mb-12 flex-wrap">
+              <Button
+                variant={activeFilter === "all" ? "default" : "outline"}
+                onClick={() => setActiveFilter("all")}
+                className="min-w-[100px]"
+              >
+                All Courses
+              </Button>
+              {batches.map((batch) => (
+                <Button
+                  key={batch}
+                  variant={activeFilter === batch ? "default" : "outline"}
+                  onClick={() => setActiveFilter(batch)}
+                  className="min-w-[100px]"
+                >
+                  {batch}
+                </Button>
+              ))}
+            </div>
+          )}
+
           {courses.length === 0 ? (
             <div className="text-center py-16">
               <BookOpen className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
@@ -109,73 +129,129 @@ export default function CoursesPage() {
             </div>
           ) : (
             <div className="space-y-12">
-              {batches.map((batch) => {
-                const batchCourses = courses.filter(
-                  (course) => course.batch === batch
-                );
-                return (
-                  <div key={batch} className="space-y-6">
-                    <div className="flex items-center gap-3">
-                      <h2 className="text-2xl font-bold text-foreground">
-                        {batch} Batch
-                      </h2>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {batchCourses.map((course) => (
-                        <Card
-                          key={course.id || course.course_id}
-                          className="overflow-hidden hover:shadow-lg transition-shadow"
-                        >
-                          <CardHeader className="p-0">
-                            <div className="relative aspect-auto overflow-hidden bg-muted">
-                              {course.thumbnail ? (
-                                <img
-                                  src={course.thumbnail}
-                                  alt={course.course_title}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <BookOpen className="w-12 h-12 text-muted-foreground" />
+              {activeFilter === "all"
+                ? // Show all batches
+                  batches.map((batch) => {
+                    const batchCourses = courses.filter(
+                      (course) => course.batch === batch
+                    );
+                    return (
+                      <div key={batch} className="space-y-6">
+                        <div className="flex items-center gap-3">
+                          <h2 className="text-2xl font-bold text-foreground">
+                            {batch} Batch
+                          </h2>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {batchCourses.map((course) => (
+                            <Card
+                              key={course.id || course.course_id}
+                              className="overflow-hidden hover:shadow-lg transition-shadow"
+                            >
+                              <CardHeader className="p-0">
+                                <div className="relative aspect-auto overflow-hidden bg-muted">
+                                  <ImageFallback
+                                    src={course.thumbnail}
+                                    alt={course.course_title}
+                                  />
+                                  {/* Batch Tag */}
+                                  {course.batch && (
+                                    <div className="absolute top-3 right-3">
+                                      <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                                        <BookOpen className="w-3 h-3" />
+                                        {course.batch}
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                              {/* Batch Tag */}
-                              {course.batch && (
-                                <div className="absolute top-3 right-3">
-                                  <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                                    <BookOpen className="w-3 h-3" />
-                                    {course.batch}
+                              </CardHeader>
+
+                              <CardContent className="p-6">
+                                <h3 className="text-xl font-semibold text-foreground mb-3 line-clamp-2">
+                                  {course.course_title}
+                                </h3>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-2xl font-bold text-primary">
+                                    ৳{course.price}
                                   </span>
                                 </div>
-                              )}
-                            </div>
-                          </CardHeader>
+                              </CardContent>
 
-                          <CardContent className="p-6">
-                            <h3 className="text-xl font-semibold text-foreground mb-3 line-clamp-2">
-                              {course.course_title}
-                            </h3>
-                            <div className="flex items-center justify-between">
-                              <span className="text-2xl font-bold text-primary">
-                                ৳{course.price}
-                              </span>
-                            </div>
-                          </CardContent>
-
-                          <CardFooter className="p-6 pt-0">
-                            <Button
-                              className="w-full"
-                              onClick={() => handleEnroll(course.slug)}
+                              <CardFooter className="p-6 pt-0">
+                                <Link
+                                  className="w-full"
+                                  to={`/courses/${course.slug}`}
+                                >
+                                  <Button className="w-full">Enroll Now</Button>
+                                </Link>
+                              </CardFooter>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })
+                : // Show filtered batch
+                  (() => {
+                    const filteredCourses = courses.filter(
+                      (course) => course.batch === activeFilter
+                    );
+                    return (
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                          <h2 className="text-2xl font-bold text-foreground">
+                            {activeFilter} Batch
+                          </h2>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {filteredCourses.map((course) => (
+                            <Card
+                              key={course.id || course.course_id}
+                              className="overflow-hidden hover:shadow-lg transition-shadow"
                             >
-                              Enroll Now
-                            </Button>
-                          </CardFooter>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
+                              <CardHeader className="p-0">
+                                <div className="relative aspect-auto overflow-hidden bg-muted">
+                                  <ImageFallback
+                                    src={course.thumbnail}
+                                    alt={course.course_title}
+                                  />
+                                  {/* Batch Tag */}
+                                  {course.batch && (
+                                    <div className="absolute top-3 right-3">
+                                      <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                                        <BookOpen className="w-3 h-3" />
+                                        {course.batch}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              </CardHeader>
+
+                              <CardContent className="p-6">
+                                <h3 className="text-xl font-semibold text-foreground mb-3 line-clamp-2">
+                                  {course.course_title}
+                                </h3>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-2xl font-bold text-primary">
+                                    ৳{course.price}
+                                  </span>
+                                </div>
+                              </CardContent>
+
+                              <CardFooter className="p-6 pt-0">
+                                <Link
+                                  className="w-full"
+                                  to={`/courses/${course.slug}`}
+                                >
+                                  <Button className="w-full">Enroll Now</Button>
+                                </Link>
+                              </CardFooter>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
             </div>
           )}
         </div>

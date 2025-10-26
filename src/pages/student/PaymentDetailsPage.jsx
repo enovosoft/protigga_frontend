@@ -53,7 +53,7 @@ const PaymentDetailsPage = () => {
             <p className="text-muted-foreground">
               Payment not found for "{transactionId}".
             </p>
-            <div className="mt-4">
+            <div className="mt-4 print:hidden">
               <Button onClick={() => navigate(-1)}>Go back</Button>
             </div>
           </CardContent>
@@ -64,51 +64,41 @@ const PaymentDetailsPage = () => {
 
   return (
     <StudentDashboardLayout>
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-          @media print {
-            body { font-size: 12px; }
-            .no-print { display: none !important; }
-            .print-break-inside-avoid { break-inside: avoid; }
-            .print-grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }
-            .print-space-y-2 > * + * { margin-top: 0.5rem !important; }
-            .print-p-4 { padding: 1rem !important; }
-          }
-        `,
-        }}
-      />
-      <Card>
-        <CardHeader>
-          <div className="flex justify-center items-center">
-            <CardTitle className="text-2xl font-bold text-center">
+      <div className="flex justify-end items-center mb-4">
+        <Button
+          onClick={handlePrint}
+          variant="secondary"
+          size="sm"
+          className="print:hidden "
+        >
+          <Printer className="w-4 h-4 mr-2" />
+          Print
+        </Button>
+      </div>
+      <Card className="print:shadow-none print:border-none print:m-0">
+        <CardHeader className="print:p-4">
+          <div className="flex  items-center justify-between">
+            <CardTitle className="text-2xl font-bold text-center print:text-xl w-full ">
               Payment Receipt
             </CardTitle>
-            <Button
-              onClick={handlePrint}
-              variant="outline"
-              size="sm"
-              className="no-print hidden"
-            >
-              <Printer className="w-4 h-4 mr-2" />
-              Print
-            </Button>
           </div>
-          <div className="text-center border-b pb-4">
+          <div className="text-center border-b pb-4 print:pb-2">
             <div className="flex justify-center">
               {getPaymentStatusBadge(payment.status)}
             </div>
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 print:space-y-3 print:p-4 print:text-sm">
           {/* Transaction Header */}
 
           {/* Transaction Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 print-break-inside-avoid print-grid-cols-1 print-space-y-2">
-            <div className="space-y-3">
-              <h3 className="font-semibold text-lg">Transaction Information</h3>
-              <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 print:grid-cols-1 print:gap-3 print:break-inside-avoid">
+            <div className="space-y-3 print:space-y-2">
+              <h3 className="font-semibold text-lg print:text-base">
+                Transaction Information
+              </h3>
+              <div className="space-y-2 print:space-y-1">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Transaction ID:</span>
                   <span>{payment.Txn_ID || bookOrder?.Txn_ID || "—"}</span>
@@ -155,9 +145,11 @@ const PaymentDetailsPage = () => {
               </div>
             </div>
 
-            <div className="space-y-3">
-              <h3 className="font-semibold text-lg">Price Breakdown</h3>
-              <div className="space-y-2">
+            <div className="space-y-3 print:space-y-2">
+              <h3 className="font-semibold text-lg print:text-base">
+                Price Breakdown
+              </h3>
+              <div className="space-y-2 print:space-y-1">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Material Price:</span>
                   <span>{formatPrice(payment.meterial_price)}</span>
@@ -220,10 +212,12 @@ const PaymentDetailsPage = () => {
 
           {/* Order Details */}
           {bookOrder && (
-            <div className="border-t pt-4">
-              <h3 className="font-semibold text-lg mb-3">Book Order Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print-break-inside-avoid print-grid-cols-1 print-space-y-2">
-                <div className="space-y-2">
+            <div className="border-t pt-4 print:border-t-0 print:pt-2 print:break-inside-avoid">
+              <h3 className="font-semibold text-lg mb-3 print:text-base print:mb-2">
+                Book Order Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-1 print:gap-2 print:space-y-1">
+                <div className="space-y-2 print:space-y-1">
                   <div>
                     <strong>Order ID:</strong> {bookOrder.order_id}
                   </div>
@@ -245,7 +239,7 @@ const PaymentDetailsPage = () => {
                     <strong>Quantity:</strong> {bookOrder.quantity}
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 print:space-y-1">
                   <div>
                     <strong>Status:</strong>{" "}
                     {getOrderStatusBadge(bookOrder.status)}
@@ -271,18 +265,22 @@ const PaymentDetailsPage = () => {
           )}
 
           {courseEnrollment && (
-            <div className="border-t pt-4">
-              <h3 className="font-semibold text-lg mb-3">
+            <div className="border-t pt-4 print:border-t-0 print:pt-2 print:break-inside-avoid">
+              <h3 className="font-semibold text-lg mb-3 print:text-base print:mb-2">
                 Course Enrollment Details
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print-break-inside-avoid print-grid-cols-1 print-space-y-2">
-                <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-1 print:gap-2 print:space-y-1">
+                <div className="space-y-2 print:space-y-1">
                   <div>
                     <strong>Transaction ID:</strong> {payment.Txn_ID || "—"}
                   </div>
                   <div>
                     <strong>Enrollment ID:</strong>{" "}
                     {courseEnrollment.enrollment_id}
+                  </div>
+                  <div>
+                    <strong>Enrollment Type:</strong>{" "}
+                    {courseEnrollment.enrollment_type}
                   </div>
                   <div>
                     <strong>Course ID:</strong> {courseEnrollment.course_id}
@@ -293,12 +291,8 @@ const PaymentDetailsPage = () => {
                   <div>
                     <strong>Batch:</strong> {relatedCourse?.batch || "—"}
                   </div>
-                  <div>
-                    <strong>Enrollment Type:</strong>{" "}
-                    {courseEnrollment.enrollment_type}
-                  </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 print:space-y-1">
                   <div>
                     <strong>Status:</strong>{" "}
                     {getEnrollmentStatusBadge(courseEnrollment.status)}
@@ -321,11 +315,11 @@ const PaymentDetailsPage = () => {
           )}
 
           {/* Footer */}
-          <div className="border-t pt-4 text-center">
-            <p className="text-sm text-muted-foreground">
-              Thank you for your business with Protigga!
+          <div className="border-t pt-4 text-center print:border-t-0 print:pt-2">
+            <p className="text-sm text-muted-foreground print:text-xs">
+              Thank you for trusting Protigga!
             </p>
-            <div className="mt-4 no-print">
+            <div className="mt-4 print:hidden">
               <Button onClick={() => navigate(-1)}>Close</Button>
             </div>
           </div>

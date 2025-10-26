@@ -13,7 +13,7 @@ export const publicRoutes = (
     <Route path="/courses" element={<CoursesPage />} />
     <Route path="/courses/:slug" element={<CourseDetailsPage />} />
     <Route path="/notes" element={<NotesPage />} />
-    <Route path="/notes/view" element={<NotesViewPage />} />
+    <Route path="/notes/:slug" element={<NotesViewPage />} />
     <Route path="/books" element={<BooksPage />} />
     <Route path="/books/:slug" element={<BookDetailsPage />} />
     <Route path="/checkout" element={<CheckoutPage />} />
