@@ -35,4 +35,31 @@ apiInstance.interceptors.response.use(
   }
 );
 
+// Helper function to download Excel file
+export const downloadExcelFile = async (url, filename) => {
+  try {
+    const response = await apiInstance.get(url, {
+      responseType: "blob",
+    });
+
+    const blob = new Blob([response.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(downloadUrl);
+    document.body.removeChild(a);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error downloading Excel file:", error);
+    throw error;
+  }
+};
+
 export default apiInstance;

@@ -172,6 +172,11 @@ export const getEnrollmentStatusBadge = (status) => {
       label: "Cancelled",
       className: "bg-red-100 text-red-800 border-red-200 hover:bg-red-100",
     },
+    INACTIVE: {
+      variant: "destructive",
+      label: "Inactive",
+      className: "bg-red-100 text-red-800 border-red-200 hover:bg-red-100",
+    },
     PENDING: {
       variant: "secondary",
       label: "Pending",

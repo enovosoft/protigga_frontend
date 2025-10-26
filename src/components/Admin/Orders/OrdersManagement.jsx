@@ -2,12 +2,14 @@ import OrdersTable, {
   OrdersTableSkeleton,
 } from "@/components/Admin/Orders/OrdersTable";
 import UserDashboardLayout from "@/components/shared/DashboardLayout";
+import Loading from "@/components/shared/Loading";
 import Pagination from "@/components/shared/Pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import api from "@/lib/api";
-import { Eye, Search } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import api, { downloadExcelFile } from "@/lib/api";
+import { ChevronDown, Download, Eye, Search } from "lucide-react";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -24,6 +26,11 @@ const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
     end_date: "",
   });
   const [searching, setSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [books, setBooks] = useState([]);
+  const [bookSearch, setBookSearch] = useState("");
+  const [bookPopoverOpen, setBookPopoverOpen] = useState(false);
 
   const fetchOrders = async (page = 1, searchParams = {}) => {
     setLoading(true);
@@ -34,7 +41,8 @@ const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
       params.append("page_size", itemsPerPage.toString());
 
       // Add search parameters if provided
-      if (searchParams.book_id) params.append("book_id", searchParams.book_id);
+      if (searchParams.book_id && searchParams.book_id !== "all")
+        params.append("book_id", searchParams.book_id);
       if (searchParams.start_date)
         params.append("start_date", searchParams.start_date);
       if (searchParams.end_date)
@@ -43,7 +51,9 @@ const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
       const response = await api.get(`/orders?${params.toString()}`);
       if (response.data.success) {
         const ordersData = response.data?.orders || [];
+        const booksData = response.data?.books || [];
         setOrders(ordersData);
+        setBooks(booksData);
         setTotalPages(response.data.total_page || 1);
         setCurrentPage(response.data.curr_page || 1);
       }
@@ -75,6 +85,7 @@ const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
     try {
       await fetchOrders(1, searchForm);
       setCurrentPage(1); // Reset to first page when searching
+      setHasSearched(true);
     } finally {
       setSearching(false);
     }
@@ -87,6 +98,27 @@ const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
     }));
   };
 
+  const handleDownloadExcel = async () => {
+    setDownloading(true);
+    try {
+      const params = new URLSearchParams();
+      if (searchForm.start_date)
+        params.append("start_date", searchForm.start_date);
+      if (searchForm.end_date) params.append("end_date", searchForm.end_date);
+
+      const filename = `orders_${searchForm.start_date || "all"}_to_${
+        searchForm.end_date || "all"
+      }.xlsx`;
+
+      await downloadExcelFile(`/orders-excel?${params.toString()}`, filename);
+    } catch (error) {
+      console.error("Error downloading Excel:", error);
+      // You might want to show a toast error here
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
@@ -97,16 +129,65 @@ const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
       <div className="bg-card rounded-lg border p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
           <div className="md:col-span-1">
-            <Label htmlFor="search_book_id" className="text-sm font-medium">
-              Book ID
+            <Label htmlFor="search_book" className="text-sm font-medium">
+              Book
             </Label>
-            <Input
-              id="search_book_id"
-              value={searchForm.book_id}
-              onChange={(e) => handleSearchChange("book_id", e.target.value)}
-              placeholder="Enter book ID"
-              className="mt-1"
-            />
+            <Popover open={bookPopoverOpen} onOpenChange={setBookPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={bookPopoverOpen}
+                  className="w-full justify-between mt-1"
+                >
+                  {searchForm.book_id
+                    ? books.find((book) => book.book_id === searchForm.book_id)?.title + " (" + books.find((book) => book.book_id === searchForm.book_id)?.batch + ")"
+                    : "Select book..."}
+                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0" align="start">
+                <div className="p-2">
+                  <Input
+                    placeholder="Search books..."
+                    value={bookSearch}
+                    onChange={(e) => setBookSearch(e.target.value)}
+                    className="mb-2"
+                  />
+                </div>
+                <div className="max-h-48 overflow-y-auto">
+                  <div
+                    className="px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                    onClick={() => {
+                      handleSearchChange("book_id", "");
+                      setBookPopoverOpen(false);
+                      setBookSearch("");
+                    }}
+                  >
+                    All Books
+                  </div>
+                  {books
+                    .filter((book) =>
+                      book.title.toLowerCase().includes(bookSearch.toLowerCase()) ||
+                      book.batch.toLowerCase().includes(bookSearch.toLowerCase()) ||
+                      book.writter.toLowerCase().includes(bookSearch.toLowerCase())
+                    )
+                    .map((book) => (
+                      <div
+                        key={book.book_id}
+                        className="px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                        onClick={() => {
+                          handleSearchChange("book_id", book.book_id);
+                          setBookPopoverOpen(false);
+                          setBookSearch("");
+                        }}
+                      >
+                        {book.title} ({book.batch})
+                      </div>
+                    ))}
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
           <div className="md:col-span-1">
             <Label htmlFor="search_start_date" className="text-sm font-medium">
@@ -167,6 +248,31 @@ const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
         </div>
       ) : (
         <>
+          {hasSearched &&
+            orders.length > 0 &&
+            (searchForm.start_date || searchForm.end_date) && (
+              <div className="flex justify-end mb-4">
+                <Button
+                  onClick={handleDownloadExcel}
+                  disabled={downloading}
+                  variant="success"
+                  className="flex items-center gap-2"
+                >
+                  {downloading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      Preparing download...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4" />
+                      Download Excel
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+
           <OrdersTable
             orders={orders}
             startIndex={(currentPage - 1) * itemsPerPage}
@@ -182,6 +288,7 @@ const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
           )}
         </>
       )}
+      {downloading && <Loading text="Preparing download" />}
     </div>
   );
 

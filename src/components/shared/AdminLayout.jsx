@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Book,
+  BookCheck,
   BookOpen,
   FileText,
   GraduationCap,
@@ -61,24 +62,6 @@ const AdminLayout = ({ children }) => {
       path: "/admin",
     },
     {
-      id: "notes",
-      label: "Notes",
-      icon: FileText,
-      path: "/admin/notes",
-    },
-    {
-      id: "promo-codes",
-      label: "Promo Codes",
-      icon: Ticket,
-      path: "/admin/promo",
-    },
-    {
-      id: "books",
-      label: "Books",
-      icon: Book,
-      path: "/admin/books",
-    },
-    {
       id: "orders",
       label: "Orders",
       icon: Package,
@@ -91,22 +74,41 @@ const AdminLayout = ({ children }) => {
       path: "/admin/enrollments",
     },
     {
-      id: "users",
-      label: "Users",
-      icon: Users,
-      path: "/admin/users",
-    },
-    {
       id: "courses",
       label: "Courses",
       icon: BookOpen,
       path: "/admin/courses",
     },
     {
+      id: "books",
+      label: "Books",
+      icon: Book,
+      path: "/admin/books",
+    },
+
+    {
+      id: "users",
+      label: "Users",
+      icon: Users,
+      path: "/admin/users",
+    },
+    {
       id: "exams",
       label: "Exams",
-      icon: FileText,
+      icon: BookCheck,
       path: "/admin/exams",
+    },
+    {
+      id: "notes",
+      label: "Notes",
+      icon: FileText,
+      path: "/admin/notes",
+    },
+    {
+      id: "promo-codes",
+      label: "Promo Codes",
+      icon: Ticket,
+      path: "/admin/promo",
     },
   ];
 
