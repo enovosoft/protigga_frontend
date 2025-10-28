@@ -12,6 +12,7 @@ export default function FileUpload({
   supportedTypes = "PDF",
   maxSize,
   autoUpload = false,
+  showLabel = true,
 }) {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -35,6 +36,9 @@ export default function FileUpload({
       } else if (type === "*/*" || type === "*") {
         // Accept all files
         return true;
+      } else if (type === "pdf/*") {
+        // Accept PDF files
+        return fileExtension === ".pdf";
       } else {
         // Check exact extension match
         return type === fileExtension;
@@ -136,7 +140,7 @@ export default function FileUpload({
 
   return (
     <div className="space-y-3 w-full overflow-hidden">
-      <Label className="text-sm font-medium">{label}</Label>
+      {showLabel && <Label className="text-sm  font-normal">{label}</Label>}
 
       {!uploadedUrl ? (
         <div className="space-y-3 w-full">

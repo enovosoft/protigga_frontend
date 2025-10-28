@@ -1,4 +1,3 @@
-import CourseDialog from "@/components/Admin/Courses/CourseDialog";
 import CoursesTable, {
   CoursesTableSkeleton,
 } from "@/components/Admin/Courses/CoursesTable";
@@ -25,8 +24,6 @@ export default function CoursesManagement({ useLayout = true }) {
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
@@ -56,8 +53,7 @@ export default function CoursesManagement({ useLayout = true }) {
   }, []);
 
   const handleAdd = () => {
-    setSelectedCourse(null);
-    setDialogOpen(true);
+    navigate("/admin/courses/new");
   };
 
   const handleEdit = (course) => {
@@ -188,13 +184,6 @@ export default function CoursesManagement({ useLayout = true }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <CourseDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        course={selectedCourse}
-        onSuccess={fetchCourses}
-      />
     </div>
   );
 

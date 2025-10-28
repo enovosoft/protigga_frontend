@@ -37,6 +37,12 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import api from "@/lib/api";
 import {
   ArrowLeft,
@@ -52,9 +58,42 @@ import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 
+// Simple validation function
+const validateCourseForm = (formData) => {
+  const errors = [];
+
+  if (!formData.course_title?.trim()) {
+    errors.push("Course title is required");
+  }
+  if (!formData.batch?.trim()) {
+    errors.push("Batch is required");
+  }
+  if (!formData.price || isNaN(formData.price) || formData.price <= 0) {
+    errors.push("Please enter a valid price greater than 0");
+  }
+  if (!formData.thumbnail?.trim()) {
+    errors.push("Please upload a thumbnail");
+  }
+  if (!formData.academy_name?.trim()) {
+    errors.push("Academy name is required");
+  }
+  if (!formData.description?.trim()) {
+    errors.push("Description is required");
+  }
+  if (!formData.skill_level) {
+    errors.push("Please select a skill level");
+  }
+  if (!formData.expired_date) {
+    errors.push("Expired date is required");
+  }
+
+  return errors;
+};
+
 export default function CourseEditPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const isCreating = !slug || slug === "new";
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -68,6 +107,9 @@ export default function CourseEditPage() {
   const [deletingChapter, setDeletingChapter] = useState(null);
   const [deletingTopic, setDeletingTopic] = useState(null);
   const [deleting, setDeleting] = useState(false);
+
+  const [relatedBooksDialogOpen, setRelatedBooksDialogOpen] = useState(false);
+  const [bookSearchQuery, setBookSearchQuery] = useState("");
 
   // Dialog states
   const [chapterDialogOpen, setChapterDialogOpen] = useState(false);
@@ -85,11 +127,12 @@ export default function CourseEditPage() {
     thumbnail: "",
     academy_name: "",
     description: "",
-    related_book: "",
+    related_books: [],
     quiz_count: "",
     assessment: false,
     skill_level: "",
     expired_date: "",
+    is_featured: false,
   });
 
   const [chapterForm, setChapterForm] = useState({
@@ -132,7 +175,7 @@ export default function CourseEditPage() {
             thumbnail: courseData.thumbnail || "",
             academy_name: courseData.course_details?.academy_name || "",
             description: courseData.course_details?.description || "",
-            related_book: courseData.course_details?.related_book || "",
+            related_books: courseData.related_books || [],
             quiz_count: courseData.course_details?.quiz_count || "",
             assessment: courseData.course_details?.assessment || false,
             skill_level: courseData.course_details?.skill_level || "",
@@ -141,6 +184,7 @@ export default function CourseEditPage() {
                   .toISOString()
                   .split("T")[0]
               : "",
+            is_featured: courseData.is_featured || false,
           });
         }
       } catch (error) {
@@ -157,11 +201,29 @@ export default function CourseEditPage() {
   );
 
   useEffect(() => {
-    if (slug) {
+    if (isCreating) {
+      // For creating new course, initialize form and set loading to false
+      setCourseForm({
+        batch: "",
+        course_title: "",
+        price: "",
+        thumbnail: "",
+        academy_name: "",
+        description: "",
+        related_books: [],
+        quiz_count: "",
+        assessment: false,
+        skill_level: "",
+        expired_date: "",
+        is_featured: false,
+      });
+      setLoading(false);
+    } else {
+      // For editing, fetch course data
       fetchCourse();
-      fetchBooks();
     }
-  }, [slug, fetchCourse, fetchBooks]);
+    fetchBooks();
+  }, [isCreating, slug, fetchCourse, fetchBooks]);
 
   // Handle course form changes
   const handleCourseChange = (e) => {
@@ -188,69 +250,69 @@ export default function CourseEditPage() {
 
   // Save course details
   const saveCourseDetails = async () => {
-    // Validation
-    if (!courseForm.course_title.trim()) {
-      toast.error("Course title is required");
-      return;
-    }
-    if (!courseForm.batch.trim()) {
-      toast.error("Batch is required");
-      return;
-    }
-    if (!courseForm.price || isNaN(courseForm.price) || courseForm.price <= 0) {
-      toast.error("Please enter a valid price");
-      return;
-    }
-    if (!courseForm.thumbnail.trim()) {
-      toast.error("Please upload a thumbnail");
-      return;
-    }
-    if (!courseForm.academy_name.trim()) {
-      toast.error("Academy name is required");
-      return;
-    }
-    if (!courseForm.description.trim()) {
-      toast.error("Description is required");
-      return;
-    }
-    if (!courseForm.skill_level) {
-      toast.error("Skill level is required");
-      return;
-    }
-    if (!courseForm.expired_date) {
-      toast.error("Expired date is required");
+    // Simple validation
+    const errors = validateCourseForm(courseForm);
+    if (errors.length > 0) {
+      toast.error(errors[0]); // Show first error
       return;
     }
 
+    setSaving(true);
     try {
-      const response = await api.put(`/course/${slug}`, {
+      const payload = {
         ...courseForm,
         expired_date: `${courseForm.expired_date}T00:00:00.000Z`,
-      });
+        related_books: courseForm.related_books,
+        related_book:
+          courseForm.related_books.length > 0
+            ? courseForm.related_books[0]
+            : "null",
+        quiz_count:
+          courseForm.quiz_count === "" || courseForm.quiz_count === undefined
+            ? null
+            : parseInt(courseForm.quiz_count),
+        price: parseFloat(courseForm.price),
+      };
+
+      let response;
+      if (isCreating) {
+        // Create new course
+        response = await api.post(`/course`, payload);
+      } else {
+        // Update existing course
+        response = await api.put(`/course`, payload);
+      }
+
       if (response.data.success) {
-        toast.success("Course details updated successfully");
-        // Update local course data
-        setCourse((prev) => ({
-          ...prev,
-          course_title: courseForm.course_title,
-          batch: courseForm.batch,
-          price: courseForm.price,
-          thumbnail: courseForm.thumbnail,
-          course_details: {
-            ...prev.course_details,
-            academy_name: courseForm.academy_name,
-            description: courseForm.description,
-            related_book: courseForm.related_book,
-            quiz_count: courseForm.quiz_count,
-            assessment: courseForm.assessment,
-            skill_level: courseForm.skill_level,
-            expired_date: courseForm.expired_date,
-          },
-        }));
+        toast.success(response.data.message || "Course operation successful!");
+        if (isCreating) {
+          // Navigate to the edit page of the newly created course
+          navigate(`/admin/courses/${response.data.course.slug}`);
+        } else {
+          // Update local course data
+          setCourse((prev) => ({
+            ...prev,
+            course_title: courseForm.course_title,
+            batch: courseForm.batch,
+            price: courseForm.price,
+            thumbnail: courseForm.thumbnail,
+            is_featured: courseForm.is_featured,
+            related_books: courseForm.related_books,
+            course_details: {
+              ...prev.course_details,
+              academy_name: courseForm.academy_name,
+              description: courseForm.description,
+              quiz_count: courseForm.quiz_count,
+              assessment: courseForm.assessment,
+              skill_level: courseForm.skill_level,
+              expired_date: courseForm.expired_date,
+            },
+          }));
+        }
       }
     } catch (error) {
-      console.error("Error updating course:", error);
-      toast.error(error.response?.data?.message || "Failed to update course");
+      console.error("Error saving course:", error);
+      toast.error(error.response?.data?.message || "Failed to save course");
     } finally {
       setSaving(false);
     }
@@ -579,7 +641,7 @@ export default function CourseEditPage() {
     );
   }
 
-  if (!course) {
+  if (!isCreating && !course) {
     return (
       <AdminLayout>
         <div className="text-center py-16">
@@ -607,13 +669,15 @@ export default function CourseEditPage() {
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Back to Courses</span>
             </Button>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-                Edit Course
+            <div className="w-full">
+              <h1 className="text-2xl sm:text-3xl font-semibold text-foreground text-center">
+                {isCreating ? "Add New Course" : "Edit Course"}
               </h1>
-              <p className="text-muted-foreground text-sm sm:text-base">
-                {course.course_title}
-              </p>
+              {!isCreating && course && (
+                <p className="text-muted-foreground text-sm sm:text-base">
+                  {course.course_title}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -731,41 +795,20 @@ export default function CourseEditPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="related_book">Related Book</Label>
-                <Select
-                  value={courseForm.related_book}
-                  onValueChange={(value) =>
-                    handleCourseSelectChange("related_book", value)
-                  }
+                <Label htmlFor="related_books">Related Books</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setRelatedBooksDialogOpen(true)}
+                  className="w-full justify-between"
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a related book (optional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {courseForm.related_book &&
-                      !books.some(
-                        (book) => book.title === courseForm.related_book
-                      ) && (
-                        <SelectItem value={courseForm.related_book}>
-                          {courseForm.related_book} (previously selected)
-                        </SelectItem>
-                      )}
-                    {books.length > 0 ? (
-                      books.map((book) => (
-                        <SelectItem
-                          key={book.book_id || book.id}
-                          value={book.title}
-                        >
-                          {book.title}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="no-books" disabled>
-                        No books available
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
+                  <span>
+                    {courseForm.related_books.length > 0
+                      ? `${courseForm.related_books.length} book(s) selected`
+                      : "Select related books"}
+                  </span>
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
               </div>
             </div>
 
@@ -796,15 +839,45 @@ export default function CourseEditPage() {
               <Label htmlFor="assessment">Has Assessment</Label>
             </div>
 
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="is_featured"
+                name="is_featured"
+                checked={courseForm.is_featured}
+                onCheckedChange={(checked) =>
+                  setCourseForm((prev) => ({ ...prev, is_featured: checked }))
+                }
+              />
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Label htmlFor="is_featured" className="cursor-help">
+                      Featured on Homepage
+                    </Label>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      Check this to display this course on the homepage featured
+                      section
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+
             <div className="space-y-2">
               <Label>
-                <span className="text-primary">Thumbnail</span>{" "}
+                <span className="text-primary">Thumbnail: </span>{" "}
                 <span className="text-destructive">*</span>
               </Label>
+
               <FileUpload
-                onUpload={handleImageUpload}
+                onUploadSuccess={handleImageUpload}
                 currentImage={courseForm.thumbnail}
                 accept="image/*"
+                supportedTypes="jpg, jpeg, png"
+                autoUpload={true}
+                showLabel={false}
               />
             </div>
 
@@ -825,177 +898,182 @@ export default function CourseEditPage() {
           </CardContent>
         </Card>
 
-        {/* Lectures/Chapters Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Lectures</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {chapters.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No chapters added yet. Click "Add Chapter" to get started.
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {chapters.map((chapter) => (
-                  <Collapsible
-                    key={chapter.chapter_id}
-                    open={expandedChapters.has(chapter.chapter_id)}
-                    onOpenChange={() =>
-                      toggleChapterExpansion(chapter.chapter_id)
-                    }
-                  >
-                    <div className="border rounded-lg p-4">
-                      <CollapsibleTrigger className="flex flex-col sm:flex-row sm:items-center justify-between w-full text-left gap-2">
-                        <div className="flex items-center gap-3">
-                          {expandedChapters.has(chapter.chapter_id) ? (
-                            <ChevronDown className="w-4 h-4" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4" />
-                          )}
-                          <h3 className="font-semibold text-foreground">
-                            {chapter.title}
-                          </h3>
-                          <span className="text-sm text-muted-foreground">
-                            ({chapter.topics?.length || 0} topics)
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 ml-7 sm:ml-0">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleAddTopic(chapter);
-                            }}
-                            className="flex items-center gap-1"
-                          >
-                            <Plus className="w-3 h-3" />
-                            <span className="hidden sm:inline">Add Topic</span>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditChapter(chapter);
-                            }}
-                            className="flex items-center gap-1"
-                          >
-                            <Edit className="w-3 h-3" />
-                            <span className="hidden sm:inline">Edit</span>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteClick(chapter, "chapter");
-                            }}
-                            disabled={deletingChapter === chapter.chapter_id}
-                            className="flex items-center gap-1 text-destructive hover:text-destructive"
-                          >
-                            {deletingChapter === chapter.chapter_id ? (
-                              <Loader2 className="w-3 h-3 animate-spin" />
+        {/* Lectures/Chapters Section - Only show when editing */}
+        {!isCreating && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Lectures</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {chapters.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No chapters added yet. Click "Add Chapter" to get started.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {chapters.map((chapter) => (
+                    <Collapsible
+                      key={chapter.chapter_id}
+                      open={expandedChapters.has(chapter.chapter_id)}
+                      onOpenChange={() =>
+                        toggleChapterExpansion(chapter.chapter_id)
+                      }
+                    >
+                      <div className="border rounded-lg p-4">
+                        <CollapsibleTrigger className="flex flex-col sm:flex-row sm:items-center justify-between w-full text-left gap-2">
+                          <div className="flex items-center gap-3">
+                            {expandedChapters.has(chapter.chapter_id) ? (
+                              <ChevronDown className="w-4 h-4" />
                             ) : (
-                              <Trash2 className="w-3 h-3" />
+                              <ChevronRight className="w-4 h-4" />
                             )}
-                            <span className="hidden sm:inline">
-                              {deletingChapter === chapter.chapter_id
-                                ? "Deleting..."
-                                : "Delete"}
+                            <h3 className="font-semibold text-foreground">
+                              {chapter.title}
+                            </h3>
+                            <span className="text-sm text-muted-foreground">
+                              ({chapter.topics?.length || 0} topics)
                             </span>
-                          </Button>
-                        </div>
-                      </CollapsibleTrigger>
+                          </div>
+                          <div className="flex items-center gap-2 ml-7 sm:ml-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddTopic(chapter);
+                              }}
+                              className="flex items-center gap-1"
+                            >
+                              <Plus className="w-3 h-3" />
+                              <span className="hidden sm:inline">
+                                Add Topic
+                              </span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditChapter(chapter);
+                              }}
+                              className="flex items-center gap-1"
+                            >
+                              <Edit className="w-3 h-3" />
+                              <span className="hidden sm:inline">Edit</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteClick(chapter, "chapter");
+                              }}
+                              disabled={deletingChapter === chapter.chapter_id}
+                              className="flex items-center gap-1 text-destructive hover:text-destructive"
+                            >
+                              {deletingChapter === chapter.chapter_id ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <Trash2 className="w-3 h-3" />
+                              )}
+                              <span className="hidden sm:inline">
+                                {deletingChapter === chapter.chapter_id
+                                  ? "Deleting..."
+                                  : "Delete"}
+                              </span>
+                            </Button>
+                          </div>
+                        </CollapsibleTrigger>
 
-                      <CollapsibleContent className="mt-4">
-                        {chapter.topics && chapter.topics.length > 0 ? (
-                          <div className="space-y-2 pl-7">
-                            {chapter.topics.map((topic) => (
-                              <div
-                                key={topic.chapter_topic_id}
-                                className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-muted/30 rounded-md gap-2"
-                              >
-                                <div className="flex items-center gap-3 min-w-0 flex-1">
-                                  <Play className="w-4 h-4 text-primary flex-shrink-0" />
-                                  <div className="min-w-0 flex-1">
-                                    <p className="font-medium text-foreground truncate">
-                                      {topic.title}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground break-all">
-                                      {topic.youtube_url}
-                                    </p>
+                        <CollapsibleContent className="mt-4">
+                          {chapter.topics && chapter.topics.length > 0 ? (
+                            <div className="space-y-2 pl-7">
+                              {chapter.topics.map((topic) => (
+                                <div
+                                  key={topic.chapter_topic_id}
+                                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-muted/30 rounded-md gap-2"
+                                >
+                                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                                    <Play className="w-4 h-4 text-primary flex-shrink-0" />
+                                    <div className="min-w-0 flex-1">
+                                      <p className="font-medium text-foreground truncate">
+                                        {topic.title}
+                                      </p>
+                                      <p className="text-sm text-muted-foreground break-all">
+                                        {topic.youtube_url}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-2 flex-shrink-0">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleEditTopic(topic, chapter)
+                                      }
+                                      className="flex items-center gap-1"
+                                    >
+                                      <Edit className="w-3 h-3" />
+                                      <span className="hidden sm:inline">
+                                        Edit
+                                      </span>
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleDeleteClick(topic, "topic")
+                                      }
+                                      disabled={
+                                        deletingTopic === topic.chapter_topic_id
+                                      }
+                                      className="flex items-center gap-1 text-destructive hover:text-destructive"
+                                    >
+                                      {deletingTopic ===
+                                      topic.chapter_topic_id ? (
+                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                      ) : (
+                                        <Trash2 className="w-3 h-3" />
+                                      )}
+                                      <span className="hidden sm:inline">
+                                        {deletingTopic ===
+                                        topic.chapter_topic_id
+                                          ? "Deleting..."
+                                          : "Delete"}
+                                      </span>
+                                    </Button>
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-2 flex-shrink-0">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() =>
-                                      handleEditTopic(topic, chapter)
-                                    }
-                                    className="flex items-center gap-1"
-                                  >
-                                    <Edit className="w-3 h-3" />
-                                    <span className="hidden sm:inline">
-                                      Edit
-                                    </span>
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() =>
-                                      handleDeleteClick(topic, "topic")
-                                    }
-                                    disabled={
-                                      deletingTopic === topic.chapter_topic_id
-                                    }
-                                    className="flex items-center gap-1 text-destructive hover:text-destructive"
-                                  >
-                                    {deletingTopic ===
-                                    topic.chapter_topic_id ? (
-                                      <Loader2 className="w-3 h-3 animate-spin" />
-                                    ) : (
-                                      <Trash2 className="w-3 h-3" />
-                                    )}
-                                    <span className="hidden sm:inline">
-                                      {deletingTopic === topic.chapter_topic_id
-                                        ? "Deleting..."
-                                        : "Delete"}
-                                    </span>
-                                  </Button>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-center py-4 text-muted-foreground text-sm pl-7">
-                            No topics added yet. Click "Add Topic" to add video
-                            lectures.
-                          </div>
-                        )}
-                      </CollapsibleContent>
-                    </div>
-                  </Collapsible>
-                ))}
-              </div>
-            )}
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-center py-4 text-muted-foreground text-sm pl-7">
+                              No topics added yet. Click "Add Topic" to add
+                              video lectures.
+                            </div>
+                          )}
+                        </CollapsibleContent>
+                      </div>
+                    </Collapsible>
+                  ))}
+                </div>
+              )}
 
-            {/* Add Chapter Button at Bottom */}
-            <div className="flex justify-center pt-4 border-t border-border">
-              <Button
-                onClick={handleAddChapter}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Add Chapter</span>
-                <span className="sm:hidden">Add</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              {/* Add Chapter Button at Bottom */}
+              <div className="flex justify-center pt-4 border-t border-border">
+                <Button
+                  onClick={handleAddChapter}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">Add Chapter</span>
+                  <span className="sm:hidden">Add</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Chapter Dialog */}
         <Dialog open={chapterDialogOpen} onOpenChange={setChapterDialogOpen}>
@@ -1118,6 +1196,136 @@ export default function CourseEditPage() {
                 ) : (
                   `${editingTopic ? "Update" : "Add"} Topic`
                 )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Related Books Selection Dialog */}
+        <Dialog
+          open={relatedBooksDialogOpen}
+          onOpenChange={setRelatedBooksDialogOpen}
+        >
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
+            <DialogHeader>
+              <DialogTitle>Select Related Books</DialogTitle>
+              <DialogDescription>
+                Choose books that are related to this course. You can select
+                multiple books.
+              </DialogDescription>
+            </DialogHeader>
+
+            {/* Search Input */}
+            <div className="space-y-4">
+              <div className="relative">
+                <Input
+                  placeholder="Search books..."
+                  value={bookSearchQuery}
+                  onChange={(e) => setBookSearchQuery(e.target.value)}
+                  className="pl-8"
+                />
+                <svg
+                  className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+
+              {/* Books List */}
+              <div className="max-h-96 overflow-y-auto border rounded-md p-3 space-y-2">
+                {books.length > 0 ? (
+                  books
+                    .filter((book) =>
+                      book.title
+                        .toLowerCase()
+                        .trim()
+                        .includes(bookSearchQuery.toLowerCase())
+                    )
+                    .map((book) => (
+                      <div
+                        key={book.book_id || book.id}
+                        className="flex items-center space-x-3 p-2 hover:bg-muted/50 rounded-md"
+                      >
+                        <Checkbox
+                          id={`dialog-book-${book.book_id || book.id}`}
+                          checked={courseForm.related_books.includes(
+                            book.book_id || book.id
+                          )}
+                          onCheckedChange={(checked) => {
+                            setCourseForm((prev) => ({
+                              ...prev,
+                              related_books: checked
+                                ? [
+                                    ...prev.related_books,
+                                    book.book_id || book.id,
+                                  ]
+                                : prev.related_books.filter(
+                                    (id) => id !== (book.book_id || book.id)
+                                  ),
+                            }));
+                          }}
+                        />
+                        <Label
+                          htmlFor={`dialog-book-${book.book_id || book.id}`}
+                          className="text-sm cursor-pointer flex-1"
+                        >
+                          <div className="font-medium">{book.title}</div>
+                          {book.author && (
+                            <div className="text-xs text-muted-foreground">
+                              by {book.author}
+                            </div>
+                          )}
+                        </Label>
+                      </div>
+                    ))
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No books available
+                  </p>
+                )}
+                {books.length > 0 &&
+                  books.filter((book) =>
+                    book.title
+                      .toLowerCase()
+                      .includes(bookSearchQuery.toLowerCase())
+                  ).length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      No books match your search
+                    </p>
+                  )}
+              </div>
+
+              {/* Selection Summary */}
+              <div className="text-sm text-muted-foreground">
+                {courseForm.related_books.length} book(s) selected
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setRelatedBooksDialogOpen(false);
+                  setBookSearchQuery("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  setRelatedBooksDialogOpen(false);
+                  setBookSearchQuery("");
+                }}
+              >
+                Done
               </Button>
             </DialogFooter>
           </DialogContent>
