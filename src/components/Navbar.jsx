@@ -30,9 +30,10 @@ export default function Navbar() {
             className="flex items-center gap-2"
             onClick={closeMobileMenu}
           >
-            <h1 className="text-2xl font-bold text-primary font-primary">
+            {/* <h1 className="text-2xl font-semibold text-primary font-primary">
               প্রতিজ্ঞা
-            </h1>
+            </h1> */}
+            <img src="/logo-transparent.png" className="max-w-[100px]" />
           </Link>
 
           {/* Desktop Navigation */}

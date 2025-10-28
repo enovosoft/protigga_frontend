@@ -13,10 +13,10 @@ export default function Dashboard() {
     if (isAuthLoading) return;
 
     if (!isAuthenticated) {
-      navigate("/");
+      return navigate("/");
     } else if (primaryRole === "admin") {
       // Redirect admins to the admin dashboard
-      navigate("/admin");
+      return navigate("/admin");
     }
   }, [isAuthenticated, isAuthLoading, navigate, primaryRole]);
 

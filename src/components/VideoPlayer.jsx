@@ -6,6 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Slider } from "@/components/ui/slider";
+import { useStoreState } from "easy-peasy";
 import {
   FastForward,
   Maximize,
@@ -22,6 +23,7 @@ import ReactPlayer from "react-player";
 
 const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
   const playerRef = useRef(null);
+  const containerRef = useRef(null);
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.8);
   const [muted, setMuted] = useState(false);
@@ -32,9 +34,31 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
   const [showControls, setShowControls] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [playerReady, setPlayerReady] = useState(false);
-  const containerRef = useRef(null);
+  const [watermarkPosition, setWatermarkPosition] = useState({
+    top: 10,
+    left: 10,
+  });
 
-  // Convert youtu.be URL to standard youtube.com format
+  const { profile } = useStoreState((store) => store.student);
+
+  // Shuffle watermark position every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const videoRect = containerRef.current?.getBoundingClientRect();
+      if (videoRect) {
+        const maxTop = videoRect.height - 50;
+        const maxLeft = videoRect.width - 150;
+        setWatermarkPosition({
+          top: Math.random() * maxTop,
+          left: Math.random() * maxLeft,
+        });
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Convert youtu.be URL to standard youtube.com format (stricly checking)
   const normalizedUrl = useMemo(() => {
     if (!url) return null;
 
@@ -50,7 +74,9 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
   // Load saved progress when topic changes
   useEffect(() => {
     if (courseSlug && topicId) {
-      const savedProgress = localStorage.getItem(`video_progress_${courseSlug}_${topicId}`);
+      const savedProgress = localStorage.getItem(
+        `video_progress_${courseSlug}_${topicId}`
+      );
       if (savedProgress) {
         const { progress, completed } = JSON.parse(savedProgress);
         setPlayed(progress);
@@ -71,10 +97,13 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
       const progressData = {
         progress,
         completed,
-        lastWatched: Date.now()
+        lastWatched: Date.now(),
       };
-      localStorage.setItem(`video_progress_${courseSlug}_${topicId}`, JSON.stringify(progressData));
-      
+      localStorage.setItem(
+        `video_progress_${courseSlug}_${topicId}`,
+        JSON.stringify(progressData)
+      );
+
       // Call the callback if provided
       if (onProgressUpdate) {
         onProgressUpdate(topicId, progress, completed);
@@ -87,38 +116,6 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
     setPlaying(false);
     saveProgress(1, true); // Mark as completed
   };
-
-  // Inject CSS to hide YouTube elements
-  useEffect(() => {
-    const style = document.createElement("style");
-    style.textContent = `
-      .ytp-chrome-top,
-      .ytp-pause-overlay,
-      .ytp-cards-teaser,
-      .ytp-endscreen-element,
-      .ytp-watermark,
-      .ytp-impression-link,
-      .ytp-title-channel,
-      .ytp-title-text,
-      .ytp-share-button,
-      .ytp-watch-later-button,
-      .ytp-youtube-button,
-      .ytp-embed-link {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-      }
-    `;
-    document.head.appendChild(style);
-
-    return () => {
-      if (document.head.contains(style)) {
-        document.head.removeChild(style);
-      }
-    };
-  }, []);
-
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e) => {
@@ -281,15 +278,21 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
         currentProgress = state.playedSeconds / duration;
         setPlayed(currentProgress);
       }
-      
+
       // Save progress every 5 seconds if playing
-      if (playing && duration > 0 && Math.floor(currentProgress * duration) % 5 === 0) {
+      if (
+        playing &&
+        duration > 0 &&
+        Math.floor(currentProgress * duration) % 5 === 0
+      ) {
         saveProgress(currentProgress);
       }
-      
+
       // Mark as completed when 90% watched
       if (currentProgress >= 0.9 && courseSlug && topicId) {
-        const savedData = localStorage.getItem(`video_progress_${courseSlug}_${topicId}`);
+        const savedData = localStorage.getItem(
+          `video_progress_${courseSlug}_${topicId}`
+        );
         if (!savedData || !JSON.parse(savedData).completed) {
           saveProgress(currentProgress, true);
         }
@@ -506,6 +509,19 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
         />
       </div>
 
+      {/* Watermark */}
+      {profile?.phone && playing && (
+        <div
+          className="absolute pointer-events-none select-none z-40 text-secondary/30 text-lg font-medium "
+          style={{
+            top: `${watermarkPosition.top}px`,
+            left: `${watermarkPosition.left}px`,
+          }}
+        >
+          {profile.phone}
+        </div>
+      )}
+
       {/* Custom Controls */}
       <div
         className={`absolute inset-0 transition-opacity duration-300 ${
@@ -547,20 +563,6 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
           <div className="flex items-center justify-between gap-2">
             {/* Left Controls - Play, Skip, Next/Prev Topic */}
             <div className="flex items-center gap-1 sm:gap-2">
-              {/* Play/Pause */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handlePlayPause}
-                className="text-white hover:bg-white/20 w-11 h-11 sm:w-12 sm:h-12 p-1 flex-shrink-0"
-              >
-                {playing ? (
-                  <Pause className="w-5 h-5 sm:w-6 sm:h-6" />
-                ) : (
-                  <Play className="w-5 h-5 sm:w-6 sm:h-6 ml-0.5" />
-                )}
-              </Button>
-
               {/* Rewind 10 seconds */}
               <Button
                 variant="ghost"
@@ -573,6 +575,19 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
                 <span className="absolute text-[11px] md:text-xs  font-bold -bottom-0.5 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
                   10
                 </span>
+              </Button>
+              {/* Play/Pause */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handlePlayPause}
+                className="text-white hover:bg-white/20 w-11 h-11 sm:w-12 sm:h-12 p-1 flex-shrink-0"
+              >
+                {playing ? (
+                  <Pause className="w-5 h-5 sm:w-6 sm:h-6" />
+                ) : (
+                  <Play className="w-5 h-5 sm:w-6 sm:h-6 ml-0.5" />
+                )}
               </Button>
 
               {/* Fast Forward 10 seconds */}

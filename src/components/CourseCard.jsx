@@ -1,47 +1,53 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { ShoppingCart } from 'lucide-react';
+import ImageFallback from "@/components/shared/ImageFallback";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { BookOpen } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function CourseCard({ course }) {
-  const { thumbnail, name, price, id } = course;
+  const { thumbnail, name, price, slug, batch } = course;
 
   return (
-    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-secondary/50">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
       <CardHeader className="p-0">
         <div className="relative aspect-video overflow-hidden bg-muted">
-          {thumbnail ? (
-            <img 
-              src={thumbnail} 
-              alt={name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10">
-              <div className="text-center p-4">
-                <div className="w-16 h-16 bg-primary/20 rounded-full mx-auto mb-2 flex items-center justify-center">
-                  <ShoppingCart className="w-8 h-8 text-primary/60" />
-                </div>
-                <p className="text-sm text-muted-foreground">Course Thumbnail</p>
-              </div>
+          <ImageFallback
+            src={thumbnail}
+            alt={name}
+            className="group-hover:scale-105 transition-transform duration-300"
+            icon={BookOpen}
+            text="Course Thumbnail"
+          />
+          {/* Batch Tag */}
+          {batch && (
+            <div className="absolute top-3 right-3">
+              <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                <BookOpen className="w-3 h-3" />
+                {batch}
+              </span>
             </div>
           )}
         </div>
       </CardHeader>
-      
-      <CardContent className="p-4">
-        <h3 className="font-semibold text-lg text-foreground line-clamp-2 mb-2 group-hover:text-secondary transition-colors">
+
+      <CardContent className="p-6 flex-grow">
+        <h3 className="text-xl font-semibold text-foreground mb-3 line-clamp-2">
           {name}
         </h3>
-        <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold text-primary">৳{price}</span>
+        <div className="flex items-center justify-between">
+          <span className="text-2xl font-medium text-primary">৳{price}</span>
         </div>
       </CardContent>
-      
-      <CardFooter className="p-4 pt-0">
-        <Button className="w-full" size="lg">
-          <ShoppingCart className="mr-2 h-4 w-4" />
-          Buy Now
-        </Button>
+
+      <CardFooter className="p-6 pt-0 mt-auto">
+        <Link className="w-full" to={`/courses/${slug}`}>
+          <Button className="w-full">Enroll Now</Button>
+        </Link>
       </CardFooter>
     </Card>
   );

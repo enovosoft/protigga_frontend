@@ -112,7 +112,7 @@ const studentStore = {
         actions.setError(response.data?.message || "Failed to load course");
       }
     } catch (err) {
-      actions.setError(err.message || "Failed to load course");
+      actions.setError(err.response?.data?.message || "Failed to load course");
     } finally {
       actions.setLoading(false);
     }

@@ -10,41 +10,100 @@ import { Skeleton } from "@/components/ui/skeleton";
 import VideoPlayer from "@/components/VideoPlayer";
 import { useStoreActions, useStoreState } from "easy-peasy";
 import {
+  Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Clapperboard,
   Play,
   Video,
-  Check,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-export default function CoursePage() {
-  const location = useLocation();
-  const slug = location.state?.slug;
+import toast from "react-hot-toast";
+import { useParams } from "react-router-dom";
 
-  const { course, loading } = useStoreState((state) => state.student);
-  const { fetchCourseDetails } = useStoreActions((actions) => actions.student);
+import { useNavigate } from "react-router-dom";
+export default function CoursePage() {
+  const { slug } = useParams();
+
+  const { course, loading, enrollments, isFetched } = useStoreState(
+    (state) => state.student
+  );
+  const { fetchCourseDetails, setError } = useStoreActions(
+    (actions) => actions.student
+  );
 
   const [expandedChapters, setExpandedChapters] = useState({});
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [videoProgress, setVideoProgress] = useState({});
 
+  const navigate = useNavigate();
+
   useEffect(() => {
+    if (!slug) {
+      toast.error(
+        "No course selected. Please select a course from your enrollments.",
+        {
+          duration: 10000,
+        }
+      );
+      return navigate("/dashboard/enrollments", { replace: true });
+    }
+
+    if (
+      isFetched &&
+      !enrollments.some((enrollment) => enrollment.slug === slug)
+    ) {
+      toast.error(
+        "You are not enrolled in that course. Please select a course from your enrollments.",
+        {
+          duration: 15000,
+        }
+      );
+      return navigate("/dashboard/enrollments", { replace: true });
+    }
+
     if ((slug && !course) || slug !== course?.slug) {
       fetchCourseDetails(slug);
     }
-  }, [slug, course, fetchCourseDetails]);
+  }, [
+    slug,
+    course,
+    fetchCourseDetails,
+    enrollments,
+    navigate,
+    setError,
+    isFetched,
+  ]);
+
+  // Auto-select first topic when course loads
+  useEffect(() => {
+    if (course?.chapters?.length > 0 && !selectedTopic) {
+      // Find the first chapter with topics
+      const firstChapter = course.chapters.find(
+        (chapter) => chapter.topics?.length > 0
+      );
+      if (firstChapter && firstChapter.topics?.length > 0) {
+        setSelectedTopic(firstChapter.topics[0]);
+        // Expand the first chapter
+        setExpandedChapters((prev) => ({
+          ...prev,
+          [firstChapter.chapter_id]: true,
+        }));
+      }
+    }
+  }, [course, selectedTopic]);
 
   // Load video progress for all topics
   const loadVideoProgress = useCallback(() => {
     if (course?.chapters && slug) {
       const progress = {};
-      course.chapters.forEach(chapter => {
+      course.chapters.forEach((chapter) => {
         if (chapter.topics) {
-          chapter.topics.forEach(topic => {
-            const saved = localStorage.getItem(`video_progress_${slug}_${topic.chapter_topic_id}`);
+          chapter.topics.forEach((topic) => {
+            const saved = localStorage.getItem(
+              `video_progress_${slug}_${topic.chapter_topic_id}`
+            );
             if (saved) {
               progress[topic.chapter_topic_id] = JSON.parse(saved);
             }
@@ -200,7 +259,7 @@ export default function CoursePage() {
   }
 
   return (
-    <StudentDashboardLayout>
+    <StudentDashboardLayout container={false}>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Left Navigation - Chapters and Topics */}
         <div className="lg:col-span-1 order-3 lg:order-1">
@@ -252,7 +311,8 @@ export default function CoursePage() {
                         selectedTopic?.chapter_topic_id ===
                         topic.chapter_topic_id;
 
-                      const topicProgress = videoProgress[topic.chapter_topic_id];
+                      const topicProgress =
+                        videoProgress[topic.chapter_topic_id];
                       const isCompleted = topicProgress?.completed;
                       const progressPercent = topicProgress?.progress || 0;
 
@@ -306,7 +366,9 @@ export default function CoursePage() {
                                 <div className="w-full bg-muted rounded-full h-1 mt-1">
                                   <div
                                     className="bg-primary h-1 rounded-full transition-all duration-300"
-                                    style={{ width: `${progressPercent * 100}%` }}
+                                    style={{
+                                      width: `${progressPercent * 100}%`,
+                                    }}
                                   ></div>
                                 </div>
                               )}

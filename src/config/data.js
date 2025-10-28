@@ -3,19 +3,12 @@
 export const INSTRUCTORS = [
   {
     id: 1,
-    name: "Dr. Ahmed Rahman",
+    name: "Momen Tazwoar Momit",
     subject: "Physics",
-    experience: "15 years",
-    students: 2000,
-    image: null,
-  },
-  {
-    id: 2,
-    name: "Prof. Fatima Khatun",
-    subject: "Chemistry",
-    experience: "12 years",
-    students: 1800,
-    image: null,
+    experience: "10 years",
+    institution: "BUET",
+    students: 5000,
+    image: "momit.jpg",
   },
 ];
 

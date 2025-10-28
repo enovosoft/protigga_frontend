@@ -24,6 +24,13 @@ const PinMessage = ({ variant = "success", message, className }) => {
       borderColor: "border-destructive/40",
       iconColor: "text-primary",
     },
+    error: {
+      icon: XCircle,
+      bgColor: "bg-destructive/50",
+      textColor: "text-primary",
+      borderColor: "border-destructive/40",
+      iconColor: "text-primary",
+    },
     info: {
       icon: Info,
 

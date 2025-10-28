@@ -1,23 +1,25 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { INSTRUCTORS } from "@/config/data";
-import { Award, BookOpen, User } from "lucide-react";
+import { Award, BookOpen, GraduationCap, User, User2 } from "lucide-react";
+import ImageFallback from "../shared/ImageFallback";
 
 export default function InstructorList() {
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-br from-accent/10 to-secondary/5">
+    <section className="pt-16 md:pt-24 pb-4 md:pb-8 bg-secondary/10">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4 font-primary">
-            আমাদের শিক্ষকমণ্ডলী
+          <h2 className="text-3xl md:text-4xl font-semibold text-primary mb-4 font-primary">
+            আমাদের এক্সপার্ট টিম
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Learn from experienced educators dedicated to your success
+            তোমার সেরা প্রস্তুতির জন্য আমাদের এক্সপার্ট ইন্সট্রাক্টরদের সাথে
+            পরিচিত হও
           </p>
         </div>
 
         {/* Instructor Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="flex flex-wrap justify-center gap-6">
           {INSTRUCTORS.map((instructor) => (
             <Card
               key={instructor.id}
@@ -28,10 +30,11 @@ export default function InstructorList() {
                 <div className="mb-4">
                   <div className="relative w-32 h-32 mx-auto">
                     {instructor.image ? (
-                      <img
+                      <ImageFallback
                         src={instructor.image}
                         alt={instructor.name}
                         className="w-full h-full rounded-full object-cover border-4 border-secondary/20 group-hover:border-secondary/40 transition-colors"
+                        icon={User2}
                       />
                     ) : (
                       <div className="w-full h-full rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center border-4 border-secondary/20 group-hover:border-secondary/40 transition-colors">
@@ -53,6 +56,10 @@ export default function InstructorList() {
                   </div>
 
                   <div className="space-y-2 pt-3 border-t border-border">
+                    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                      <GraduationCap className="w-4 h-4 text-secondary" />
+                      <span>{instructor.institution}</span>
+                    </div>
                     <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                       <Award className="w-4 h-4 text-secondary" />
                       <span>{instructor.experience} experience</span>

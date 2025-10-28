@@ -9,14 +9,10 @@ export default function Footer({ className }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold font-primary">প্রতিজ্ঞা</h3>
-            <p className="text-primary-foreground/80 text-sm">
-              স্বপ্ন পূরণের যাত্রায় আপনার সঙ্গী। Quality education for every
-              student.
-            </p>
+            <img src="logo.jpeg" alt="Logo" className="max-w-40 rounded-2xl" />
             <div className="flex gap-3">
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/Momentazwoarmomit"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-primary-foreground/10 hover:bg-secondary flex items-center justify-center transition-colors"
@@ -24,7 +20,7 @@ export default function Footer({ className }) {
                 <Facebook className="w-5 h-5" />
               </a>
               <a
-                href="https://youtube.com"
+                href="https://www.youtube.com/@momentazwoarmomit"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-primary-foreground/10 hover:bg-secondary flex items-center justify-center transition-colors"
@@ -87,7 +83,7 @@ export default function Footer({ className }) {
             <ul className="space-y-2">
               <li>
                 <Link
-                  to="/about"
+                  to="#"
                   className="text-primary-foreground/80 hover:text-secondary transition-colors text-sm"
                 >
                   About Us
@@ -95,7 +91,7 @@ export default function Footer({ className }) {
               </li>
               <li>
                 <Link
-                  to="/contact"
+                  to="#"
                   className="text-primary-foreground/80 hover:text-secondary transition-colors text-sm"
                 >
                   Contact
@@ -103,7 +99,7 @@ export default function Footer({ className }) {
               </li>
               <li>
                 <Link
-                  to="/faq"
+                  to="#"
                   className="text-primary-foreground/80 hover:text-secondary transition-colors text-sm"
                 >
                   FAQ
@@ -111,7 +107,7 @@ export default function Footer({ className }) {
               </li>
               <li>
                 <Link
-                  to="/privacy"
+                  to="/#"
                   className="text-primary-foreground/80 hover:text-secondary transition-colors text-sm"
                 >
                   Privacy Policy
@@ -119,7 +115,7 @@ export default function Footer({ className }) {
               </li>
               <li>
                 <Link
-                  to="/terms"
+                  to="#"
                   className="text-primary-foreground/80 hover:text-secondary transition-colors text-sm"
                 >
                   Terms & Conditions
@@ -138,11 +134,11 @@ export default function Footer({ className }) {
               </li>
               <li className="flex items-center gap-2 text-sm text-primary-foreground/80">
                 <Phone className="w-5 h-5 text-secondary flex-shrink-0" />
-                <span>+880 1XXX-XXXXXX</span>
+                <span>+880 1533-381836</span>
               </li>
               <li className="flex items-center gap-2 text-sm text-primary-foreground/80">
                 <Mail className="w-5 h-5 text-secondary flex-shrink-0" />
-                <span>info@protigga.com</span>
+                <span> tazwoarbusiness@gmail.com</span>
               </li>
             </ul>
           </div>
@@ -154,25 +150,14 @@ export default function Footer({ className }) {
             <p className="text-sm text-primary-foreground/60">
               © {new Date().getFullYear()} প্রতিজ্ঞা. All rights reserved.
             </p>
-            <div className="flex gap-6 text-sm text-primary-foreground/60">
-              <Link
-                to="/privacy"
-                className="hover:text-secondary transition-colors"
+            <div className=" text-sm text-primary-foreground/60">
+              Developed by{" "}
+              <a
+                href="http://enovosoft.com/"
+                className="text-primary-foreground/80 hover:underline hover:text-primary-foreground"
               >
-                Privacy
-              </Link>
-              <Link
-                to="/terms"
-                className="hover:text-secondary transition-colors"
-              >
-                Terms
-              </Link>
-              <Link
-                to="/cookies"
-                className="hover:text-secondary transition-colors"
-              >
-                Cookies
-              </Link>
+                Enovosoft
+              </a>
             </div>
           </div>
         </div>

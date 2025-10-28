@@ -222,9 +222,6 @@ const PaymentDetailsPage = () => {
                     <strong>Order ID:</strong> {bookOrder.order_id}
                   </div>
                   <div>
-                    <strong>Book ID:</strong> {bookOrder.book_id}
-                  </div>
-                  <div>
                     <strong>Book Name:</strong> {relatedBook?.title || "—"}
                   </div>
                   <div>
@@ -282,9 +279,7 @@ const PaymentDetailsPage = () => {
                     <strong>Enrollment Type:</strong>{" "}
                     {courseEnrollment.enrollment_type}
                   </div>
-                  <div>
-                    <strong>Course ID:</strong> {courseEnrollment.course_id}
-                  </div>
+
                   <div>
                     <strong>Course Name:</strong> {relatedCourse?.name || "—"}
                   </div>

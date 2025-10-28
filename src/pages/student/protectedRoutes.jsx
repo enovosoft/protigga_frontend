@@ -65,7 +65,7 @@ export const protectedRoutes = (
       }
     />
     <Route
-      path="/dashboard/course"
+      path="/dashboard/course/:slug"
       element={
         <ProtectedRoute roles={["student"]}>
           <CoursePage />

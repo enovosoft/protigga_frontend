@@ -7,7 +7,7 @@ import Footer from "../Footer";
 import Loading from "./Loading";
 import PinMessage from "./PinMessage";
 
-const StudentDashboardLayout = ({ children }) => {
+const StudentDashboardLayout = ({ children, container = true }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { error, isFetched, loading, profile } = useStoreState(
@@ -97,7 +97,11 @@ const StudentDashboardLayout = ({ children }) => {
       )}
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 min-h-screen py-4">
+      <main
+        className={` mx-auto px-4 min-h-screen py-4 ${
+          container ? "container" : ""
+        }`}
+      >
         {children}
       </main>
       {loading && <Loading text="Preparing your journey" />}

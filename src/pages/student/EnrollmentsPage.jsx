@@ -1,15 +1,19 @@
 import ImageFallback from "@/components/shared/ImageFallback";
+import PinMessage from "@/components/shared/PinMessage";
 import StudentDashboardLayout from "@/components/shared/StudentDashboardLayout";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useStoreState } from "easy-peasy";
 import { GraduationCap } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function EnrollmentsPage() {
   const enrollments = useStoreState((state) => state.student.enrollments);
   const loading = useStoreState((state) => state.student.loading);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const { message } = location.state || {};
 
   if (loading) {
     return (
@@ -34,6 +38,12 @@ export default function EnrollmentsPage() {
     <StudentDashboardLayout>
       <div>
         <h1 className="text-3xl font-bold mb-6">My Enrollments</h1>
+        {message?.text && (
+          <div className="my-4">
+            {" "}
+            <PinMessage message={message.text} variant={message.type} />
+          </div>
+        )}
         {enrollments.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
@@ -53,11 +63,7 @@ export default function EnrollmentsPage() {
               <Card
                 key={index}
                 className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() =>
-                  navigate("/dashboard/course", {
-                    state: { slug: enrollment.slug },
-                  })
-                }
+                onClick={() => navigate(`/dashboard/course/${enrollment.slug}`)}
               >
                 <CardHeader className="p-0 relative">
                   <div className="aspect-video overflow-hidden bg-muted">
