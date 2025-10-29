@@ -444,13 +444,6 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
         height: isFullscreen ? "100vh" : "auto",
       }}
     >
-      {/* Debug info */}
-      {!playerReady && (
-        <div className="absolute top-2 left-2 bg-black/50 text-white text-xs p-2 rounded z-50">
-          Loading: {title}
-        </div>
-      )}
-
       <div className="w-full h-full">
         <ReactPlayer
           ref={playerRef}

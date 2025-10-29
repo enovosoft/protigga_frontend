@@ -333,7 +333,7 @@ export default function CustomerInformation({
               {getPaymentOptions().map((option) => (
                 <div
                   key={option.value}
-                  className={`flex items-start space-x-3 p-3 border rounded-lg transition-colors cursor-pointer ${
+                  className={`flex items-start space-x-3 p-6 border rounded-lg transition-colors cursor-pointer ${
                     paymentType === option.value
                       ? "border-primary bg-primary/5"
                       : "border-border hover:bg-muted/30"
@@ -357,41 +357,33 @@ export default function CustomerInformation({
                     <Label className="cursor-pointer font-medium text-foreground">
                       {option.label}
                     </Label>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {option.description}
-                    </p>
                   </div>
                 </div>
               ))}
             </RadioGroup>
 
-            {/* Cash on Delivery Info Alert */}
-            {isBook && paymentType === "cod" && (
-              <PinMessage
-                variant="info"
-                message="For Cash on Delivery, you need pay BDT 200 + delivery charge in advance"
-              />
-            )}
-
-            {isBook && paymentType === "sslcommerz" && (
-              <PinMessage
-                variant="info"
-                message="For online payment, you will pay full amount including Sundarban Courier delivery charge"
-              />
-            )}
+            {/* Delivery Info Alert */}
+            <PinMessage
+              variant="info"
+              message={
+                PAYMENT_DELIVERY_OPTIONS.find(
+                  (option) => option.value === paymentType
+                )?.description
+              }
+            />
           </div>
 
           <Button
             type="submit"
             className="w-full h-11 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
           >
-            {/* Pay now ৳{paymentType === "sslcommerz" ? totalAmount : totalAmount} */}
-            Pay now ৳
+            Pay now ৳{paymentType === "sslcommerz" ? totalAmount : "200"}
+            {/* Pay now ৳
             {paymentType === "sslcommerz"
               ? totalAmount
               : PAYMENT_DELIVERY_OPTIONS.find(
                   (option) => option.value === paymentType
-                )?.advancePayment + deliveryFee}
+                )?.advancePayment + deliveryFee} */}
           </Button>
         </form>
       </CardContent>

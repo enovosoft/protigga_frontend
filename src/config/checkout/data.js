@@ -15,7 +15,7 @@ export const PAYMENT_DELIVERY_OPTIONS = [
     deliveryMethods: [], // No manual selection, auto-determined by district
     insideDhakaDeliveryCharge: 80,
     outsideDhakaDeliveryCharge: 160,
-    description: "Pay ৳200 advance + delivery charge and rest on delivery",
+    description: "Pay ৳200 advance  and rest on delivery",
   },
 ];
 

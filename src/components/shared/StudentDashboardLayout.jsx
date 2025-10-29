@@ -39,9 +39,7 @@ const StudentDashboardLayout = ({ children, container = true }) => {
         <div className="flex items-center justify-between container mx-auto">
           <div className="flex items-center gap-4">
             <Link to="/" className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-primary font-primary">
-                প্রতিজ্ঞা
-              </h1>
+              <img src="/logo.png" alt="logo" className="max-w-[80px]" />
             </Link>
           </div>
 

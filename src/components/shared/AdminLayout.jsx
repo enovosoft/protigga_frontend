@@ -16,14 +16,15 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const AdminLayout = ({ children }) => {
   const { user, isAuthenticated, isAuthLoading, getPrimaryRole } = useAuth();
   const navigate = useNavigate();
   const primaryRole = getPrimaryRole();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
 
   // Get role-based icon
   const getRoleIcon = () => {
@@ -50,6 +51,9 @@ const AdminLayout = ({ children }) => {
     );
   }
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
   const handleLogout = () => {
     navigate("/auth/logout");
   };
