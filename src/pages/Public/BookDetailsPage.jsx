@@ -1,15 +1,16 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ShoppingCart } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useNavigate, useParams } from "react-router-dom";
-
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import ImageFallback from "@/components/shared/ImageFallback";
+import PDFViewer from "@/components/shared/PDFViewer";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import apiInstance from "@/lib/api";
+import { BookOpen, ShoppingCart } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useNavigate, useParams } from "react-router-dom";
 export default function BookDetailsPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -128,16 +129,39 @@ export default function BookDetailsPage() {
           {/* Responsive Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {/* Left Side - Image */}
-            <div className="order-1 lg:order-1">
+            <div className="order-1 lg:order-1 ">
               <div className="sticky top-6">
-                <Card className="overflow-hidden">
+                <Card className="overflow-hidden relative">
                   <CardHeader className="p-0">
                     <div className="relative overflow-hidden bg-muted aspect-auto">
                       <ImageFallback
                         src={book.book_image}
                         alt={book.title}
-                        className=" transition-transform duration-300 hover:scale-110 cursor-zoom-in min-h-80"
+                        className=" transition-transform duration-300 hover:scale-110 cursor-zoom-in max-w-sm mx-auto"
                       />
+                    </div>
+                    <div className="absolute top-3 right-3">
+                      <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                        <BookOpen className="w-3 h-3" />
+                        {book.batch}
+                      </span>
+                    </div>
+                    <div className="absolute top-3 left-3">
+                      <span
+                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium shadow-lg ${
+                          book.stock > 20
+                            ? "bg-green-500 text-white"
+                            : book.stock > 0
+                            ? "bg-yellow-500 text-white"
+                            : "bg-red-500 text-white"
+                        }`}
+                      >
+                        {book.stock > 20
+                          ? "In Stock"
+                          : book.stock > 0
+                          ? `Only ${book.stock} left`
+                          : "Out of Stock"}
+                      </span>
                     </div>
                   </CardHeader>
                 </Card>
@@ -163,22 +187,48 @@ export default function BookDetailsPage() {
                 </span>
               </div>
 
-              {/* Description */}
-              <Card>
-                <CardHeader>
-                  <h2 className="text-xl font-semibold text-foreground">
-                    Description
-                  </h2>
-                </CardHeader>
-                <CardContent>
-                  <div className="prose prose-sm max-w-none">
-                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                      {book.description ||
-                        "No description available for this book."}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Description and Demo Tabs */}
+              <Tabs defaultValue="description" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 gap-1">
+                  <TabsTrigger value="description">Description</TabsTrigger>
+                  <TabsTrigger value="demo">Book demo</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="description" className="mt-4">
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="prose prose-sm max-w-none">
+                        <p className="text-muted-foreground leading-relaxed whitespace-pre-line font-primary">
+                          {book.description ||
+                            "No description available for this book."}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="demo" className="mt-4">
+                  <Card>
+                    <CardContent className="pt-6">
+                      {book.demo_file_link ? (
+                        <PDFViewer
+                          link={book.demo_file_link}
+                          title={`${book.title} Demo`}
+                          isBasicControl={true}
+                          initialScale={0.8}
+                          disableScaling={false}
+                        />
+                      ) : (
+                        <div className="text-center py-8">
+                          <p className="text-muted-foreground">
+                            No demo file available for this book.
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
 
               {/* Order Button */}
               <Button className="w-full" size="lg" onClick={handleOrderNow}>

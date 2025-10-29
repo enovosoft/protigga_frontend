@@ -1,3 +1,4 @@
+import BookCard from "@/components/BookCard";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import ImageFallback from "@/components/shared/ImageFallback";
@@ -18,12 +19,37 @@ import {
   Globe,
   Play,
   ShoppingCart,
-  User,
   XCircle,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+const RelatedBooksSection = ({ books }) => {
+  return (
+    <>
+      {/* Related Books Section */}
+      {books && books.length > 0 && (
+        <section className="bg-muted/30 py-8">
+          <div className="container mx-auto px-4">
+            <div className="max-w-7xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-foreground mb-4">
+                  Related Books
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {books.map((book, index) => (
+                  <BookCard key={book.slug || index} book={book} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+    </>
+  );
+};
 export default function CourseDetailsPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -54,6 +80,7 @@ export default function CourseDetailsPage() {
           expired_date: courseData.course_details?.expired_date,
           academy_name: courseData.course_details?.academy_name || "",
           curriculum: courseData.chapters || [],
+          related_books: courseData.related_books || [],
         };
 
         setCourse(courseInfo);
@@ -385,17 +412,11 @@ export default function CourseDetailsPage() {
                             {/* Instructor Image */}
                             <div className="mb-4">
                               <div className="relative w-24 h-24 mx-auto">
-                                {instructor.image ? (
-                                  <img
-                                    src={instructor.image}
-                                    alt={instructor.name}
-                                    className="w-full h-full rounded-full object-cover border-4 border-secondary/20 group-hover:border-secondary/40 transition-colors"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center border-4 border-secondary/20 group-hover:border-secondary/40 transition-colors">
-                                    <User className="w-12 h-12 text-primary/60" />
-                                  </div>
-                                )}
+                                <ImageFallback
+                                  src={instructor.image}
+                                  alt={instructor.name}
+                                  className="rounded-full"
+                                />
                               </div>
                             </div>
 
@@ -430,8 +451,15 @@ export default function CourseDetailsPage() {
                   </div>
                 )}
               </div>
+
+              <div className="hidden lg:block">
+                <RelatedBooksSection books={course.related_books} />
+              </div>
             </div>
           </div>
+        </div>
+        <div className="lg:hidden mt-12">
+          <RelatedBooksSection books={course.related_books} />
         </div>
       </main>
 

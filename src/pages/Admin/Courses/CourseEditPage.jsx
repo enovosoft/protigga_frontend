@@ -175,7 +175,9 @@ export default function CourseEditPage() {
             thumbnail: courseData.thumbnail || "",
             academy_name: courseData.course_details?.academy_name || "",
             description: courseData.course_details?.description || "",
-            related_books: courseData.related_books || [],
+            related_books: (courseData.related_books || []).map(
+              (book) => book.slug
+            ),
             quiz_count: courseData.course_details?.quiz_count || "",
             assessment: courseData.course_details?.assessment || false,
             skill_level: courseData.course_details?.skill_level || "",
@@ -1206,7 +1208,7 @@ export default function CourseEditPage() {
           open={relatedBooksDialogOpen}
           onOpenChange={setRelatedBooksDialogOpen}
         >
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
+          <DialogContent className="max-w-2xl  ">
             <DialogHeader>
               <DialogTitle>Select Related Books</DialogTitle>
               <DialogDescription>
@@ -1251,38 +1253,28 @@ export default function CourseEditPage() {
                     )
                     .map((book) => (
                       <div
-                        key={book.book_id || book.id}
+                        key={book.slug}
                         className="flex items-center space-x-3 p-2 hover:bg-muted/50 rounded-md"
                       >
                         <Checkbox
-                          id={`dialog-book-${book.book_id || book.id}`}
-                          checked={courseForm.related_books.includes(
-                            book.book_id || book.id
-                          )}
+                          id={`dialog-book-${book.slug}`}
+                          checked={courseForm.related_books.includes(book.slug)}
                           onCheckedChange={(checked) => {
                             setCourseForm((prev) => ({
                               ...prev,
                               related_books: checked
-                                ? [
-                                    ...prev.related_books,
-                                    book.book_id || book.id,
-                                  ]
+                                ? [...prev.related_books, book.slug]
                                 : prev.related_books.filter(
-                                    (id) => id !== (book.book_id || book.id)
+                                    (slug) => slug !== book.slug
                                   ),
                             }));
                           }}
                         />
                         <Label
-                          htmlFor={`dialog-book-${book.book_id || book.id}`}
+                          htmlFor={`dialog-book-${book.slug}`}
                           className="text-sm cursor-pointer flex-1"
                         >
                           <div className="font-medium">{book.title}</div>
-                          {book.author && (
-                            <div className="text-xs text-muted-foreground">
-                              by {book.author}
-                            </div>
-                          )}
                         </Label>
                       </div>
                     ))

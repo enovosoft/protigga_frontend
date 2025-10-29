@@ -141,9 +141,7 @@ const AdminLayout = ({ children }) => {
                 <Menu className="w-4 h-4" />
               </Button>
               <Link to="/" className="flex items-center gap-2 ">
-                <h1 className="text-2xl font-bold text-primary font-primary">
-                  প্রতিজ্ঞা
-                </h1>
+                <img src="/logo.png" alt="logo" className="max-w-[80px]" />
               </Link>
             </div>
 

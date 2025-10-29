@@ -1,4 +1,5 @@
 import FileUpload from "@/components/shared/FileUpload";
+import ImageFallback from "@/components/shared/ImageFallback";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,18 +23,53 @@ import api from "@/lib/api";
 import { Book, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { z } from "zod";
 
+const bookSchema = z.object({
+  title: z
+    .string("Title is required")
+    .min(3, "Title must be at least 3 characters long")
+    .max(100, "Title must be at most 200 characters long"),
+  price: z.coerce
+    .number("Price is required")
+    .min(0, "Price must be a positive number"),
+
+  book_image: z
+    .string("Book image is required")
+    .url("Book image must be a valid URL"),
+  writter: z
+    .string("Writer name is required")
+    .min(3, "Writer name must be at least 3 characters long")
+    .max(100, "Writer name must be at most 100 characters long"),
+  description: z
+    .string("Description is required")
+    .min(10, "Description must be at least 10 characters long"),
+  batch: z
+    .string("Batch is required")
+    .min(2, "Batch must be at least 2 characters long"),
+  is_featured: z.boolean(),
+  stock: z.coerce
+    .number("Stock is required")
+    .min(0, "Stock must be a positive number"),
+  demo_file_link: z
+    .string("Demo file link is required")
+    .url("Demo file link must be a valid URL"),
+});
+
+const initialFormData = {
+  title: "",
+  price: "",
+  book_image: "",
+  writter: "",
+  description: "",
+  batch: "",
+  is_featured: false,
+  stock: "",
+  demo_file_link: "",
+};
 export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
-  const [formData, setFormData] = useState({
-    title: "",
-    price: "",
-    book_image: "",
-    writter: "",
-    description: "",
-    batch: "",
-    is_featured: false,
-    stock: 1,
-  });
+  const [formData, setFormData] = useState({ ...initialFormData });
+
   const [loading, setLoading] = useState(false);
   const [fetchingBook, setFetchingBook] = useState(false);
 
@@ -47,13 +83,14 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
         const bookData = response.data.book;
         setFormData({
           title: bookData.title || "",
-          price: bookData.price || "",
+          price: bookData.price || 0,
           book_image: bookData.book_image || "",
           writter: bookData.writter || "",
           description: bookData.description || "",
           batch: bookData.batch || "",
           is_featured: bookData.is_featured || false,
           stock: bookData.stock || 1,
+          demo_file_link: bookData.demo_file_link || "",
         });
       }
     } catch (error) {
@@ -62,13 +99,14 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
       // Fallback to the passed book data
       setFormData({
         title: book.title || "",
-        price: book.price || "",
+        price: book.price || 0,
         book_image: book.book_image || "",
         writter: book.writter || "",
         description: book.description || "",
         batch: book.batch || "",
         is_featured: book.is_featured || false,
         stock: book.stock || 1,
+        demo_file_link: book.demo_file_link || "",
       });
     } finally {
       setFetchingBook(false);
@@ -81,13 +119,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
       fetchBookDetails();
     } else if (!book) {
       setFormData({
-        title: "",
-        price: "",
-        book_image: "",
-        writter: "",
-        description: "",
-        batch: "",
-        is_featured: false,
+        ...initialFormData,
       });
     }
   }, [book, open, fetchBookDetails]);
@@ -100,10 +132,17 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
     }));
   };
 
-  const handleImageUpload = (url) => {
+  const handleCoverImageUpload = (url) => {
     setFormData((prev) => ({
       ...prev,
       book_image: url,
+    }));
+  };
+
+  const handleDemoFileUpload = (url) => {
+    setFormData((prev) => ({
+      ...prev,
+      demo_file_link: url,
     }));
   };
 
@@ -117,41 +156,25 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
-    if (!formData.title.trim()) {
-      toast.error("Book title is required");
-      return;
-    }
-    if (!formData.price || isNaN(formData.price) || formData.price <= 0) {
-      toast.error("Please enter a valid price");
-      return;
-    }
-    if (!formData.book_image.trim()) {
-      toast.error("Please upload a book image");
-      return;
-    }
-    if (!formData.writter.trim()) {
-      toast.error("Writer name is required");
-      return;
-    }
-    if (!formData.description.trim()) {
-      toast.error("Book description is required");
+    // Validate form data
+    let validationResult = bookSchema.safeParse(formData);
+
+    console.log("Validation Result:", validationResult);
+    if (!validationResult.success) {
+      toast.error(
+        validationResult.error?.issues[0].message ||
+          "Validation errors found. Please check the form."
+      );
       return;
     }
 
-    if (!formData.stock || isNaN(formData.stock) || formData.stock < 0) {
-      toast.error("Please enter a valid stock quantity");
-      return;
-    }
     setLoading(true);
 
     try {
       let response;
 
       const payload = {
-        ...formData,
-        price: parseFloat(formData.price),
-        stock: parseInt(formData.stock, 10),
+        ...validationResult.data,
       };
 
       if (book) {
@@ -168,7 +191,9 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
 
       if (response.data.success) {
         toast.success(
-          book ? "Book updated successfully!" : "Book created successfully!"
+          response.data.message || book
+            ? "Book updated successfully!"
+            : "Book created successfully!"
         );
         onSuccess();
         onOpenChange(false);
@@ -255,34 +280,6 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
               onSubmit={handleSubmit}
               className="space-y-3 sm:space-y-4 md:space-y-5 mt-3 sm:mt-4 overflow-x-hidden"
             >
-              {/* Show existing book image when editing */}
-              {book && book.book_image && (
-                <div className="p-2.5 sm:p-3 md:p-4 bg-primary/5 border border-primary/20 rounded-lg overflow-hidden w-full">
-                  <Label className="text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2 block">
-                    Current Book Image:
-                  </Label>
-                  <div className="flex items-center gap-3 overflow-hidden">
-                    <div className="overflow-hidden w-full">
-                      <a
-                        href={book.book_image}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs sm:text-sm text-primary hover:underline break-words block w-full overflow-hidden"
-                        style={{
-                          wordBreak: "break-word",
-                          overflowWrap: "anywhere",
-                        }}
-                      >
-                        {book.book_image}
-                      </a>
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1.5 sm:mt-2">
-                    Upload a new image below to replace the current one
-                  </p>
-                </div>
-              )}
-
               <div className="space-y-1.5 sm:space-y-2 overflow-hidden p-1">
                 <Label htmlFor="title" className="text-sm font-medium">
                   Book Title <span className="text-destructive">*</span>
@@ -293,7 +290,6 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
                   value={formData.title}
                   onChange={handleChange}
                   placeholder="HSC Physics Formula Book"
-                  required
                   className="w-full h-10 sm:h-11"
                 />
               </div>
@@ -312,8 +308,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
                     min="0"
                     value={formData.price}
                     onChange={handleChange}
-                    placeholder="299"
-                    required
+                    placeholder="599"
                     className="w-full h-10 sm:h-11"
                   />
                 </div>
@@ -333,22 +328,20 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
                     value={formData.stock}
                     onChange={handleChange}
                     placeholder="100"
-                    required
                     className="w-full h-10 sm:h-11"
                   />
                 </div>
 
                 <div className="space-y-1.5 sm:space-y-2">
-                  <Label htmlFor="writter" className="text-sm font-medium">
+                  <Label htmlFor="writer" className="text-sm font-medium">
                     Writer <span className="text-destructive">*</span>
                   </Label>
                   <Input
-                    id="writter"
+                    id="writer"
                     name="writter"
                     value={formData.writter}
                     onChange={handleChange}
-                    placeholder="Protigga Publication"
-                    required
+                    placeholder="মোমেন তাজোয়ার মমিত"
                     className="w-full h-10 sm:h-11"
                   />
                 </div>
@@ -362,8 +355,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
                     name="batch"
                     value={formData.batch}
                     onChange={handleChange}
-                    placeholder="HSC 2025"
-                    required
+                    placeholder="HSC 26"
                     className="w-full h-10 sm:h-11"
                   />
                 </div>
@@ -379,7 +371,6 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
                   value={formData.description}
                   onChange={handleChange}
                   placeholder="A compact,  guide packed with every essential formula you need to ace your HSC Physics exams. Clear, concise, and perfect for last-minute revision — because sometimes, all you need is the formula."
-                  required
                   rows={3}
                   className="w-full px-3 py-2 text-sm rounded-md border border-solid border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none min-h-[80px] sm:min-h-[100px]"
                 />
@@ -424,7 +415,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
                   accept=".jpg,.jpeg,.png,.webp"
                   supportedTypes="Images"
                   autoUpload={true}
-                  onUploadSuccess={handleImageUpload}
+                  onUploadSuccess={handleCoverImageUpload}
                 />
               </div>
 
@@ -433,6 +424,49 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
                   type="hidden"
                   name="book_image"
                   value={formData.book_image}
+                />
+              )}
+              {/* Show existing book image when editing */}
+              {book && book.book_image && (
+                <div className="p-2.5 sm:p-3 md:p-4 bg-primary/5 border border-primary/20 rounded-lg overflow-hidden w-full">
+                  <Label className="text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2 block">
+                    Current Book Image:
+                  </Label>
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <div className="overflow-hidden w-full">
+                      <ImageFallback
+                        alt="Current Book Image"
+                        src={book.book_image}
+                        className="object-cover max-w-40  aspect-auto rounded-md border border-solid border-border"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1.5 sm:mt-2">
+                    Upload a new image below to replace the current one
+                  </p>
+                </div>
+              )}
+
+              <div className="overflow-hidden p-1">
+                <FileUpload
+                  label={
+                    <span>
+                      Upload Demo File Link{" "}
+                      <span className="text-destructive">*</span>
+                    </span>
+                  }
+                  accept=".pdf"
+                  supportedTypes="PDF Documents"
+                  autoUpload={true}
+                  onUploadSuccess={handleDemoFileUpload}
+                />
+              </div>
+
+              {formData.demo_file_link && (
+                <Input
+                  type="hidden"
+                  name="demo_file_link"
+                  value={formData.demo_file_link}
                 />
               )}
 

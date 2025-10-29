@@ -123,7 +123,7 @@ export default function EnrollmentsTable({ enrollments, startIndex, onView }) {
               <TableHead className="font-semibold text-foreground min-w-[80px]">
                 Payment Status
               </TableHead>
-              <TableHead className="font-semibold text-foreground min-w-[80px] hidden sm:table-cell">
+              <TableHead className="font-semibold text-foreground min-w-[80px] hidden lg:table-cell">
                 Method
               </TableHead>
               <TableHead className="text-right font-semibold text-foreground w-16">

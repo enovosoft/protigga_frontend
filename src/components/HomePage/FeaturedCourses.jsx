@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
 import api from "@/lib/api";
+import { Info } from "lucide-react";
 import { useEffect, useState } from "react";
 import CourseCard from "../CourseCard";
 
@@ -100,6 +101,14 @@ export default function FeaturedCourses() {
                       </div>
                     </CarouselItem>
                   ))}
+              {!loading && courses.length === 0 && (
+                <div>
+                  <Info className="mx-auto mb-4 h-8 w-8 text-primary" />
+                  <p className="text-primary text-center">
+                    Featured courses are coming soon checkout our all courses.
+                  </p>
+                </div>
+              )}
             </CarouselContent>
             {!loading && courses.length > 0 && (
               <>

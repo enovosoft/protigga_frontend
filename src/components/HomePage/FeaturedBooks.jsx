@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
 import api from "@/lib/api";
+import { Info } from "lucide-react";
 import { useEffect, useState } from "react";
 import BookCard from "../BookCard";
 
@@ -92,6 +93,14 @@ export default function FeaturedBooks() {
                       </div>
                     </CarouselItem>
                   ))}
+              {!loading && books.length === 0 && (
+                <div>
+                  <Info className="mx-auto mb-4 h-8 w-8 text-primary" />
+                  <p className="text-primary text-center">
+                    Featured books are coming soon checkout our all books.
+                  </p>
+                </div>
+              )}
             </CarouselContent>
             {!loading && books.length > 0 && (
               <>

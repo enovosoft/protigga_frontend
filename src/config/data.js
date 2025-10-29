@@ -4,11 +4,11 @@ export const INSTRUCTORS = [
   {
     id: 1,
     name: "Momen Tazwoar Momit",
-    subject: "Physics",
+    subject: "CEO, Protigga",
     experience: "10 years",
     institution: "BUET",
     students: 5000,
-    image: "momit.jpg",
+    image: "/momit.jpg",
   },
 ];
 

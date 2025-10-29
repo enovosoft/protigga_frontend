@@ -15,7 +15,7 @@ export default function BookCard({ book }) {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
       <CardHeader className="p-0">
-        <div className="relative aspect-video overflow-hidden bg-muted">
+        <div className="relative aspect-square overflow-hidden bg-muted">
           <ImageFallback
             src={book_image}
             alt={title}
@@ -37,7 +37,7 @@ export default function BookCard({ book }) {
             <div className="absolute top-3 left-3">
               <span
                 className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium shadow-lg ${
-                  stock > 10
+                  stock > 20
                     ? "bg-green-500 text-white"
                     : stock > 0
                     ? "bg-yellow-500 text-white"
@@ -55,8 +55,8 @@ export default function BookCard({ book }) {
         </div>
       </CardHeader>
 
-      <CardContent className="p-6 flex-grow">
-        <h3 className="text-xl font-semibold text-foreground mb-2 line-clamp-2">
+      <CardContent className="p-4 flex-grow">
+        <h3 className="text-xl font-medium text-foreground mb-2 line-clamp-2 font-primary">
           {title}
         </h3>
 
@@ -65,7 +65,7 @@ export default function BookCard({ book }) {
         </div>
       </CardContent>
 
-      <CardFooter className="p-6 pt-0 mt-auto">
+      <CardFooter className="p-4 pt-0 mt-auto">
         <Link className="w-full" to={`/books/${slug}`}>
           <Button className="w-full" disabled={stock === 0}>
             <ShoppingCart className="w-4 h-4 mr-2" />{" "}
