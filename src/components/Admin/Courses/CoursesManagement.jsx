@@ -14,8 +14,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import api from "@/lib/api";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -28,6 +29,7 @@ export default function CoursesManagement({ useLayout = true }) {
   const [courseToDelete, setCourseToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 10;
 
   const fetchCourses = async () => {
@@ -91,30 +93,60 @@ export default function CoursesManagement({ useLayout = true }) {
     }
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  // Filter courses based on search term
+  const filteredCourses = courses.filter((course) => {
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase().trim();
+    return (
+      course.course_title?.toLowerCase().trim().includes(searchLower) ||
+      course.batch?.toLowerCase().trim().includes(searchLower)
+    );
+  });
+
   // Pagination
-  const totalPages = Math.ceil(courses.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentCourses = courses
+  const currentCourses = filteredCourses
     .slice(startIndex, endIndex)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   const content = (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-            Courses Management
-          </h2>
-          <p className="text-muted-foreground mt-1">
-            Manage all courses and programs
-          </p>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+              Courses Management
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              Manage all courses and programs
+            </p>
+          </div>
+          <Button onClick={handleAdd} className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            Add Course
+          </Button>
         </div>
-        <Button onClick={handleAdd} className="flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          Add Course
-        </Button>
+
+        {/* Search */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1   w-full">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
+            <Input
+              placeholder="Search courses by title or batch..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="pl-10 bg-primary-foreground  w-full text-primary"
+            />
+          </div>
+        </div>
       </div>
 
       {loading ? (
@@ -147,7 +179,7 @@ export default function CoursesManagement({ useLayout = true }) {
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            totalItems={courses.length}
+            totalItems={filteredCourses.length}
             startIndex={startIndex}
             endIndex={endIndex}
             onPageChange={setCurrentPage}

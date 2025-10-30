@@ -4,10 +4,17 @@ import ImageFallback from "@/components/shared/ImageFallback";
 import PDFViewer from "@/components/shared/PDFViewer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import apiInstance from "@/lib/api";
-import { BookOpen, ShoppingCart } from "lucide-react";
+import { BookOpen, Eye, ShoppingCart } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
@@ -187,30 +194,41 @@ export default function BookDetailsPage() {
                 </span>
               </div>
 
-              {/* Description and Demo Tabs */}
-              <Tabs defaultValue="description" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 gap-1">
-                  <TabsTrigger value="description">Description</TabsTrigger>
-                  <TabsTrigger value="demo">Book demo</TabsTrigger>
-                </TabsList>
+              {/* Description */}
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="prose prose-sm max-w-none">
+                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line font-primary">
+                      {book.description ||
+                        "No description available for this book."}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
 
-                <TabsContent value="description" className="mt-4">
-                  <Card>
-                    <CardContent className="pt-6">
-                      <div className="prose prose-sm max-w-none">
-                        <p className="text-muted-foreground leading-relaxed whitespace-pre-line font-primary">
-                          {book.description ||
-                            "No description available for this book."}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button className="flex-1" size="lg" onClick={handleOrderNow}>
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                  Order Now
+                </Button>
 
-                <TabsContent value="demo" className="mt-4">
-                  <Card>
-                    <CardContent className="pt-6">
-                      {book.demo_file_link ? (
+                {book.demo_file_link && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="lg" className="flex-1">
+                        <Eye className="w-5 h-5 mr-2" />
+                        Show Demo
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+                      <DialogHeader className="flex-shrink-0">
+                        <DialogTitle>{book.title} - Demo</DialogTitle>
+                        <DialogDescription>
+                          Preview of the book content
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="flex-1 overflow-y-auto min-h-0">
                         <PDFViewer
                           link={book.demo_file_link}
                           title={`${book.title} Demo`}
@@ -218,23 +236,11 @@ export default function BookDetailsPage() {
                           initialScale={0.8}
                           disableScaling={false}
                         />
-                      ) : (
-                        <div className="text-center py-8">
-                          <p className="text-muted-foreground">
-                            No demo file available for this book.
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
-
-              {/* Order Button */}
-              <Button className="w-full" size="lg" onClick={handleOrderNow}>
-                <ShoppingCart className="w-5 h-5 mr-2" />
-                Order Now
-              </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </div>
             </div>
           </div>
         </div>

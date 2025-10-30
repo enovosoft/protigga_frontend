@@ -181,7 +181,7 @@ const AdminLayout = ({ children }) => {
         <div className="flex flex-col md:flex-row gap-6 min-h-[calc(100vh-130px)]">
           {/* Sidebar */}
           <div
-            className={`w-full md:w-64 bg-card rounded-lg border p-4 md:sticky md:top-4 md:self-start md:max-h-[calc(100vh-140px)] md:overflow-y-auto transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
+            className={`w-full md:w-64 bg-card rounded-lg border p-4 md:sticky md:top-4 md:self-start md:max-h-[calc(100vh-80px)] md:overflow-y-auto transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
               sidebarOpen
                 ? "translate-x-0"
                 : "-translate-x-full md:translate-x-0"

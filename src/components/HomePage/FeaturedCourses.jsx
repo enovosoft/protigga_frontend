@@ -7,29 +7,38 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
-import api from "@/lib/api";
-import { Info } from "lucide-react";
+import apiInstance from "@/lib/api";
 import { useEffect, useState } from "react";
 import CourseCard from "../CourseCard";
 
 export default function FeaturedCourses() {
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useState({});
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchFeaturedCourses = async () => {
       try {
-        const response = await api.get("/courses?featured=true");
+        const response = await apiInstance.get("/courses?featured=true");
         if (response.data.success) {
           // Map API data to match CourseCard props
-          const mappedCourses = response.data.courses.map((course) => ({
-            id: course.course_id,
-            name: course.course_title,
-            price: course.price,
-            thumbnail: course.thumbnail,
-            slug: course.slug,
-            batch: course.batch,
-          }));
+          const mappedCourses = response.data.courses.reduce(
+            (store, course) => {
+              if (store[course.batch]) {
+                store[course.batch].push({
+                  ...course,
+                });
+              } else {
+                store[course.batch] = [
+                  {
+                    ...course,
+                  },
+                ];
+              }
+
+              return store;
+            },
+            {}
+          );
+
           setCourses(mappedCourses);
         }
       } catch (error) {
@@ -44,9 +53,9 @@ export default function FeaturedCourses() {
 
   const renderSkeletonCards = () => {
     return Array.from({ length: 5 }).map((_, index) => (
-      <CarouselItem
+      <div
         key={index}
-        className="pl-2 md:pl-4 basis-full xs:basis-1/2 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+        className="pl-2 md:pl-4 basis-4/5 xs:basis-1/2 sm:basis-1/3 lg:basis-1/4 "
       >
         <div className="p-1">
           <div className="bg-card border rounded-lg overflow-hidden h-full flex flex-col">
@@ -62,7 +71,7 @@ export default function FeaturedCourses() {
             </div>
           </div>
         </div>
-      </CarouselItem>
+      </div>
     ));
   };
 
@@ -79,50 +88,58 @@ export default function FeaturedCourses() {
           </p>
         </div>
 
+        {loading && renderSkeletonCards()}
         {/* Courses Carousel */}
-        <div className="relative ">
-          <Carousel
-            opts={{
-              align: "center",
-              loop: true,
-            }}
-            className="w-full max-w-6xl mx-auto"
-          >
-            <CarouselContent className="-ml-2 md:-ml-4 justify-center items-center">
-              {loading
-                ? renderSkeletonCards()
-                : courses.map((course) => (
-                    <CarouselItem
-                      key={course.id}
-                      className="pl-2 md:pl-4 basis-full xs:basis-1/2 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
-                    >
-                      <div className="p-1">
-                        <CourseCard course={course} />
-                      </div>
-                    </CarouselItem>
-                  ))}
-              {!loading && courses.length === 0 && (
-                <div>
-                  <Info className="mx-auto mb-4 h-8 w-8 text-primary" />
-                  <p className="text-primary text-center">
-                    Featured courses are coming soon checkout our all courses.
-                  </p>
-                </div>
-              )}
-            </CarouselContent>
-            {!loading && courses.length > 0 && (
-              <>
-                <CarouselPrevious className="flex h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg -left-4 md:-left-10" />
-                <CarouselNext className="flex h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg -right-4 md:-right-10" />
-              </>
-            )}
-          </Carousel>
-        </div>
+        {!loading && courses && Object.keys(courses).length > 0 ? (
+          Object.keys(courses).map((batch) => (
+            <div key={batch} className="mb-12">
+              <div className="flex items-center mb-6 gap-2">
+                <h3 className="text-2xl font-semibold text-primary">
+                  <span className="text-secondary">{batch} </span> ব্যাচের
+                  কোর্সসমূহ
+                </h3>
+              </div>
+              <div className="relative ">
+                <Carousel
+                  opts={{
+                    align: "start",
+                    loop: true,
+                  }}
+                  className="w-full max-w-6xl mx-auto"
+                >
+                  <CarouselContent className="-ml-2 md:-ml-4">
+                    {courses[batch].map((course) => (
+                      <CarouselItem
+                        key={course.course_id}
+                        className="pl-2 md:pl-4 basis-4/5 xs:basis-1/2 sm:basis-1/3 lg:basis-1/4 hover:-translate-y-2 cursor-pointer duration-300 "
+                      >
+                        <div className="p-1">
+                          <CourseCard course={course} />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  {
+                    <CarouselPrevious className="flex h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg -left-4 md:-left-10" />
+                  }
+                  {
+                    <CarouselNext className="flex h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg -right-4 md:-right-10" />
+                  }
+                </Carousel>
+              </div>
+            </div>
+          ))
+        ) : (
+          <span className="text-muted-foreground text-center block">
+            {" "}
+            এই মুহূর্তে কোন ফিচার্ড কোর্স নেই, তবে খুব শীঘ্রই আসছে ...{" "}
+          </span>
+        )}
 
         {/* View All Button */}
         <div className="text-center mt-12">
           <Button variant="secondary" size="lg" className="min-w-[200px]">
-            View All Courses
+            সকল কোর্স দেখুন
           </Button>
         </div>
       </div>

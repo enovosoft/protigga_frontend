@@ -15,8 +15,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import api from "@/lib/api";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +32,7 @@ export default function BooksManagement({ useLayout = true }) {
   const [bookToDelete, setBookToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 10;
 
   const fetchBooks = async () => {
@@ -100,28 +102,59 @@ export default function BooksManagement({ useLayout = true }) {
     }
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  // Filter books based on search term
+  const filteredBooks = books.filter((book) => {
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase().trim();
+    return (
+      book.title?.toLowerCase().trim().includes(searchLower) ||
+      book.author?.toLowerCase().trim().includes(searchLower) ||
+      book.batch?.toLowerCase().trim().includes(searchLower)
+    );
+  });
+
   // Pagination
-  const totalPages = Math.ceil(books.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredBooks.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentBooks = books.slice(startIndex, endIndex);
+  const currentBooks = filteredBooks.slice(startIndex, endIndex);
 
   const content = (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-            Books Management
-          </h2>
-          <p className="text-muted-foreground mt-1">
-            Manage all books and publications
-          </p>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+              Books Management
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              Manage all books and publications
+            </p>
+          </div>
+          <Button onClick={handleAdd} className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            Add Book
+          </Button>
         </div>
-        <Button onClick={handleAdd} className="flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          Add Book
-        </Button>
+
+        {/* Search */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1 w-full ">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
+            <Input
+              placeholder="Search books by title, author and batch..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="pl-10 bg-primary-foreground  w-full text-primary"
+            />
+          </div>
+        </div>
       </div>
 
       {loading ? (
@@ -154,7 +187,7 @@ export default function BooksManagement({ useLayout = true }) {
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            totalItems={books.length}
+            totalItems={filteredBooks.length}
             startIndex={startIndex}
             endIndex={endIndex}
             onPageChange={setCurrentPage}

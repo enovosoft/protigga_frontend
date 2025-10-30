@@ -56,7 +56,7 @@ export default function BookCard({ book }) {
       </CardHeader>
 
       <CardContent className="p-4 flex-grow">
-        <h3 className="text-xl font-medium text-foreground mb-2 line-clamp-2 font-primary">
+        <h3 className="text-base lg:text-lg font-medium text-foreground line-clamp-2 ">
           {title}
         </h3>
 

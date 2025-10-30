@@ -1,3 +1,4 @@
+import DropDownWithSearch from "@/components/shared/DropDownWithSearch";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -33,7 +34,7 @@ import api from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, Plus } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import * as z from "zod";
@@ -98,9 +99,9 @@ export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
       phone: "",
       course_id: "",
       expiry_date: (() => {
-        const oneWeekFromNow = new Date();
-        oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
-        return oneWeekFromNow.toISOString();
+        const ThreeMonthFromNow = new Date();
+        ThreeMonthFromNow.setDate(ThreeMonthFromNow.getDate() + 90);
+        return ThreeMonthFromNow.toISOString();
       })(),
       product_price: 0,
       discount_amount: 0,
@@ -136,6 +137,20 @@ export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
     }
   }, [open]);
 
+  // Update product price when course changes
+  const watchedCourseId = form.watch("course_id");
+
+  useEffect(() => {
+    if (watchedCourseId && courses.length > 0) {
+      const selectedCourse = courses.find(
+        (course) => course.course_id === watchedCourseId
+      );
+      if (selectedCourse && selectedCourse.price) {
+        form.setValue("product_price", selectedCourse.price);
+      }
+    }
+  }, [watchedCourseId, courses, form]);
+
   const onSubmit = async (data) => {
     setLoading(true);
     try {
@@ -161,21 +176,6 @@ export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
       setLoading(false);
     }
   };
-
-  const selectedCourse = useMemo(() => {
-    if (!form || !courses) return null;
-    const courseId = form.watch("course_id");
-    const found = (courses || []).find(
-      (course) => course.course_id === courseId
-    );
-    return found;
-  }, [courses, form]);
-
-  useEffect(() => {
-    if (selectedCourse) {
-      form.setValue("product_price", selectedCourse.price || 0);
-    }
-  }, [selectedCourse, form]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -248,23 +248,17 @@ export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
                     <FormLabel>
                       Course <span className="text-destructive">*</span>
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a course" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {(courses || []).map((course) => (
-                          <SelectItem
-                            key={course.course_id}
-                            value={course.course_id}
-                          >
-                            {course.course_title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <DropDownWithSearch
+                      items={courses}
+                      valueKey="course_id"
+                      displayFormat={(item) =>
+                        `${item.course_title} (${item.batch})`
+                      }
+                      searchKeys={["course_title", "batch"]}
+                      selectedValue={field.value}
+                      onSelect={field.onChange}
+                      placeholder="Select a course"
+                    />
                     <FormMessage />
                   </FormItem>
                 )}

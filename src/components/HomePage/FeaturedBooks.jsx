@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import BookCard from "../BookCard";
 
 export default function FeaturedBooks() {
-  const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,7 +21,23 @@ export default function FeaturedBooks() {
       try {
         const response = await api.get("/books?featured=true");
         if (response.data.success) {
-          setBooks(response.data.books || []);
+          const mappedBooks = response.data.books.reduce((store, book) => {
+            if (store[book.batch]) {
+              store[book.batch].push({
+                ...book,
+              });
+            } else {
+              store[book.batch] = [
+                {
+                  ...book,
+                },
+              ];
+            }
+
+            return store;
+          }, {});
+
+          setBooks(mappedBooks);
         }
       } catch (error) {
         console.error("Error fetching featured books:", error);
@@ -35,26 +51,26 @@ export default function FeaturedBooks() {
 
   const renderSkeletonCards = () => {
     return Array.from({ length: 5 }).map((_, index) => (
-      <CarouselItem
+      <div
         key={index}
-        className="pl-2 md:pl-4 basis-full xs:basis-1/2 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+        className="pl-2 md:pl-4 basis-4/5 xs:basis-1/2 sm:basis-1/3 lg:basis-1/4 "
       >
         <div className="p-1">
           <div className="bg-card border rounded-lg overflow-hidden h-full flex flex-col">
             <div className="p-0">
-              <Skeleton className="aspect-video w-full" />
+              <Skeleton className="aspect-square w-full" />
             </div>
-            <div className="p-6 flex-grow">
+            <div className="p-4 flex-grow">
               <Skeleton className="h-6 w-3/4 mb-2" />
               <Skeleton className="h-4 w-1/2 mb-3" />
               <Skeleton className="h-8 w-20" />
             </div>
-            <div className="p-6 pt-0 mt-auto">
+            <div className="p-4 pt-0 mt-auto">
               <Skeleton className="h-10 w-full" />
             </div>
           </div>
         </div>
-      </CarouselItem>
+      </div>
     ));
   };
 
@@ -72,49 +88,60 @@ export default function FeaturedBooks() {
         </div>
 
         {/* Books Carousel */}
-        <div className="relative">
-          <Carousel
-            opts={{
-              align: "center",
-              loop: true,
-            }}
-            className="w-full max-w-6xl mx-auto"
-          >
-            <CarouselContent className="-ml-2 md:-ml-4 justify-center items-center">
-              {loading
-                ? renderSkeletonCards()
-                : books.map((book) => (
-                    <CarouselItem
-                      key={book.book_id}
-                      className="pl-2 md:pl-4 basis-full xs:basis-1/2 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
-                    >
-                      <div className="p-1">
-                        <BookCard book={book} />
-                      </div>
-                    </CarouselItem>
-                  ))}
-              {!loading && books.length === 0 && (
-                <div>
-                  <Info className="mx-auto mb-4 h-8 w-8 text-primary" />
-                  <p className="text-primary text-center">
-                    Featured books are coming soon checkout our all books.
-                  </p>
+        {loading && renderSkeletonCards()}
+        {/* Books Carousel */}
+        {!loading && books && Object.keys(books).length > 0
+          ? Object.keys(books).map((batch) => (
+              <div key={batch} className="mb-12">
+                <div className="flex items-center mb-6 gap-2">
+                  <h3 className="text-2xl font-semibold text-primary">
+                    <span className="text-secondary">{batch} </span> ব্যাচের
+                    বইসমূহ
+                  </h3>
                 </div>
-              )}
-            </CarouselContent>
-            {!loading && books.length > 0 && (
-              <>
-                <CarouselPrevious className="flex h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg -left-4 md:-left-10" />
-                <CarouselNext className="flex h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg -right-4 md:-right-10" />
-              </>
+                <div className="relative ">
+                  <Carousel
+                    opts={{
+                      align: "start",
+                      loop: true,
+                    }}
+                    className="w-full max-w-6xl mx-auto"
+                  >
+                    <CarouselContent className="-ml-2 md:-ml-4">
+                      {books[batch].map((book) => (
+                        <CarouselItem
+                          key={book.book_id}
+                          className="pl-2 md:pl-4 basis-4/5 xs:basis-1/2 sm:basis-1/3 lg:basis-1/4 hover:-translate-y-2 cursor-pointer duration-300 "
+                        >
+                          <div className="p-1">
+                            <BookCard book={book} />
+                          </div>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    {
+                      <CarouselPrevious className="flex h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg -left-4 md:-left-10" />
+                    }
+                    {
+                      <CarouselNext className="flex h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg -right-4 md:-right-10" />
+                    }
+                  </Carousel>
+                </div>
+              </div>
+            ))
+          : !loading && (
+              <div className="flex flex-col items-center justify-center py-12">
+                <Info className="mx-auto mb-4 h-8 w-8 text-primary" />
+                <p className="text-primary text-center">
+                  এই মুহূর্তে কোন ফিচার্ড বই নেই, তবে খুব শীঘ্রই আসছে ...
+                </p>
+              </div>
             )}
-          </Carousel>
-        </div>
 
         {/* View All Button */}
         <div className="text-center mt-12">
           <Button variant="secondary" size="lg" className="min-w-[200px]">
-            View All Books
+            সকল বই দেখুন
           </Button>
         </div>
       </div>

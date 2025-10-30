@@ -10,7 +10,7 @@ import { BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function CourseCard({ course }) {
-  const { thumbnail, name, price, slug, batch } = course;
+  const { thumbnail, course_title, price, slug, batch } = course;
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
@@ -18,7 +18,7 @@ export default function CourseCard({ course }) {
         <div className="relative aspect-video overflow-hidden bg-muted">
           <ImageFallback
             src={thumbnail}
-            alt={name}
+            alt={course_title}
             className="group-hover:scale-105 transition-transform duration-300"
             icon={BookOpen}
             text="Course Thumbnail"
@@ -36,8 +36,8 @@ export default function CourseCard({ course }) {
       </CardHeader>
 
       <CardContent className="p-6 flex-grow">
-        <h3 className="text-xl font-semibold text-foreground mb-3 line-clamp-2">
-          {name}
+        <h3 className="text-base lg:text-lg font-medium text-foreground line-clamp-2">
+          {course_title}
         </h3>
         <div className="flex items-center justify-between">
           <span className="text-2xl font-medium text-primary">৳{price}</span>

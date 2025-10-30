@@ -1,3 +1,4 @@
+import DropDownWithSearch from "@/components/shared/DropDownWithSearch";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -198,20 +199,16 @@ export default function ManualOrderDialog({ onOrderCreated }) {
                     <FormLabel>
                       Book <span className="text-destructive">*</span>
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a book" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {books.map((book) => (
-                          <SelectItem key={book.book_id} value={book.book_id}>
-                            {book.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <DropDownWithSearch
+                      items={books}
+                      onSelect={field.onChange}
+                      displayFormat={(item) => `${item.title} (${item.batch})`}
+                      valueKey="book_id"
+                      searchKeys={["title", "writter", "batch"]}
+                      disabled={books.length === 0}
+                      selectedValue={field.value}
+                      placeholder="Select a book"
+                    />
                     <FormMessage />
                   </FormItem>
                 )}

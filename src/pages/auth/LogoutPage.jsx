@@ -22,7 +22,7 @@ export default function LogoutPage() {
           // Clear authentication state from the frontend if any left or api call fails
           logout();
           navigate("/");
-        }, 2000);
+        }, 1200);
       }
     };
 
