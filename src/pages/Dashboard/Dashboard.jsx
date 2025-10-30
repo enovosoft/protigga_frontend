@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import Loading from "@/components/shared/Loading";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -41,18 +41,23 @@ export default function Dashboard() {
   }
 
   // Fallback for unrecognized roles
+  // return (
+  //   <div className="min-h-screen flex items-center justify-center">
+  //     <div className="text-center">
+  //       <h2 className="text-2xl font-bold mb-4">User Role not recognized</h2>
+  //       <p>Please contact support for assistance.</p>
+
+  //       <div className="mt-4">
+  //         <Button onClick={() => navigate("/")} className="mt-4">
+  //           Go to home
+  //         </Button>
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold mb-4">User Role not recognized</h2>
-        <p>Please contact support for assistance.</p>
-
-        <div className="mt-4">
-          <Button onClick={() => navigate("/")} className="mt-4">
-            Go to home
-          </Button>
-        </div>
-      </div>
+      <Loading />
     </div>
   );
 }

@@ -39,7 +39,7 @@ export default function BookCard({ book, className }) {
             </div>
           )}
           {/* Stock Status */}
-          {stock && (
+          {
             <div className="absolute top-3 left-3">
               <span
                 className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium shadow-lg ${
@@ -57,7 +57,7 @@ export default function BookCard({ book, className }) {
                   : "Out of Stock"}
               </span>
             </div>
-          )}
+          }
         </div>
       </CardHeader>
 
@@ -72,7 +72,7 @@ export default function BookCard({ book, className }) {
       </CardContent>
 
       <CardFooter className="p-4 pt-0 mt-auto">
-        <Link className="w-full" to={`/books/${slug}`}>
+        <Link className="w-full" to={stock === 0 ? "#" : `/books/${slug}`}>
           <Button className="w-full" disabled={stock === 0}>
             <ShoppingCart className="w-4 h-4 mr-2" />{" "}
             {stock === 0 ? "Out of Stock" : "Order Now"}

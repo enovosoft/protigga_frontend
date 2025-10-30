@@ -50,28 +50,67 @@ export default function FeaturedBooks() {
   }, []);
 
   const renderSkeletonCards = () => {
-    return Array.from({ length: 5 }).map((_, index) => (
-      <div
-        key={index}
-        className="pl-2 md:pl-4 basis-4/5 xs:basis-1/2 sm:basis-1/3 lg:basis-1/4 "
-      >
-        <div className="p-1">
-          <div className="bg-card border rounded-lg overflow-hidden h-full flex flex-col">
-            <div className="p-0">
-              <Skeleton className="aspect-square w-full" />
+    return (
+      <div className="space-y-12 mx-auto">
+        {/* Skeleton for batch sections */}
+        {Array.from({ length: 2 }).map((_, sectionIndex) => (
+          <div key={sectionIndex} className="space-y-6">
+            {/* Batch title skeleton */}
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-8 w-52" />
             </div>
-            <div className="p-4 flex-grow">
-              <Skeleton className="h-6 w-3/4 mb-2" />
-              <Skeleton className="h-4 w-1/2 mb-3" />
-              <Skeleton className="h-8 w-20" />
-            </div>
-            <div className="p-4 pt-0 mt-auto">
-              <Skeleton className="h-10 w-full" />
+
+            {/* Cards carousel skeleton */}
+            <div className="relative">
+              <div className="flex gap-2 md:gap-4 overflow-hidden">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="flex-shrink-0 w-[280px] xs:w-[240px] sm:w-[260px] lg:w-[240px]"
+                  >
+                    <div className="bg-card border rounded-lg overflow-hidden h-full flex flex-col shadow-sm">
+                      <div className="p-0 relative">
+                        <Skeleton className="aspect-square w-full rounded-t-lg" />
+                        {/* Batch tag skeleton */}
+                        <div className="absolute top-3 right-3">
+                          <Skeleton className="h-6 w-16 rounded-full" />
+                        </div>
+                        {/* Stock status skeleton */}
+                        <div className="absolute top-3 left-3">
+                          <Skeleton className="h-6 w-20 rounded-full" />
+                        </div>
+                      </div>
+                      <div className="p-4 flex-grow space-y-3">
+                        <Skeleton className="h-5 w-full" />
+                        <Skeleton className="h-4 w-3/4" />
+                        <div className="flex items-center justify-start mt-3">
+                          <Skeleton className="h-6 w-16" />
+                        </div>
+                      </div>
+                      <div className="p-4 pt-0">
+                        <Skeleton className="h-10 w-full rounded-md" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Navigation button skeletons */}
+              <div className="absolute top-1/2 -translate-y-1/2 -left-4 md:-left-10">
+                <Skeleton className="h-10 w-10 rounded-full" />
+              </div>
+              <div className="absolute top-1/2 -translate-y-1/2 -right-4 md:-right-10">
+                <Skeleton className="h-10 w-10 rounded-full" />
+              </div>
             </div>
           </div>
+        ))}
+
+        {/* View all button skeleton */}
+        <div className="text-center mt-12">
+          <Skeleton className="h-12 w-48 mx-auto rounded-md" />
         </div>
       </div>
-    ));
+    );
   };
 
   return (
@@ -88,7 +127,9 @@ export default function FeaturedBooks() {
         </div>
 
         {/* Books Carousel */}
-        {loading && renderSkeletonCards()}
+        {loading && (
+          <div className="animate-pulse">{renderSkeletonCards()}</div>
+        )}
         {/* Books Carousel */}
         {!loading && books && Object.keys(books).length > 0
           ? Object.keys(books).map((batch) => (
@@ -96,7 +137,7 @@ export default function FeaturedBooks() {
                 <div className="flex items-center mb-6 gap-2">
                   <h3 className="text-2xl font-semibold text-primary">
                     <span className="text-secondary">{batch} </span> ব্যাচের
-                    বইসমূহ
+                    সেরা বইসমূহ
                   </h3>
                 </div>
                 <div className="relative ">

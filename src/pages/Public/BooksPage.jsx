@@ -129,66 +129,68 @@ export default function BooksPage() {
           ) : (
             <>
               {/* Search and Filter */}
-              <div className="space-y-8 mb-8">
-                {/* Search Bar */}
-                <div className="flex justify-center">
-                  <div className="relative w-full max-w-lg">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                      <Search className="w-5 h-5 text-primary/80" />
-                    </div>
-                    <Input
-                      placeholder="Search books by title, author, or batch..."
-                      value={searchTerm}
-                      onChange={(e) => handleSearchChange(e.target.value)}
-                      className="pl-12 pr-4 py-3 h-12 text-base bg-card border-1 border-accent/30 rounded-xl shadow-sm focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all duration-200 placeholder:text-muted-foreground/60"
-                    />
-                    {searchTerm && (
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <button
-                          onClick={() => handleSearchChange("")}
-                          className="p-1 hover:bg-accent rounded-full transition-colors"
-                        >
-                          <span className="sr-only">Clear search</span>
-                          <svg
-                            className="w-4 h-4 text-muted-foreground"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
-                            />
-                          </svg>
-                        </button>
+              {books.length > 0 && (
+                <div className="space-y-8 mb-8">
+                  {/* Search Bar */}
+                  <div className="flex justify-center">
+                    <div className="relative w-full max-w-lg">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                        <Search className="w-5 h-5 text-primary/80" />
                       </div>
-                    )}
+                      <Input
+                        placeholder="Search books by title, author, or batch..."
+                        value={searchTerm}
+                        onChange={(e) => handleSearchChange(e.target.value)}
+                        className="pl-12 pr-4 py-3 h-12 text-base bg-card border-1 border-accent/30 rounded-xl shadow-sm focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all duration-200 placeholder:text-muted-foreground/60"
+                      />
+                      {searchTerm && (
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                          <button
+                            onClick={() => handleSearchChange("")}
+                            className="p-1 hover:bg-accent rounded-full transition-colors"
+                          >
+                            <span className="sr-only">Clear search</span>
+                            <svg
+                              className="w-4 h-4 text-muted-foreground"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {/* Filter Buttons */}
-                <div className="flex justify-center gap-2 sm:gap-3 flex-wrap max-w-3xl mx-auto">
-                  <Button
-                    variant={activeFilter === "all" ? "default" : "outline"}
-                    onClick={() => handleFilterChange("all")}
-                    className="min-w-[100px] h-10 rounded-lg font-medium transition-all duration-200"
-                  >
-                    All Books
-                  </Button>
-                  {batches.map((batch) => (
+                  {/* Filter Buttons */}
+                  <div className="flex justify-center gap-2 sm:gap-3 flex-wrap max-w-3xl mx-auto">
                     <Button
-                      key={batch}
-                      variant={activeFilter === batch ? "default" : "outline"}
-                      onClick={() => handleFilterChange(batch)}
+                      variant={activeFilter === "all" ? "default" : "outline"}
+                      onClick={() => handleFilterChange("all")}
                       className="min-w-[100px] h-10 rounded-lg font-medium transition-all duration-200"
                     >
-                      {batch}
+                      All Books
                     </Button>
-                  ))}
+                    {batches.map((batch) => (
+                      <Button
+                        key={batch}
+                        variant={activeFilter === batch ? "default" : "outline"}
+                        onClick={() => handleFilterChange(batch)}
+                        className="min-w-[100px] h-10 rounded-lg font-medium transition-all duration-200"
+                      >
+                        {batch}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {books.length === 0 ? (
                 <div className="text-center py-16">

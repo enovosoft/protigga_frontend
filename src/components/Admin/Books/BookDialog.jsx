@@ -159,7 +159,6 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
     // Validate form data
     let validationResult = bookSchema.safeParse(formData);
 
-    console.log("Validation Result:", validationResult);
     if (!validationResult.success) {
       toast.error(
         validationResult.error?.issues[0].message ||
