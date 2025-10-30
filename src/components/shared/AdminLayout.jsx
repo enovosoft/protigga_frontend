@@ -9,6 +9,7 @@ import {
   GraduationCap,
   LogOut,
   Menu,
+  MessageSquare,
   Package,
   Shield,
   Ticket,
@@ -26,6 +27,9 @@ const AdminLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
   // Get role-based icon
   const getRoleIcon = () => {
     if (primaryRole === "admin") {
@@ -50,10 +54,6 @@ const AdminLayout = ({ children }) => {
       </div>
     );
   }
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location.pathname]);
   const handleLogout = () => {
     navigate("/auth/logout");
   };
@@ -101,6 +101,12 @@ const AdminLayout = ({ children }) => {
       label: "Exams",
       icon: BookCheck,
       path: "/admin/exams",
+    },
+    {
+      id: "announcements",
+      label: "Announcements",
+      icon: MessageSquare,
+      path: "/admin/announcements",
     },
     {
       id: "notes",

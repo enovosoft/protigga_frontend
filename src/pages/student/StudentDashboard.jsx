@@ -6,6 +6,7 @@ import {
   Book,
   CreditCard,
   GraduationCap,
+  MessageSquare,
   User,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -50,6 +51,12 @@ export default function StudentDashboard() {
       description: "View your exam schedule and get exam links.",
       icon: CreditCard,
       onClick: () => navigate("/dashboard/exams"),
+    },
+    {
+      title: "Announcements",
+      description: "View course announcements and important updates.",
+      icon: MessageSquare,
+      onClick: () => navigate("/dashboard/announcements"),
     },
     {
       title: "My Profile",

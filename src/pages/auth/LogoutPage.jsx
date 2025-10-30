@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
+import apiInstance from "@/lib/api";
 import { Loader2, LogOut } from "lucide-react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,15 +10,20 @@ export default function LogoutPage() {
   const { logout } = useAuth();
 
   useEffect(() => {
-    const performLogout = () => {
-      // Show success message
-
-      // Clear authentication
-      logout();
-      // Redirect to login page after a short delay
-      setTimeout(() => {
-        navigate("/");
-      }, 1000);
+    const performLogout = async () => {
+      try {
+        // call the logout API endpoint to invalidate the session/token and cookies
+        await apiInstance.get("/auth/logout");
+      } catch (error) {
+        console.error("Logout failed:", error);
+      } finally {
+        // short delay to show the loader for smooth ux
+        setTimeout(() => {
+          // Clear authentication state from the frontend if any left or api call fails
+          logout();
+          navigate("/");
+        }, 2000);
+      }
     };
 
     performLogout();

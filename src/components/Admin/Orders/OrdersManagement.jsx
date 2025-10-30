@@ -2,14 +2,14 @@ import OrdersTable, {
   OrdersTableSkeleton,
 } from "@/components/Admin/Orders/OrdersTable";
 import UserDashboardLayout from "@/components/shared/DashboardLayout";
+import DropDownWithSearch from "@/components/shared/DropDownWithSearch";
 import Loading from "@/components/shared/Loading";
 import Pagination from "@/components/shared/Pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import api, { downloadExcelFile } from "@/lib/api";
-import { ChevronDown, Download, Eye, Search } from "lucide-react";
+import { Download, Eye, Search } from "lucide-react";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -132,62 +132,15 @@ const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
             <Label htmlFor="search_book" className="text-sm font-medium">
               Book
             </Label>
-            <Popover open={bookPopoverOpen} onOpenChange={setBookPopoverOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={bookPopoverOpen}
-                  className="w-full justify-between mt-1"
-                >
-                  {searchForm.book_id
-                    ? books.find((book) => book.book_id === searchForm.book_id)?.title + " (" + books.find((book) => book.book_id === searchForm.book_id)?.batch + ")"
-                    : "Select book..."}
-                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0" align="start">
-                <div className="p-2">
-                  <Input
-                    placeholder="Search books..."
-                    value={bookSearch}
-                    onChange={(e) => setBookSearch(e.target.value)}
-                    className="mb-2"
-                  />
-                </div>
-                <div className="max-h-48 overflow-y-auto">
-                  <div
-                    className="px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                    onClick={() => {
-                      handleSearchChange("book_id", "");
-                      setBookPopoverOpen(false);
-                      setBookSearch("");
-                    }}
-                  >
-                    All Books
-                  </div>
-                  {books
-                    .filter((book) =>
-                      book.title.toLowerCase().includes(bookSearch.toLowerCase()) ||
-                      book.batch.toLowerCase().includes(bookSearch.toLowerCase()) ||
-                      book.writter.toLowerCase().includes(bookSearch.toLowerCase())
-                    )
-                    .map((book) => (
-                      <div
-                        key={book.book_id}
-                        className="px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                        onClick={() => {
-                          handleSearchChange("book_id", book.book_id);
-                          setBookPopoverOpen(false);
-                          setBookSearch("");
-                        }}
-                      >
-                        {book.title} ({book.batch})
-                      </div>
-                    ))}
-                </div>
-              </PopoverContent>
-            </Popover>
+            <DropDownWithSearch
+              id="search_book"
+              className="mt-1"
+              items={[{ id: "all", title: "All Books" }, ...books]}
+              displayKey="title"
+              value={searchForm.book_id}
+              onChange={(value) => handleSearchChange("book_id", value)}
+              placeholder="Select a book"
+            />
           </div>
           <div className="md:col-span-1">
             <Label htmlFor="search_start_date" className="text-sm font-medium">

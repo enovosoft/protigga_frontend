@@ -3,6 +3,7 @@ import { ProtectedRoute } from "../../components/routing/ProtectedRoute";
 
 import Dashboard from "../Dashboard/Dashboard";
 
+import AnnouncementsPage from "@/pages/student/AnnouncementsPage";
 import CoursePage from "@/pages/student/CoursePage";
 import EnrollmentsPage from "@/pages/student/EnrollmentsPage";
 import ExamPage from "@/pages/student/ExamPage";
@@ -93,6 +94,14 @@ export const protectedRoutes = (
       element={
         <ProtectedRoute roles={["student"]}>
           <ExamPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/dashboard/announcements"
+      element={
+        <ProtectedRoute roles={["student"]}>
+          <AnnouncementsPage />
         </ProtectedRoute>
       }
     />

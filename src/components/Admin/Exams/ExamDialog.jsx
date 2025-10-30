@@ -1,3 +1,4 @@
+import DropDownWithSearch from "@/components/shared/DropDownWithSearch";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,13 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import api from "@/lib/api";
 import { FileText, Loader2 } from "lucide-react";
@@ -238,34 +232,21 @@ export default function ExamDialog({ open, onOpenChange, exam, onSuccess }) {
                 <Label htmlFor="course_id" className="text-sm font-medium">
                   Course <span className="text-destructive">*</span>
                 </Label>
-                <Select
-                  value={formData.course_id}
-                  onValueChange={(value) =>
-                    handleSelectChange("course_id", value)
+                <DropDownWithSearch
+                  items={courses}
+                  valueKey="course_id"
+                  displayKey="course_title"
+                  searchKeys={["course_title", "batch"]}
+                  displayFormat={(item) =>
+                    `${item.course_title} (${item.batch})`
                   }
-                >
-                  <SelectTrigger className="w-full h-10 sm:h-11">
-                    <SelectValue placeholder="Select a course" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {courses.length > 0 ? (
-                      courses.map((course) => (
-                        <SelectItem
-                          key={course.course_id}
-                          value={course.course_id}
-                        >
-                          {course.course_title} ({course.batch})
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="no-courses" disabled>
-                        No courses available
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-
+                  placeholder="Select a course"
+                  selectedValue={formData.course_id}
+                  onSelect={(value) => handleSelectChange("course_id", value)}
+                  disabled={courses.length === 0}
+                  className="h-10 sm:h-11"
+                />
+              </div>{" "}
               {/* Exam Title */}
               <div className="space-y-1.5 sm:space-y-2 overflow-hidden p-1">
                 <Label htmlFor="exam_title" className="text-sm font-medium">
@@ -281,7 +262,6 @@ export default function ExamDialog({ open, onOpenChange, exam, onSuccess }) {
                   className="w-full h-10 sm:h-11"
                 />
               </div>
-
               {/* Start and End Time */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 overflow-hidden p-1">
                 <div className="space-y-1.5 sm:space-y-2">
@@ -320,7 +300,6 @@ export default function ExamDialog({ open, onOpenChange, exam, onSuccess }) {
                   />
                 </div>
               </div>
-
               {/* Exam Topic */}
               <div className="space-y-1.5 sm:space-y-2 overflow-hidden p-1">
                 <Label htmlFor="exam_topic" className="text-sm font-medium">
@@ -336,7 +315,6 @@ export default function ExamDialog({ open, onOpenChange, exam, onSuccess }) {
                   className="w-full h-10 sm:h-11"
                 />
               </div>
-
               {/* Exam Link */}
               <div className="space-y-1.5 sm:space-y-2 overflow-hidden p-1">
                 <Label htmlFor="exam_link" className="text-sm font-medium">
@@ -352,7 +330,6 @@ export default function ExamDialog({ open, onOpenChange, exam, onSuccess }) {
                   className="w-full h-10 sm:h-11"
                 />
               </div>
-
               {/* Exam Description */}
               <div className="space-y-1.5 sm:space-y-2 overflow-hidden p-1">
                 <Label
@@ -372,7 +349,6 @@ export default function ExamDialog({ open, onOpenChange, exam, onSuccess }) {
                   className="w-full resize-none min-h-[80px] sm:min-h-[100px]"
                 />
               </div>
-
               <DialogFooter className="gap-2 sm:gap-3 flex-col sm:flex-row pt-2 sm:pt-0">
                 <Button
                   type="button"

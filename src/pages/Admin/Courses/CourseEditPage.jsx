@@ -282,7 +282,7 @@ export default function CourseEditPage() {
         response = await api.post(`/course`, payload);
       } else {
         // Update existing course
-        response = await api.put(`/course`, payload);
+        response = await api.put(`/course`, { ...payload, slug: course.slug });
       }
 
       if (response.data.success) {

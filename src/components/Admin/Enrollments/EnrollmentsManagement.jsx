@@ -2,16 +2,12 @@ import EnrollmentsTable, {
   EnrollmentsTableSkeleton,
 } from "@/components/Admin/Enrollments/EnrollmentsTable";
 import UserDashboardLayout from "@/components/shared/DashboardLayout";
+import DropDownWithSearch from "@/components/shared/DropDownWithSearch";
 import Loading from "@/components/shared/Loading";
 import Pagination from "@/components/shared/Pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -20,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { default as api, downloadExcelFile } from "@/lib/api";
-import { ChevronDown, Download, Eye, Search } from "lucide-react";
+import { Download, Eye, Search } from "lucide-react";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -44,8 +40,6 @@ const EnrollmentsManagement = forwardRef(function EnrollmentsManagement(
   const [hasSearched, setHasSearched] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [courses, setCourses] = useState([]);
-  const [courseSearch, setCourseSearch] = useState("");
-  const [coursePopoverOpen, setCoursePopoverOpen] = useState(false);
 
   const fetchEnrollments = async (page = 1, searchParams = {}) => {
     setLoading(true);
@@ -95,10 +89,6 @@ const EnrollmentsManagement = forwardRef(function EnrollmentsManagement(
   useImperativeHandle(ref, () => ({
     fetchEnrollments,
   }));
-
-  useEffect(() => {
-    fetchEnrollments(currentPage);
-  }, [currentPage]);
 
   useEffect(() => {
     fetchEnrollments(currentPage);
@@ -160,81 +150,25 @@ const EnrollmentsManagement = forwardRef(function EnrollmentsManagement(
       {/* Search Form */}
       <div className="bg-card rounded-lg border p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-          <div className="sm:col-span-1">
+          <div className="sm:col-span-1 ">
             <Label htmlFor="search_course" className="text-sm font-medium">
               Course
             </Label>
-            <Popover
-              open={coursePopoverOpen}
-              onOpenChange={setCoursePopoverOpen}
-            >
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={coursePopoverOpen}
-                  className="w-full justify-between mt-1"
-                >
-                  {searchForm.course_id
-                    ? courses.find(
-                        (course) => course.course_id === searchForm.course_id
-                      )?.course_title +
-                      " (" +
-                      courses.find(
-                        (course) => course.course_id === searchForm.course_id
-                      )?.batch +
-                      ")"
-                    : "Select course..."}
-                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0" align="start">
-                <div className="p-2">
-                  <Input
-                    placeholder="Search courses..."
-                    value={courseSearch}
-                    onChange={(e) => setCourseSearch(e.target.value)}
-                    className="mb-2"
-                  />
-                </div>
-                <div className="max-h-48 overflow-y-auto">
-                  <div
-                    className="px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                    onClick={() => {
-                      handleSearchChange("course_id", "");
-                      setCoursePopoverOpen(false);
-                      setCourseSearch("");
-                    }}
-                  >
-                    All Courses
-                  </div>
-                  {courses
-                    .filter(
-                      (course) =>
-                        course.course_title
-                          .toLowerCase()
-                          .includes(courseSearch.toLowerCase()) ||
-                        course.batch
-                          .toLowerCase()
-                          .includes(courseSearch.toLowerCase())
-                    )
-                    .map((course) => (
-                      <div
-                        key={course.course_id}
-                        className="px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                        onClick={() => {
-                          handleSearchChange("course_id", course.course_id);
-                          setCoursePopoverOpen(false);
-                          setCourseSearch("");
-                        }}
-                      >
-                        {course.course_title} ({course.batch})
-                      </div>
-                    ))}
-                </div>
-              </PopoverContent>
-            </Popover>
+            <DropDownWithSearch
+              items={[
+                { id: "all", title: "All Courses", value: "" },
+                ...courses,
+              ]}
+              valueKey="course_id"
+              displayKey="course_title"
+              searchKeys={["course_title", "batch"]}
+              placeholder="Select course..."
+              selectedValue={searchForm.course_id}
+              onSelect={(value) => handleSearchChange("course_id", value)}
+              className="sm:col-span-1 truncate"
+            />
           </div>
+
           <div className="sm:col-span-1">
             <Label
               htmlFor="search_enrollment_type"

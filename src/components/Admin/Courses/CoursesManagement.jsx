@@ -95,7 +95,9 @@ export default function CoursesManagement({ useLayout = true }) {
   const totalPages = Math.ceil(courses.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentCourses = courses.slice(startIndex, endIndex);
+  const currentCourses = courses
+    .slice(startIndex, endIndex)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   const content = (
     <div className="space-y-6">
