@@ -6,14 +6,20 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { BookOpen, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export default function BookCard({ book }) {
+export default function BookCard({ book, className }) {
   const { book_image, title, price, slug, batch, stock } = book;
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
+    <Card
+      className={cn(
+        `overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col `,
+        className
+      )}
+    >
       <CardHeader className="p-0">
         <div className="relative aspect-square overflow-hidden bg-muted">
           <ImageFallback
@@ -55,13 +61,13 @@ export default function BookCard({ book }) {
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 flex-grow">
-        <h3 className="text-base lg:text-lg font-medium text-foreground line-clamp-2 ">
+      <CardContent className="p-4 flex flex-col flex-grow">
+        <h3 className="text-base lg:text-lg font-medium text-foreground line-clamp-2">
           {title}
         </h3>
 
-        <div className="flex items-center justify-start ">
-          <span className="text-2xl  font-medium text-primary">৳{price}</span>
+        <div className="flex items-center justify-start mt-auto">
+          <span className="text-2xl font-medium text-primary">৳{price}</span>
         </div>
       </CardContent>
 

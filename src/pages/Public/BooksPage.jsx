@@ -1,26 +1,19 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import apiInstance from "@/lib/api";
-import { Book, ShoppingCart } from "lucide-react";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-
+import BookCard from "@/components/BookCard";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import ImageFallback from "@/components/shared/ImageFallback";
-import { BookOpen } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import apiInstance from "@/lib/api";
+import { Book, Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 export default function BooksPage() {
   const [books, setBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [batches, setBatches] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchBooks();
@@ -44,6 +37,52 @@ export default function BooksPage() {
     }
   };
 
+  // Handle search input change
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+    if (value) {
+      setActiveFilter("all"); // Reset to all when searching
+    }
+  };
+
+  // Handle filter change
+  const handleFilterChange = (filter) => {
+    setActiveFilter(filter);
+    if (filter !== "all") {
+      setSearchTerm(""); // Reset search when filtering
+    }
+  };
+
+  // Filter and search books
+  const filteredBooks = books.filter((book) => {
+    const matchesSearch =
+      !searchTerm ||
+      book.title
+        ?.toLowerCase()
+        .trim()
+        .includes(searchTerm.toLowerCase().trim()) ||
+      book.batch
+        ?.toLowerCase()
+        .trim()
+        .includes(searchTerm.toLowerCase().trim()) ||
+      book.writter
+        ?.toLowerCase()
+        .trim()
+        .includes(searchTerm.toLowerCase().trim());
+
+    const matchesFilter = activeFilter === "all" || book.batch === activeFilter;
+
+    return matchesSearch && matchesFilter;
+  });
+
+  // Group filtered books by batch
+  const groupedBooks = filteredBooks.reduce((acc, book) => {
+    const batch = book.batch || "Other";
+    if (!acc[batch]) acc[batch] = [];
+    acc[batch].push(book);
+    return acc;
+  }, {});
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -60,52 +99,95 @@ export default function BooksPage() {
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {Array.from({ length: 8 }).map((_, index) => (
-                <Card
-                  key={`book-skeleton-${index}`}
-                  className="overflow-hidden"
-                >
-                  <CardHeader className="p-0">
-                    <Skeleton className="w-full aspect-square" />
-                  </CardHeader>
-                  <CardContent className="p-4 space-y-3">
-                    <Skeleton className="h-6 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </CardContent>
-                  <CardFooter className="p-4 pt-0">
-                    <Skeleton className="h-10 w-full" />
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
+            <>
+              {/* Search and Filter Skeleton */}
+              <div className="space-y-8 mb-8">
+                <div className="flex justify-start">
+                  <Skeleton className="h-12 w-full max-w-lg rounded-xl" />
+                </div>
+                <div className="flex justify-center gap-2 sm:gap-3 flex-wrap">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <Skeleton key={index} className="h-10 w-24 rounded-lg" />
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                {Array.from({ length: 10 }).map((_, index) => (
+                  <div key={`book-skeleton-${index}`} className="space-y-4">
+                    <Skeleton className="w-full aspect-square rounded-lg" />
+                    <div className="space-y-3 p-2">
+                      <Skeleton className="h-5 w-full" />
+                      <Skeleton className="h-4 w-2/3" />
+                      <Skeleton className="h-6 w-16" />
+                      <Skeleton className="h-10 w-full rounded-md" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           ) : (
             <>
-              {/* Filter controls */}
-              <div className="flex justify-center gap-3 mb-8 flex-wrap">
-                <button
-                  className={`px-4 py-2 rounded-md font-medium ${
-                    activeFilter === "all"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-transparent border border-border"
-                  }`}
-                  onClick={() => setActiveFilter("all")}
-                >
-                  All Books
-                </button>
-                {batches.map((batch) => (
-                  <button
-                    key={batch}
-                    className={`px-4 py-2 rounded-md font-medium ${
-                      activeFilter === batch
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-transparent border border-border"
-                    }`}
-                    onClick={() => setActiveFilter(batch)}
+              {/* Search and Filter */}
+              <div className="space-y-8 mb-8">
+                {/* Search Bar */}
+                <div className="flex justify-center">
+                  <div className="relative w-full max-w-lg">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                      <Search className="w-5 h-5 text-primary/80" />
+                    </div>
+                    <Input
+                      placeholder="Search books by title, author, or batch..."
+                      value={searchTerm}
+                      onChange={(e) => handleSearchChange(e.target.value)}
+                      className="pl-12 pr-4 py-3 h-12 text-base bg-card border-1 border-accent/30 rounded-xl shadow-sm focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all duration-200 placeholder:text-muted-foreground/60"
+                    />
+                    {searchTerm && (
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <button
+                          onClick={() => handleSearchChange("")}
+                          className="p-1 hover:bg-accent rounded-full transition-colors"
+                        >
+                          <span className="sr-only">Clear search</span>
+                          <svg
+                            className="w-4 h-4 text-muted-foreground"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Filter Buttons */}
+                <div className="flex justify-center gap-2 sm:gap-3 flex-wrap max-w-3xl mx-auto">
+                  <Button
+                    variant={activeFilter === "all" ? "default" : "outline"}
+                    onClick={() => handleFilterChange("all")}
+                    className="min-w-[100px] h-10 rounded-lg font-medium transition-all duration-200"
                   >
-                    {batch}
-                  </button>
-                ))}
+                    All Books
+                  </Button>
+                  {batches.map((batch) => (
+                    <Button
+                      key={batch}
+                      variant={activeFilter === batch ? "default" : "outline"}
+                      onClick={() => handleFilterChange(batch)}
+                      className="min-w-[100px] h-10 rounded-lg font-medium transition-all duration-200"
+                    >
+                      {batch}
+                    </Button>
+                  ))}
+                </div>
               </div>
 
               {books.length === 0 ? (
@@ -115,148 +197,33 @@ export default function BooksPage() {
                     No books available at the moment
                   </p>
                 </div>
+              ) : filteredBooks.length === 0 ? (
+                <div className="text-center py-16">
+                  <Book className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground text-lg">
+                    No books found matching your search criteria
+                  </p>
+                </div>
               ) : (
                 <div className="space-y-12">
-                  {activeFilter === "all"
-                    ? batches.map((batch) => {
-                        const batchBooks = books.filter(
-                          (b) => b.batch === batch
-                        );
-                        if (!batchBooks.length) return null;
-                        return (
-                          <div key={batch}>
-                            <h2 className="text-2xl font-semibold mb-4">
-                              {batch}
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                              {batchBooks.map((book) => (
-                                <Card
-                                  key={book.slug}
-                                  className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
-                                >
-                                  <CardHeader className="p-0 relative">
-                                    <div className="relative aspect-auto overflow-hidden bg-muted">
-                                      <ImageFallback
-                                        src={book.book_image}
-                                        alt={book.title}
-                                      />
-                                      {book.batch && (
-                                        <div className="absolute top-3 right-3">
-                                          <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                                            <BookOpen className="w-3 h-3" />
-                                            {book.batch}
-                                          </span>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </CardHeader>
-
-                                  <CardContent className="p-4 flex-1">
-                                    <h3 className="text-lg font-semibold text-foreground mb-3 line-clamp-2">
-                                      {book.title}
-                                    </h3>
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-xl font-bold text-primary">
-                                        ৳{book.price}
-                                      </span>
-                                    </div>
-                                  </CardContent>
-
-                                  <CardFooter className="p-4 pt-0">
-                                    {book.stock === 0 ? (
-                                      <button
-                                        disabled
-                                        className="w-full bg-muted text-muted-foreground py-2 rounded-md cursor-not-allowed"
-                                      >
-                                        Stock Out
-                                      </button>
-                                    ) : (
-                                      <Link
-                                        to={`/books/${book.slug}`}
-                                        className="w-full"
-                                      >
-                                        <Button className="w-full">
-                                          <ShoppingCart className="w-4 h-4 mr-2" />
-                                          Order Now
-                                        </Button>
-                                      </Link>
-                                    )}
-                                  </CardFooter>
-                                </Card>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      })
-                    : (() => {
-                        const filtered = books.filter(
-                          (b) => b.batch === activeFilter
-                        );
-                        return (
-                          <div>
-                            <h2 className="text-2xl font-semibold mb-4">
-                              {activeFilter}
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                              {filtered.map((book) => (
-                                <Card
-                                  key={book.slug}
-                                  className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
-                                >
-                                  <CardHeader className="p-0 relative">
-                                    <div className="relative aspect-auto overflow-hidden bg-muted">
-                                      <ImageFallback
-                                        src={book.book_image}
-                                        alt={book.title}
-                                      />
-                                      {book.batch && (
-                                        <div className="absolute top-3 right-3">
-                                          <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                                            <BookOpen className="w-3 h-3" />
-                                            {book.batch}
-                                          </span>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </CardHeader>
-
-                                  <CardContent className="p-4 flex-1">
-                                    <h3 className="text-lg font-semibold text-foreground mb-3 line-clamp-2">
-                                      {book.title}
-                                    </h3>
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-xl font-bold text-primary">
-                                        ৳{book.price}
-                                      </span>
-                                    </div>
-                                  </CardContent>
-
-                                  <CardFooter className="p-4 pt-0">
-                                    {book.stock === 0 ? (
-                                      <button
-                                        disabled
-                                        className="w-full bg-muted text-muted-foreground py-2 rounded-md cursor-not-allowed"
-                                      >
-                                        Stock Out
-                                      </button>
-                                    ) : (
-                                      <Link
-                                        to={`/books/${book.slug}`}
-                                        className="w-full"
-                                      >
-                                        <Button className="w-full">
-                                          <ShoppingCart className="w-4 h-4 mr-2" />{" "}
-                                          Order Now
-                                        </Button>
-                                      </Link>
-                                    )}
-                                  </CardFooter>
-                                </Card>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      })()}
+                  {Object.entries(groupedBooks).map(([batch, batchBooks]) => (
+                    <div key={batch} className="space-y-6">
+                      <div className="flex items-center gap-3">
+                        <h2 className="text-2xl font-bold text-primary">
+                          <span className="text-secondary">{batch}</span> Books
+                        </h2>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                        {batchBooks.map((book) => (
+                          <BookCard
+                            key={book.book_id || book.slug}
+                            book={book}
+                            className="hover:scale-105 transition-transform duration-300 select-none cursor-pointer"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </>

@@ -1,25 +1,20 @@
+import CourseCard from "@/components/CourseCard";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import ImageFallback from "@/components/shared/ImageFallback";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import api from "@/lib/api";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState([]);
   const [batches, setBatches] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchCourses();
@@ -48,6 +43,43 @@ export default function CoursesPage() {
     }
   };
 
+  // Handle search input change
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+    if (value) {
+      setActiveFilter("all"); // Reset to all when searching
+    }
+  };
+
+  // Handle filter change
+  const handleFilterChange = (filter) => {
+    setActiveFilter(filter);
+    if (filter !== "all") {
+      setSearchTerm(""); // Reset search when filtering
+    }
+  };
+
+  // Filter and search courses
+  const filteredCourses = courses.filter((course) => {
+    const matchesSearch =
+      !searchTerm ||
+      course.course_title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.batch?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesFilter =
+      activeFilter === "all" || course.batch === activeFilter;
+
+    return matchesSearch && matchesFilter;
+  });
+
+  // Group filtered courses by batch
+  const groupedCourses = filteredCourses.reduce((acc, course) => {
+    const batch = course.batch || "Other";
+    if (!acc[batch]) acc[batch] = [];
+    acc[batch].push(course);
+    return acc;
+  }, {});
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -58,20 +90,29 @@ export default function CoursesPage() {
               <Skeleton className="h-10 w-80 mx-auto mb-4" />
               <Skeleton className="h-6 w-96 mx-auto" />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <Card key={index} className="overflow-hidden">
-                  <CardHeader className="p-0">
-                    <Skeleton className="aspect-video w-full" />
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <Skeleton className="h-6 w-3/4 mb-3" />
-                    <Skeleton className="h-8 w-24" />
-                  </CardContent>
-                  <CardFooter className="p-6 pt-0">
-                    <Skeleton className="h-10 w-full" />
-                  </CardFooter>
-                </Card>
+            {/* Search Skeleton */}
+            <div className="space-y-6 mb-12">
+              <div className="flex justify-start">
+                <Skeleton className="h-10 w-full max-w-md rounded-lg" />
+              </div>
+              <div className="flex justify-center gap-3 flex-wrap">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <Skeleton key={index} className="h-10 w-24 rounded-lg" />
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div key={index} className="space-y-4">
+                  <Skeleton className="aspect-video w-full rounded-lg" />
+                  <div className="space-y-3 p-2">
+                    <Skeleton className="h-5 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-8 w-20" />
+                    <Skeleton className="h-10 w-full rounded-md" />
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -97,26 +138,67 @@ export default function CoursesPage() {
             </p>
           </div>
 
-          {/* Filter Buttons */}
+          {/* Search and Filter */}
           {courses.length > 0 && (
-            <div className="flex justify-center gap-3 mb-12 flex-wrap">
-              <Button
-                variant={activeFilter === "all" ? "default" : "outline"}
-                onClick={() => setActiveFilter("all")}
-                className="min-w-[100px]"
-              >
-                All Courses
-              </Button>
-              {batches.map((batch) => (
+            <div className="space-y-8 mb-12">
+              {/* Enhanced Search Bar */}
+              <div className="flex justify-center">
+                <div className="relative w-full max-w-lg">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                    <Search className="w-5 h-5 text-primary/80" />
+                  </div>
+                  <Input
+                    placeholder="Search courses by title or batch..."
+                    value={searchTerm}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    className="pl-12 pr-4 py-3 h-12 text-base bg-card border-1 border-accent/30 rounded-xl shadow-sm focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all duration-200 placeholder:text-muted-foreground/60"
+                  />
+                  {searchTerm && (
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                      <button
+                        onClick={() => handleSearchChange("")}
+                        className="p-1 hover:bg-accent rounded-full transition-colors"
+                      >
+                        <span className="sr-only">Clear search</span>
+                        <svg
+                          className="w-4 h-4 text-muted-foreground"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Filter Buttons */}
+              <div className="flex justify-center gap-2 sm:gap-3 flex-wrap max-w-3xl mx-auto">
                 <Button
-                  key={batch}
-                  variant={activeFilter === batch ? "default" : "outline"}
-                  onClick={() => setActiveFilter(batch)}
-                  className="min-w-[100px]"
+                  variant={activeFilter === "all" ? "default" : "outline"}
+                  onClick={() => handleFilterChange("all")}
+                  className="min-w-[100px] h-10 rounded-lg font-medium transition-all duration-200"
                 >
-                  {batch}
+                  All Courses
                 </Button>
-              ))}
+                {batches.map((batch) => (
+                  <Button
+                    key={batch}
+                    variant={activeFilter === batch ? "default" : "outline"}
+                    onClick={() => handleFilterChange(batch)}
+                    className="min-w-[100px] h-10 rounded-lg font-medium transition-all duration-200"
+                  >
+                    {batch}
+                  </Button>
+                ))}
+              </div>
             </div>
           )}
 
@@ -127,131 +209,33 @@ export default function CoursesPage() {
                 No courses available at the moment
               </p>
             </div>
+          ) : filteredCourses.length === 0 ? (
+            <div className="text-center py-16">
+              <BookOpen className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground text-lg">
+                No courses found matching your search criteria
+              </p>
+            </div>
           ) : (
             <div className="space-y-12">
-              {activeFilter === "all"
-                ? // Show all batches
-                  batches.map((batch) => {
-                    const batchCourses = courses.filter(
-                      (course) => course.batch === batch
-                    );
-                    return (
-                      <div key={batch} className="space-y-6">
-                        <div className="flex items-center gap-3">
-                          <h2 className="text-2xl font-bold text-foreground">
-                            {batch} Batch
-                          </h2>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                          {batchCourses.map((course) => (
-                            <Card
-                              key={course.id || course.course_id}
-                              className="overflow-hidden hover:shadow-lg transition-shadow"
-                            >
-                              <CardHeader className="p-0">
-                                <div className="relative aspect-auto overflow-hidden bg-muted">
-                                  <ImageFallback
-                                    src={course.thumbnail}
-                                    alt={course.course_title}
-                                  />
-                                  {/* Batch Tag */}
-                                  {course.batch && (
-                                    <div className="absolute top-3 right-3">
-                                      <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                                        <BookOpen className="w-3 h-3" />
-                                        {course.batch}
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                              </CardHeader>
-
-                              <CardContent className="p-6">
-                                <h3 className="text-xl font-semibold text-foreground mb-3 line-clamp-2">
-                                  {course.course_title}
-                                </h3>
-                                <div className="flex items-center justify-between">
-                                  <span className="text-2xl font-bold text-primary">
-                                    ৳{course.price}
-                                  </span>
-                                </div>
-                              </CardContent>
-
-                              <CardFooter className="p-6 pt-0">
-                                <Link
-                                  className="w-full"
-                                  to={`/courses/${course.slug}`}
-                                >
-                                  <Button className="w-full">Enroll Now</Button>
-                                </Link>
-                              </CardFooter>
-                            </Card>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })
-                : // Show filtered batch
-                  (() => {
-                    const filteredCourses = courses.filter(
-                      (course) => course.batch === activeFilter
-                    );
-                    return (
-                      <div className="space-y-6">
-                        <div className="flex items-center gap-3">
-                          <h2 className="text-2xl font-bold text-foreground">
-                            {activeFilter} Batch
-                          </h2>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                          {filteredCourses.map((course) => (
-                            <Card
-                              key={course.id || course.course_id}
-                              className="overflow-hidden hover:shadow-lg transition-shadow"
-                            >
-                              <CardHeader className="p-0">
-                                <div className="relative aspect-auto overflow-hidden bg-muted">
-                                  <ImageFallback
-                                    src={course.thumbnail}
-                                    alt={course.course_title}
-                                  />
-                                  {/* Batch Tag */}
-                                  {course.batch && (
-                                    <div className="absolute top-3 right-3">
-                                      <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                                        <BookOpen className="w-3 h-3" />
-                                        {course.batch}
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                              </CardHeader>
-
-                              <CardContent className="p-6">
-                                <h3 className="text-xl font-semibold text-foreground mb-3 line-clamp-2">
-                                  {course.course_title}
-                                </h3>
-                                <div className="flex items-center justify-between">
-                                  <span className="text-2xl font-bold text-primary">
-                                    ৳{course.price}
-                                  </span>
-                                </div>
-                              </CardContent>
-
-                              <CardFooter className="p-6 pt-0">
-                                <Link
-                                  className="w-full"
-                                  to={`/courses/${course.slug}`}
-                                >
-                                  <Button className="w-full">Enroll Now</Button>
-                                </Link>
-                              </CardFooter>
-                            </Card>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })()}
+              {Object.entries(groupedCourses).map(([batch, batchCourses]) => (
+                <div key={batch} className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-2xl font-bold text-primary">
+                      <span className="text-secondary">{batch}</span> Batch
+                    </h2>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                    {batchCourses.map((course) => (
+                      <CourseCard
+                        key={course.course_id || course.id}
+                        course={course}
+                        className="transition-transform duration-200 hover:-translate-y-1 select-none cursor-pointer"
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
