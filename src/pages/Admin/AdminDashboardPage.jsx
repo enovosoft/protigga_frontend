@@ -137,7 +137,7 @@ export default function AdminDashboardPage() {
     },
 
     {
-      title: "Total Book Sales",
+      title: "Total Book Orders",
       value: financeData
         ? financeData.book_sales?.reduce(
             (acc, item) => acc + item.total_orders,
@@ -145,10 +145,10 @@ export default function AdminDashboardPage() {
           )
         : 0,
       icon: BookOpen,
-      description: "Total number of book sales",
+      description: "Total number of book orders",
     },
     {
-      title: "Total Course Sales",
+      title: "Total Course Orders",
       value: financeData
         ? financeData.course_sales?.reduce(
             (acc, item) => acc + item.total_orders,
@@ -156,7 +156,7 @@ export default function AdminDashboardPage() {
           )
         : 0,
       icon: GraduationCap,
-      description: "Total number of course sales",
+      description: "Total number of course orders",
     },
     {
       title: "Number of Unique Book Sales",
@@ -212,6 +212,38 @@ export default function AdminDashboardPage() {
       ...prev,
       [field]: value,
     }));
+  };
+
+  // Helper function to process sales data
+  const processSalesData = (bookSales, courseSales, timeKey) => {
+    const groupedData = {};
+
+    // Process book sales
+    bookSales?.forEach((item) => {
+      const key = item[timeKey];
+      if (!groupedData[key]) {
+        groupedData[key] = { books: 0, courses: 0 };
+      }
+      groupedData[key].books += item.total;
+    });
+
+    // Process course sales
+    courseSales?.forEach((item) => {
+      const key = item[timeKey];
+      if (!groupedData[key]) {
+        groupedData[key] = { books: 0, courses: 0 };
+      }
+      groupedData[key].courses += item.total;
+    });
+
+    // Convert to array format for charts
+    return Object.keys(groupedData)
+      .sort()
+      .map((key) => ({
+        [timeKey]: key,
+        books: groupedData[key].books,
+        courses: groupedData[key].courses,
+      }));
   };
 
   return (
@@ -506,31 +538,14 @@ export default function AdminDashboardPage() {
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart
-                  data={Object.keys(financeData?.daily_book_sales || {}).map(
-                    (date) => {
-                      const bookVal = financeData?.daily_book_sales?.[date];
-                      const courseVal = financeData?.daily_course_sales?.[date];
-
-                      const books =
-                        bookVal && typeof bookVal === "object"
-                          ? Object.values(bookVal).reduce((a, b) => a + b, 0)
-                          : bookVal || 0;
-
-                      const courses =
-                        courseVal && typeof courseVal === "object"
-                          ? Object.values(courseVal).reduce((a, b) => a + b, 0)
-                          : courseVal || 0;
-
-                      return {
-                        date,
-                        books,
-                        courses,
-                      };
-                    }
+                  data={processSalesData(
+                    financeData?.daily_book_sales,
+                    financeData?.daily_course_sales,
+                    "day"
                   )}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
+                  <XAxis dataKey="day" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
@@ -564,28 +579,10 @@ export default function AdminDashboardPage() {
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart
-                  data={Object.keys(financeData?.weekly_book_sales || {}).map(
-                    (week) => {
-                      const bookVal = financeData?.weekly_book_sales?.[week];
-                      const courseVal =
-                        financeData?.weekly_course_sales?.[week];
-
-                      const books =
-                        bookVal && typeof bookVal === "object"
-                          ? Object.values(bookVal).reduce((a, b) => a + b, 0)
-                          : bookVal || 0;
-
-                      const courses =
-                        courseVal && typeof courseVal === "object"
-                          ? Object.values(courseVal).reduce((a, b) => a + b, 0)
-                          : courseVal || 0;
-
-                      return {
-                        week,
-                        books,
-                        courses,
-                      };
-                    }
+                  data={processSalesData(
+                    financeData?.weekly_book_sales,
+                    financeData?.weekly_course_sales,
+                    "week"
                   )}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
@@ -623,28 +620,10 @@ export default function AdminDashboardPage() {
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart
-                  data={Object.keys(financeData?.monthly_book_sales || {}).map(
-                    (month) => {
-                      const bookVal = financeData?.monthly_book_sales?.[month];
-                      const courseVal =
-                        financeData?.monthly_course_sales?.[month];
-
-                      const books =
-                        bookVal && typeof bookVal === "object"
-                          ? Object.values(bookVal).reduce((a, b) => a + b, 0)
-                          : bookVal || 0;
-
-                      const courses =
-                        courseVal && typeof courseVal === "object"
-                          ? Object.values(courseVal).reduce((a, b) => a + b, 0)
-                          : courseVal || 0;
-
-                      return {
-                        month,
-                        books,
-                        courses,
-                      };
-                    }
+                  data={processSalesData(
+                    financeData?.monthly_book_sales,
+                    financeData?.monthly_course_sales,
+                    "month"
                   )}
                 >
                   <CartesianGrid strokeDasharray="3 3" />

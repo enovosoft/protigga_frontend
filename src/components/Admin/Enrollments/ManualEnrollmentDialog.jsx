@@ -1,6 +1,5 @@
 import DropDownWithSearch from "@/components/shared/DropDownWithSearch";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
@@ -19,22 +18,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import api from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
 import { useStoreState } from "easy-peasy";
-import { CalendarIcon, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -86,6 +80,7 @@ const manualEnrollmentSchema = z.object({
     "OTHER",
     "BANK",
   ]),
+  address: z.string().min(1, "Address is required"),
 });
 
 export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
@@ -102,7 +97,7 @@ export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
       expiry_date: (() => {
         const ThreeMonthFromNow = new Date();
         ThreeMonthFromNow.setDate(ThreeMonthFromNow.getDate() + 90);
-        return ThreeMonthFromNow.toISOString();
+        return ThreeMonthFromNow.toISOString().slice(0, 16);
       })(),
       product_price: 0,
       discount_amount: 0,
@@ -113,6 +108,7 @@ export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
       enrollment_status: "success",
       remarks: "",
       method: "BKASH",
+      address: "",
     },
   });
 
@@ -252,38 +248,13 @@ export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
                     <FormLabel>
                       Expiry Date <span className="text-destructive">*</span>
                     </FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            className={`w-full pl-3 text-left font-normal ${
-                              !field.value && "text-muted-foreground"
-                            }`}
-                          >
-                            {field.value ? (
-                              format(new Date(field.value), "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={
-                            field.value ? new Date(field.value) : undefined
-                          }
-                          onSelect={(date) =>
-                            field.onChange(date ? date.toISOString() : "")
-                          }
-                          disabled={(date) => date < new Date()}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <FormControl>
+                      <Input
+                        type="datetime-local"
+                        {...field}
+                        className="w-full h-10 sm:h-11"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -496,6 +467,27 @@ export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
                       <SelectItem value="BANK">Bank Transfer</SelectItem>
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Address */}
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Address <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Full address"
+                      className="min-h-[80px]"
+                      {...field}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

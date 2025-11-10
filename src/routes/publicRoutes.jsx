@@ -5,6 +5,7 @@ import CheckoutPage from "../pages/Public/CheckoutPage";
 import CourseDetailsPage from "../pages/Public/CourseDetailsPage";
 import CoursesPage from "../pages/Public/CoursesPage";
 import HomePage from "../pages/Public/HomePage";
+import NotFoundPage from "../pages/Public/NotFoundPage";
 import NotesPage from "../pages/Public/NotesPage";
 import NotesViewPage from "../pages/Public/NotesViewPage";
 export const publicRoutes = (
@@ -17,5 +18,6 @@ export const publicRoutes = (
     <Route path="/books" element={<BooksPage />} />
     <Route path="/books/:slug" element={<BookDetailsPage />} />
     <Route path="/checkout" element={<CheckoutPage />} />
+    <Route path="*" element={<NotFoundPage />} />
   </>
 );

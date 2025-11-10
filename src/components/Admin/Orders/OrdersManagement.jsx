@@ -137,11 +137,15 @@ const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
               className="mt-1"
               items={[
                 { id: "all", title: "All Books", value: "all" },
-                ...books,
+                ...books.map((book) => ({
+                  id: book.book_id,
+                  title: book.book_title || book.title,
+                  value: book.book_id,
+                })),
               ]}
               displayKey="title"
-              value={searchForm.book_id}
-              onChange={(value) => handleSearchChange("book_id", value)}
+              selectedValue={searchForm.book_id}
+              onSelect={(value) => handleSearchChange("book_id", value)}
               placeholder="Select a book"
             />
           </div>
