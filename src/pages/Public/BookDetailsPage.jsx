@@ -46,6 +46,7 @@ export default function BookDetailsPage() {
   }, [slug, navigate]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchBookDetails();
   }, [fetchBookDetails]);
 

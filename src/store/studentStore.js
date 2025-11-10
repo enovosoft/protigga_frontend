@@ -6,6 +6,8 @@ const studentStore = {
   bookOrders: [],
   payments: [],
   exams: [],
+  liveClasses: [],
+  announcements: [],
   profile: null,
   course: null,
   loading: false,
@@ -25,6 +27,12 @@ const studentStore = {
 
   setCourse: action((state, payload) => {
     state.course = payload;
+  }),
+  setLiveClasses: action((state, payload) => {
+    state.liveClasses = payload;
+  }),
+  setAnnouncements: action((state, payload) => {
+    state.announcements = payload;
   }),
   setFetchData: action((state, payload) => {
     state.profile = {
@@ -60,6 +68,16 @@ const studentStore = {
     // Exams: extract from enrollments
     state.exams = (payload.user?.enrollments || []).flatMap(
       (enrollment) => enrollment.course?.exams || []
+    );
+
+    // Live Classes: extract from enrollments
+    state.liveClasses = (payload.user?.enrollments || []).flatMap(
+      (enrollment) => enrollment.course?.live_classes || []
+    );
+
+    // Announcements: extract from enrollments
+    state.announcements = (payload.user?.enrollments || []).flatMap(
+      (enrollment) => enrollment.course?.announcements || []
     );
 
     // Book Orders: keep as is
@@ -108,6 +126,8 @@ const studentStore = {
       const response = await api.get(`/control/course/${slug}`);
       if (response.data?.success) {
         actions.setCourse(response.data.course);
+        actions.setLiveClasses(response.data.course.live_classes || []);
+        actions.setAnnouncements(response.data.course.announcements || []);
       } else {
         actions.setError(response.data?.message || "Failed to load course");
       }

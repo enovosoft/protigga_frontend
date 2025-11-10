@@ -97,6 +97,7 @@ export default function CourseDetailsPage() {
   }, [slug]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchCourseDetails();
   }, [fetchCourseDetails]);
 

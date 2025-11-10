@@ -21,7 +21,7 @@ export default function LogoutPage() {
         setTimeout(() => {
           // Clear authentication state from the frontend if any left or api call fails
           logout();
-          navigate("/");
+          window.location.href = "/";
         }, 1200);
       }
     };

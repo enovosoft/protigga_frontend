@@ -89,6 +89,7 @@ export default function CheckoutForm() {
   const [promoData, setPromoData] = useState(null);
   const [paymentType, setPaymentType] = useState("cod");
   const [deliveryFee, setDeliveryFee] = useState(80); // Default to inside_dhaka price
+  const [deliveryArea, setDeliveryArea] = useState("inside_dhaka"); // Default to inside_dhaka
   const [quantity, setQuantity] = useState(1);
   const [validationErrors, setValidationErrors] = useState({});
   // Form state
@@ -101,7 +102,7 @@ export default function CheckoutForm() {
 
   const isBook = bookSlug && !courseId;
 
-  // Update delivery fee based on payment type and district
+  // Update delivery fee based on payment type and delivery area
   useEffect(() => {
     if (isBook) {
       if (paymentType === "sslcommerz") {
@@ -111,23 +112,22 @@ export default function CheckoutForm() {
         );
         setDeliveryFee(sslOption?.deliveryCharge);
       } else if (paymentType === "cod") {
-        // COD delivery fee based on district
-        const isDhaka = formData.district?.toLowerCase().trim() === "dhaka";
-
+        // COD delivery fee based on selected delivery area
         const CodPayment = PAYMENT_DELIVERY_OPTIONS.find(
           (option) => option.value === "cod"
         );
 
-        const deliveryCharge = isDhaka
-          ? CodPayment?.insideDhakaDeliveryCharge
-          : CodPayment?.outsideDhakaDeliveryCharge;
+        const deliveryCharge =
+          deliveryArea === "inside_dhaka"
+            ? CodPayment?.insideDhakaDeliveryCharge
+            : CodPayment?.outsideDhakaDeliveryCharge;
         setDeliveryFee(deliveryCharge);
       }
     } else {
       // Courses have no delivery fee
       setDeliveryFee(0);
     }
-  }, [paymentType, formData.district, isBook]);
+  }, [paymentType, deliveryArea, isBook]);
 
   const fetchProductDetails = useCallback(async () => {
     if (courseId) {
@@ -219,6 +219,7 @@ export default function CheckoutForm() {
       const response = await apiInstance.post("/check-promo-code", {
         promocode: promoCode,
         promocode_for: isBook ? "book" : "course",
+        product_id: isBook ? product?.book_id : product?.course_id,
       });
 
       if (response.data.success) {
@@ -335,12 +336,10 @@ export default function CheckoutForm() {
             : "Prepaid"
           : "none",
         inside_dhaka: isBook
-          ? paymentType === "cod" &&
-            formData.district?.toLowerCase().trim() === "dhaka"
+          ? paymentType === "cod" && deliveryArea === "inside_dhaka"
           : false,
         outside_dhaka: isBook
-          ? paymentType === "cod" &&
-            formData.district?.toLowerCase().trim() !== "dhaka"
+          ? paymentType === "cod" && deliveryArea === "outside_dhaka"
           : false,
         sundarban_courier: isBook ? paymentType === "sslcommerz" : false,
         meterial_details: {
@@ -557,6 +556,8 @@ export default function CheckoutForm() {
             handleInputChange={handleInputChange}
             paymentType={paymentType}
             setPaymentType={setPaymentType}
+            deliveryArea={deliveryArea}
+            setDeliveryArea={setDeliveryArea}
             onSubmit={handleSubmit}
             onApplyPromo={checkPromoCode}
             promoCode={promoCode}

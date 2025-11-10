@@ -20,6 +20,8 @@ export default function CustomerInformation({
   handleInputChange,
   paymentType,
   setPaymentType,
+  deliveryArea,
+  setDeliveryArea,
   onSubmit,
   onApplyPromo,
   promoCode = "",
@@ -361,18 +363,94 @@ export default function CustomerInformation({
                 </div>
               ))}
             </RadioGroup>
-
-            {/* Delivery Info Alert */}
-            <PinMessage
-              variant="info"
-              message={
-                PAYMENT_DELIVERY_OPTIONS.find(
-                  (option) => option.value === paymentType
-                )?.description
-              }
-            />
           </div>
 
+          {/* Delivery Area Selection - Only for COD and Books */}
+          {isBook && paymentType === "cod" && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium text-foreground">
+                  Delivery Area <span className="text-destructive">*</span>
+                </Label>
+              </div>
+              <RadioGroup
+                value={deliveryArea}
+                onValueChange={setDeliveryArea}
+                className="space-y-3"
+              >
+                <div
+                  className={`flex items-start space-x-3 p-4 border rounded-lg transition-colors cursor-pointer ${
+                    deliveryArea === "inside_dhaka"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:bg-muted/30"
+                  }`}
+                  onClick={() => setDeliveryArea("inside_dhaka")}
+                >
+                  <div className="flex items-center h-5 mt-0.5">
+                    <div
+                      className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                        deliveryArea === "inside_dhaka"
+                          ? "border-primary"
+                          : "border-muted-foreground/50"
+                      }`}
+                    >
+                      {deliveryArea === "inside_dhaka" && (
+                        <div className="w-2 h-2 rounded-full bg-primary" />
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <Label className="cursor-pointer font-medium text-foreground">
+                      Inside Dhaka
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Delivery charge: ৳80
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  className={`flex items-start space-x-3 p-4 border rounded-lg transition-colors cursor-pointer ${
+                    deliveryArea === "outside_dhaka"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:bg-muted/30"
+                  }`}
+                  onClick={() => setDeliveryArea("outside_dhaka")}
+                >
+                  <div className="flex items-center h-5 mt-0.5">
+                    <div
+                      className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                        deliveryArea === "outside_dhaka"
+                          ? "border-primary"
+                          : "border-muted-foreground/50"
+                      }`}
+                    >
+                      {deliveryArea === "outside_dhaka" && (
+                        <div className="w-2 h-2 rounded-full bg-primary" />
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <Label className="cursor-pointer font-medium text-foreground">
+                      Outside Dhaka
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Delivery charge: ৳160
+                    </p>
+                  </div>
+                </div>
+              </RadioGroup>
+            </div>
+          )}
+          {/* Delivery Info Alert */}
+          <PinMessage
+            variant="info"
+            message={
+              PAYMENT_DELIVERY_OPTIONS.find(
+                (option) => option.value === paymentType
+              )?.description
+            }
+          />
           <Button
             type="submit"
             className="w-full h-11 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground"

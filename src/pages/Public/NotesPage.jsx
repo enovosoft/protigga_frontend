@@ -22,6 +22,7 @@ export default function NotesPage() {
   const notesPerPage = 9;
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchNotes();
   }, []);
 

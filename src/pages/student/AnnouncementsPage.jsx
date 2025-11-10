@@ -1,19 +1,17 @@
 import StudentDashboardLayout from "@/components/shared/StudentDashboardLayout";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAnnouncementStatusBadge } from "@/lib/badgeUtils";
 import { format } from "date-fns";
+import { useStoreState } from "easy-peasy";
 import {
   AlertCircle,
-  Calendar,
   CheckCircle2,
   Clock,
   FileText,
   MessageSquare,
 } from "lucide-react";
-import { useState } from "react";
 
 function AnnouncementSkeleton() {
   return (
@@ -49,8 +47,7 @@ const getStatusIcon = (status) => {
 };
 
 export default function StudentAnnouncementsPage() {
-  const [announcements, setAnnouncements] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { announcements, loading } = useStoreState((state) => state.student);
 
   const formatDate = (dateString) => {
     try {
@@ -131,30 +128,8 @@ export default function StudentAnnouncementsPage() {
                           <StatusIcon className="w-4 h-4" />
                           {announcement.title}
                         </CardTitle>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {formatDate(announcement.start_date)}
-                          </div>
-                          {announcement.end_date && (
-                            <div className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              Valid until {formatDate(announcement.end_date)}
-                            </div>
-                          )}
-                        </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        {isActive && (
-                          <Badge variant="default" className="text-xs">
-                            Active
-                          </Badge>
-                        )}
-                        {isUpcoming && (
-                          <Badge variant="outline" className="text-xs">
-                            Upcoming
-                          </Badge>
-                        )}
                         {getAnnouncementStatusBadge(announcement.status)}
                       </div>
                     </div>
@@ -184,29 +159,11 @@ export default function StudentAnnouncementsPage() {
                           </Button>
                         </div>
                       )}
-
-                      {announcement.is_send_sms && (
-                        <div className="pt-2">
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 p-2 rounded">
-                            <MessageSquare className="w-3 h-3" />
-                            SMS notification sent to enrolled students
-                          </div>
-                        </div>
-                      )}
                     </CardContent>
                   )}
                 </Card>
               );
             })}
-          </div>
-        )}
-
-        {/* Refresh Button */}
-        {!loading && announcements.length > 0 && (
-          <div className="text-center pt-6">
-            <Button variant="outline" onClick={fetchAnnouncements}>
-              Refresh Announcements
-            </Button>
           </div>
         )}
       </div>

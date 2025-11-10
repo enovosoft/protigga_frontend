@@ -102,10 +102,10 @@ export default function LiveClassManagement({ useLayout = true }) {
     try {
       if (selectedLiveClass) {
         // Update existing live class
-        const response = await api.put(
-          `/live-class/${selectedLiveClass.live_class_id}`,
-          data
-        );
+        const response = await api.put(`/live-class`, {
+          ...data,
+          live_class_id: selectedLiveClass.live_class_id,
+        });
         toast.success(
           response.data?.message || "Live class updated successfully!"
         );

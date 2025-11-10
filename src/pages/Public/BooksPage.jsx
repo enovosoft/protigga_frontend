@@ -16,6 +16,7 @@ export default function BooksPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchBooks();
   }, []);
 

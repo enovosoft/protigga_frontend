@@ -225,8 +225,8 @@ export default function AdminDashboardPage() {
 
         {/* Search Form */}
         <div className="bg-card rounded-lg border p-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-end">
-            <div className="flex-1">
+          <div className="flex flex-col sm:flex-row gap-4 items-end justify-center">
+            <div className="flex-1 mx-auto w-full">
               <Label
                 htmlFor="search_start_date"
                 className="text-sm font-medium"
@@ -243,7 +243,7 @@ export default function AdminDashboardPage() {
                 className="mt-1"
               />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 mx-auto w-full">
               <Label htmlFor="search_end_date" className="text-sm font-medium">
                 End Date
               </Label>
