@@ -252,10 +252,6 @@ export default function CourseEditPage() {
         ...courseForm,
         expired_date: `${courseForm.expired_date}T00:00:00.000Z`,
         related_books: courseForm.related_books,
-        related_book:
-          courseForm.related_books.length > 0
-            ? courseForm.related_books[0]
-            : "null",
         quiz_count:
           courseForm.quiz_count === "" || courseForm.quiz_count === undefined
             ? null
@@ -1240,25 +1236,27 @@ export default function CourseEditPage() {
                     )
                     .map((book) => (
                       <div
-                        key={book.slug}
+                        key={book.book_id}
                         className="flex items-center space-x-3 p-2 hover:bg-muted/50 rounded-md"
                       >
                         <Checkbox
-                          id={`dialog-book-${book.slug}`}
-                          checked={courseForm.related_books.includes(book.slug)}
+                          id={`dialog-book-${book.book_id}`}
+                          checked={courseForm.related_books.includes(
+                            book.book_id
+                          )}
                           onCheckedChange={(checked) => {
                             setCourseForm((prev) => ({
                               ...prev,
                               related_books: checked
-                                ? [...prev.related_books, book.slug]
+                                ? [...prev.related_books, book.book_id]
                                 : prev.related_books.filter(
-                                    (slug) => slug !== book.slug
+                                    (id) => id !== book.book_id
                                   ),
                             }));
                           }}
                         />
                         <Label
-                          htmlFor={`dialog-book-${book.slug}`}
+                          htmlFor={`dialog-book-${book.book_id}`}
                           className="text-sm cursor-pointer flex-1"
                         >
                           <div className="font-medium">{book.title}</div>

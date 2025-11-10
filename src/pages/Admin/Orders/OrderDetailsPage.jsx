@@ -290,6 +290,14 @@ export default function OrderDetailsPage() {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
+                        Paid Amount
+                      </label>
+                      <p className="font-semibold text-green-600">
+                        {formatPrice(order.payment.paid_amount || 0)}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">
                         Due Amount
                       </label>
                       <p className="font-semibold text-red-600">

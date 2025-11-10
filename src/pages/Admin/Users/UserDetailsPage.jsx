@@ -326,7 +326,9 @@ export default function UserDetailsPage() {
                           </p>
                         </div>
                         <div className="flex flex-col gap-1 items-end">
-                          {getEnrollmentStatusBadge(enrollment.status)}
+                          {enrollment.status &&
+                            getEnrollmentStatusBadge(enrollment.status)}
+
                           {user.is_blocked && getUserStatusBadge(false, true)}
                         </div>
                       </div>

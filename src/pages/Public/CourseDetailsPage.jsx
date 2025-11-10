@@ -153,7 +153,7 @@ export default function CourseDetailsPage() {
     );
   }
 
-  if (!course) {
+  if (!isLoadingCourse && !course) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-muted-foreground">Course not found</p>

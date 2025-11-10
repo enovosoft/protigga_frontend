@@ -135,7 +135,10 @@ const OrdersManagement = forwardRef(({ useLayout = true }, ref) => {
             <DropDownWithSearch
               id="search_book"
               className="mt-1"
-              items={[{ id: "all", title: "All Books" }, ...books]}
+              items={[
+                { id: "all", title: "All Books", value: "all" },
+                ...books,
+              ]}
               displayKey="title"
               value={searchForm.book_id}
               onChange={(value) => handleSearchChange("book_id", value)}
