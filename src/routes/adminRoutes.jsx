@@ -8,6 +8,7 @@ import AdminCoursesPage from "../pages/Admin/CoursesPage";
 import EnrollmentDetailsPage from "../pages/Admin/Enrollments/EnrollmentDetailsPage";
 import AdminEnrollmentsPage from "../pages/Admin/EnrollmentsPage";
 import ExamsPage from "../pages/Admin/ExamsPage";
+import LiveClassesPage from "../pages/Admin/LiveClassesPage";
 import AdminNotesPage from "../pages/Admin/NotesPage";
 import OrderDetailsPage from "../pages/Admin/Orders/OrderDetailsPage";
 import AdminOrdersPage from "../pages/Admin/OrdersPage";
@@ -119,6 +120,14 @@ export const adminRoutes = (
       element={
         <ProtectedRoute roles={["admin"]}>
           <ExamsPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/admin/live-classes"
+      element={
+        <ProtectedRoute roles={["admin"]}>
+          <LiveClassesPage />
         </ProtectedRoute>
       }
     />

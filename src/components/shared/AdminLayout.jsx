@@ -13,6 +13,7 @@ import {
   Menu,
   MessageSquare,
   Package,
+  PlayCircle,
   Shield,
   Ticket,
   User,
@@ -126,6 +127,12 @@ const AdminLayout = ({ children }) => {
       path: "/admin/exams",
     },
     {
+      id: "live-classes",
+      label: "Live Classes",
+      icon: PlayCircle,
+      path: "/admin/live-classes",
+    },
+    {
       id: "announcements",
       label: "Announcements",
       icon: MessageSquare,
@@ -234,14 +241,21 @@ const AdminLayout = ({ children }) => {
             <nav className="space-y-2">
               {sidebarItems.map((item) => {
                 const Icon = item.icon;
+                const isActive = location.pathname === item.path;
                 return (
                   <Link
                     key={item.id}
                     to={item.path}
                     onClick={() => setSidebarOpen(false)}
-                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors hover:bg-muted text-muted-foreground hover:text-foreground"
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                      isActive
+                        ? "bg-muted text-secondary"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    }`}
                   >
-                    <Icon className="w-5 h-5" />
+                    <Icon
+                      className={`w-5 h-5 ${isActive ? "text-secondary" : ""}`}
+                    />
                     <span className="font-medium">{item.label}</span>
                   </Link>
                 );
