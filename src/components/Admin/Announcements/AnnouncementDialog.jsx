@@ -24,10 +24,10 @@ import { z } from "zod";
 
 import DropDownWithSearch from "@/components/shared/DropDownWithSearch";
 import api from "@/lib/api";
+import { useStoreState } from "easy-peasy";
 import { Loader2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-
 const announcementSchema = z
   .object({
     title: z
@@ -75,30 +75,16 @@ export default function AnnouncementDialog({
     end_date: "",
     is_send_sms: false,
   });
-  const [courses, setCourses] = useState([]);
+  const courses = useStoreState((state) => state.admin.courses);
+
   const [loading, setLoading] = useState(false);
-  const [coursesLoading, setCoursesLoading] = useState(false);
+  const coursesLoading = useStoreState((state) => state.admin.loading);
 
   const [errors, setErrors] = useState({});
-
-  const fetchCourses = useCallback(async () => {
-    setCoursesLoading(true);
-    try {
-      const response = await api.get("/courses");
-      if (response.data.success) {
-        setCourses(response.data.courses || []);
-      }
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-    } finally {
-      setCoursesLoading(false);
-    }
-  }, []);
 
   // Reset form when dialog opens/closes or announcement changes
   useEffect(() => {
     if (open) {
-      fetchCourses();
       if (announcement) {
         // Editing existing announcement
         setFormData({
@@ -130,7 +116,7 @@ export default function AnnouncementDialog({
       }
       setErrors({});
     }
-  }, [announcement, open, fetchCourses]);
+  }, [announcement, open]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

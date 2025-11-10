@@ -17,15 +17,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import api from "@/lib/api";
+import { useStoreActions, useStoreState } from "easy-peasy";
 import { Loader2, Plus, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 export default function BooksManagement({ useLayout = true }) {
   const navigate = useNavigate();
-  const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+  // Admin store state and actions
+  const books = useStoreState((state) => state.admin.books);
+  const loading = useStoreState((state) => state.admin.loading);
+
+  const fetchBooks = useStoreActions((actions) => actions.admin.fetchBooks);
+
+  // Local state
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -34,28 +41,6 @@ export default function BooksManagement({ useLayout = true }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 10;
-
-  const fetchBooks = async () => {
-    setLoading(true);
-    try {
-      const response = await api.get("/books");
-      if (response.data.success) {
-        let books = response.data?.books || [];
-
-        books.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        setBooks(books);
-      }
-    } catch (error) {
-      console.error("Error fetching books:", error);
-      toast.error("Failed to fetch books");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchBooks();
-  }, []);
 
   const handleAdd = () => {
     setSelectedBook(null);
@@ -90,7 +75,7 @@ export default function BooksManagement({ useLayout = true }) {
       toast.success(response.data?.message || "Book deleted successfully!");
       setDeleteDialogOpen(false);
       setBookToDelete(null);
-      // Fetch books again to update the list
+      // Refresh books from store
       await fetchBooks();
     } catch (error) {
       await fetchBooks();
@@ -102,12 +87,16 @@ export default function BooksManagement({ useLayout = true }) {
     }
   };
 
+  const handleBookDialogSuccess = async () => {
+    await fetchBooks();
+  };
+
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1); // Reset to first page when searching
   };
 
-  // Filter books based on search term
+  // Filter books based on search term (Local Frontend filtering)
   const filteredBooks = books.filter((book) => {
     if (!searchTerm) return true;
     const searchLower = searchTerm.toLowerCase().trim();
@@ -199,7 +188,7 @@ export default function BooksManagement({ useLayout = true }) {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         book={selectedBook}
-        onSuccess={fetchBooks}
+        onSuccess={handleBookDialogSuccess}
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

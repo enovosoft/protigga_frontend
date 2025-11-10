@@ -31,6 +31,9 @@ export function PromoTableSkeleton() {
               <TableHead className="min-w-[100px] hidden lg:table-cell">
                 For
               </TableHead>
+              <TableHead className="min-w-[150px] hidden xl:table-cell">
+                Product
+              </TableHead>
               <TableHead className="min-w-[100px] hidden sm:table-cell">
                 Expiry
               </TableHead>
@@ -54,6 +57,9 @@ export function PromoTableSkeleton() {
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">
                   <Skeleton className="h-4 w-16" />
+                </TableCell>
+                <TableCell className="hidden xl:table-cell">
+                  <Skeleton className="h-4 w-32" />
                 </TableCell>
                 <TableCell className="hidden sm:table-cell">
                   <Skeleton className="h-4 w-24" />
@@ -111,8 +117,9 @@ export default function PromoTable({ promos, startIndex, onEdit, onDelete }) {
 
   const getForBadge = (promocode_for) => {
     const variants = {
-      book: "bg-primary/30 text-primary border-primary/50",
-      course: "bg-secondary/30 text-secondary border-secondary/50",
+      book: "bg-teal-500/30 text-teal-500 border-teal-500/50",
+      course: "bg-blue-500/30 text-blue-500 border-blue-500/50",
+      all: "bg-indigo-500/30 text-indigo-500 border-indigo-500/50",
     };
 
     return (
@@ -148,6 +155,9 @@ export default function PromoTable({ promos, startIndex, onEdit, onDelete }) {
               <TableHead className="font-semibold text-foreground min-w-[100px] hidden lg:table-cell">
                 For
               </TableHead>
+              <TableHead className="font-semibold text-foreground min-w-[100px] hidden lg:table-cell">
+                Product
+              </TableHead>
               <TableHead className="font-semibold text-foreground min-w-[100px] hidden sm:table-cell">
                 Expiry
               </TableHead>
@@ -182,7 +192,7 @@ export default function PromoTable({ promos, startIndex, onEdit, onDelete }) {
                     {promo.Discount_type}
                   </span>
                 </TableCell>
-                <TableCell className="hidden md:table-cell">
+                <TableCell className="hidden sm:table-cell">
                   <span className="font-medium text-foreground">
                     {formatDiscount(promo)}
                     {promo.Discount_type === "percentage" &&
@@ -195,6 +205,15 @@ export default function PromoTable({ promos, startIndex, onEdit, onDelete }) {
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">
                   {getForBadge(promo.promocode_for)}
+                </TableCell>
+                <TableCell className="hidden xl:table-cell">
+                  <span className="text-sm text-muted-foreground">
+                    {promo.promocode_for === "all"
+                      ? "All Products"
+                      : promo.book?.title ||
+                        promo.course?.course_title ||
+                        "N/A"}
+                  </span>
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground whitespace-nowrap hidden sm:table-cell">
                   {promo.expiry_date ? formatDate(promo.expiry_date) : "N/A"}

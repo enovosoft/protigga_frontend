@@ -44,6 +44,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import api from "@/lib/api";
+import { useStoreState } from "easy-peasy";
 import {
   ArrowLeft,
   ChevronDown,
@@ -99,7 +100,7 @@ export default function CourseEditPage() {
   const [saving, setSaving] = useState(false);
   const [chapters, setChapters] = useState([]);
   const [expandedChapters, setExpandedChapters] = useState(new Set());
-  const [books, setBooks] = useState([]);
+  const books = useStoreState((state) => state.admin.books);
 
   // Loading states for chapter and topic operations
   const [savingChapter, setSavingChapter] = useState(false);
@@ -143,19 +144,6 @@ export default function CourseEditPage() {
     title: "",
     youtube_url: "",
   });
-
-  // Fetch books for related book dropdown
-  const fetchBooks = useCallback(async () => {
-    try {
-      const response = await api.get("/books");
-      if (response.data.success) {
-        setBooks(response.data.books || []);
-      }
-    } catch (error) {
-      console.error("Error fetching books:", error);
-      // Don't show error toast for books fetch, just keep empty
-    }
-  }, []);
 
   // Fetch course data
   const fetchCourse = useCallback(
@@ -224,8 +212,7 @@ export default function CourseEditPage() {
       // For editing, fetch course data
       fetchCourse();
     }
-    fetchBooks();
-  }, [isCreating, slug, fetchCourse, fetchBooks]);
+  }, [isCreating, slug, fetchCourse]);
 
   // Handle course form changes
   const handleCourseChange = (e) => {

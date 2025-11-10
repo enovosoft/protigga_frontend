@@ -1,0 +1,100 @@
+import api from "@/lib/api";
+import { action, thunk } from "easy-peasy";
+
+const adminStore = {
+  courses: [],
+  books: [],
+
+  loading: false,
+  error: null,
+  initialFetch: false,
+
+  setLoading: action((state, payload) => {
+    state.loading = payload;
+  }),
+
+  setError: action((state, payload) => {
+    state.error = payload;
+  }),
+
+  setInitialFetch: action((state, payload) => {
+    state.initialFetch = payload;
+  }),
+
+  setCourses: action((state, payload) => {
+    state.courses = payload;
+  }),
+
+  setBooks: action((state, payload) => {
+    state.books = payload;
+  }),
+
+  fetchData: thunk(async (actions) => {
+    actions.setLoading(true);
+    actions.setError(null);
+    try {
+      const [coursesResponse, booksResponse] = await Promise.all([
+        api.get("/courses"),
+        api.get("/books"),
+      ]);
+
+      if (coursesResponse.data.success) {
+        let courses = coursesResponse.data?.courses || [];
+        courses.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        actions.setCourses(courses);
+      }
+
+      if (booksResponse.data.success) {
+        let books = booksResponse.data?.books || [];
+        books.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        actions.setBooks(books);
+      }
+
+      actions.setInitialFetch(true);
+    } catch (error) {
+      actions.setError(error.response?.data?.message || "Failed to fetch data");
+    } finally {
+      actions.setLoading(false);
+    }
+  }),
+
+  fetchCourses: thunk(async (actions) => {
+    actions.setLoading(true);
+    actions.setError(null);
+    try {
+      const response = await api.get("/courses");
+      if (response.data.success) {
+        let courses = response.data?.courses || [];
+        courses.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        actions.setCourses(courses);
+      }
+    } catch (error) {
+      actions.setError(
+        error.response?.data?.message || "Failed to fetch courses"
+      );
+    } finally {
+      actions.setLoading(false);
+    }
+  }),
+
+  fetchBooks: thunk(async (actions) => {
+    actions.setLoading(true);
+    actions.setError(null);
+    try {
+      const response = await api.get("/books");
+      if (response.data.success) {
+        let books = response.data?.books || [];
+        books.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        actions.setBooks(books);
+      }
+    } catch (error) {
+      actions.setError(
+        error.response?.data?.message || "Failed to fetch books"
+      );
+    } finally {
+      actions.setLoading(false);
+    }
+  }),
+};
+
+export default adminStore;

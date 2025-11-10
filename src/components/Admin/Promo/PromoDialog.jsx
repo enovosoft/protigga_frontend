@@ -1,3 +1,4 @@
+import DropDownWithSearch from "@/components/shared/DropDownWithSearch";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useStoreState } from "easy-peasy";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -25,9 +27,11 @@ import { z } from "zod";
 
 const promoSchema = z
   .object({
-    promocode_for: z.enum(["book", "course"], {
+    promocode_for: z.enum(["all", "book", "course"], {
       required_error: "Please select what this promo is for",
     }),
+    book_id: z.string().optional(),
+    course_id: z.string().optional(),
     Discount_type: z.enum(["percentage", "fixed"], {
       required_error: "Please select discount type",
     }),
@@ -66,6 +70,22 @@ const promoSchema = z
   })
   .refine(
     (data) => {
+      if (data.promocode_for === "book" && !data.book_id) {
+        return false;
+      }
+      if (data.promocode_for === "course" && !data.course_id) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message:
+        "Please select a specific book/course when applicable for is not 'all'",
+      path: ["promocode_for"],
+    }
+  )
+  .refine(
+    (data) => {
       if (data.Discount_type === "percentage" && data.Discount > 100) {
         return false;
       }
@@ -99,6 +119,10 @@ export default function PromoDialog({
   onSave,
   isLoading,
 }) {
+  // Get courses and books from admin store
+  const courses = useStoreState((state) => state.admin.courses);
+  const books = useStoreState((state) => state.admin.books);
+
   const {
     register,
     handleSubmit,
@@ -110,6 +134,8 @@ export default function PromoDialog({
     resolver: zodResolver(promoSchema),
     defaultValues: {
       promocode_for: "",
+      book_id: "",
+      course_id: "",
       Discount_type: "",
       Discount: "",
       Max_discount_amount: "",
@@ -123,11 +149,14 @@ export default function PromoDialog({
   });
 
   const discountType = watch("Discount_type");
+  const promocodeFor = watch("promocode_for");
 
   useEffect(() => {
     if (promo) {
       // Editing existing promo
       setValue("promocode_for", promo.promocode_for);
+      setValue("book_id", promo.book_id || "");
+      setValue("course_id", promo.course_id || "");
       setValue("Discount_type", promo.Discount_type);
       setValue("Discount", promo.Discount);
       setValue("Max_discount_amount", promo.Max_discount_amount || 0);
@@ -144,14 +173,16 @@ export default function PromoDialog({
       // Creating new promo
       reset({
         promocode_for: "",
+        book_id: "",
+        course_id: "",
         Discount_type: "",
         Discount: "",
         Max_discount_amount: "",
         Min_purchase_amount: "",
         promo_code: "",
-        expiry_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        expiry_date: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
           .toISOString()
-          .split("T")[0], // 1 week from now in YYYY-MM-DD format
+          .split("T")[0], // 2 months from now in YYYY-MM-DD format
         status: "active",
       });
     }
@@ -172,12 +203,14 @@ export default function PromoDialog({
       if (!promo) {
         reset({
           promocode_for: "",
+          book_id: "",
+          course_id: "",
           Discount_type: "",
           Discount: "",
           Max_discount_amount: "",
           Min_purchase_amount: "",
           promo_code: "",
-          expiry_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+          expiry_date: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
             .toISOString()
             .split("T")[0], // 1 week from now in YYYY-MM-DD format
           status: "active",
@@ -205,12 +238,7 @@ export default function PromoDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form
-          onSubmit={handleSubmit(onSubmit, (errors) => {
-            toast.error("Please fix the form errors before submitting");
-          })}
-          className="space-y-4"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Promo Code */}
           <div className="space-y-2">
             <Label htmlFor="promo_code" className="text-sm font-medium">
@@ -252,6 +280,7 @@ export default function PromoDialog({
                 <SelectValue placeholder="Select what this promo is for" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">All</SelectItem>
                 <SelectItem value="book">Book</SelectItem>
                 <SelectItem value="course">Course</SelectItem>
               </SelectContent>
@@ -262,6 +291,65 @@ export default function PromoDialog({
               </p>
             )}
           </div>
+
+          {/* Specific Book/Course Selection */}
+          {promocodeFor === "book" && (
+            <div className="space-y-2">
+              <Label htmlFor="book_id" className="text-sm font-medium">
+                Select Book <span className="text-destructive">*</span>
+              </Label>
+              <DropDownWithSearch
+                items={books}
+                valueKey="book_id"
+                displayKey="title"
+                searchKeys={["title", "batch"]}
+                placeholder="Select a book..."
+                selectedValue={watch("book_id")}
+                onSelect={(value) => setValue("book_id", value)}
+                className={cn(
+                  "transition-colors",
+                  errors.book_id &&
+                    "border-destructive focus:border-destructive"
+                )}
+                displayFormat={(book) => `${book.title} - ${book.batch}`}
+              />
+              {errors.book_id && (
+                <p className="text-sm text-destructive">
+                  {errors.book_id.message}
+                </p>
+              )}
+            </div>
+          )}
+
+          {promocodeFor === "course" && (
+            <div className="space-y-2">
+              <Label htmlFor="course_id" className="text-sm font-medium">
+                Select Course <span className="text-destructive">*</span>
+              </Label>
+              <DropDownWithSearch
+                items={courses}
+                valueKey="course_id"
+                displayKey="course_title"
+                searchKeys={["course_title", "batch"]}
+                displayFormat={(course) =>
+                  `${course.course_title} - ${course.batch}`
+                }
+                placeholder="Select a course..."
+                selectedValue={watch("course_id")}
+                onSelect={(value) => setValue("course_id", value)}
+                className={cn(
+                  "transition-colors",
+                  errors.course_id &&
+                    "border-destructive focus:border-destructive"
+                )}
+              />
+              {errors.course_id && (
+                <p className="text-sm text-destructive">
+                  {errors.course_id.message}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Discount Type */}
           <div className="space-y-2">

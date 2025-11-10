@@ -33,6 +33,7 @@ import {
 import api from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import { useStoreState } from "easy-peasy";
 import { CalendarIcon, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -89,7 +90,7 @@ const manualEnrollmentSchema = z.object({
 
 export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
   const [open, setOpen] = useState(false);
-  const [courses, setCourses] = useState([]);
+  const courses = useStoreState((state) => state.admin.courses);
   const [loading, setLoading] = useState(false);
 
   const form = useForm({
@@ -114,28 +115,6 @@ export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
       method: "BKASH",
     },
   });
-
-  const fetchCourses = async () => {
-    try {
-      const response = await api.get("/courses");
-      if (response.data.success) {
-        const coursesData = response.data?.courses || [];
-        setCourses(coursesData);
-      } else {
-        setCourses([]);
-      }
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-      toast.error("Failed to load courses");
-      setCourses([]);
-    }
-  };
-
-  useEffect(() => {
-    if (open) {
-      fetchCourses();
-    }
-  }, [open]);
 
   // Update product price when course changes
   const watchedCourseId = form.watch("course_id");

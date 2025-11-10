@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import api from "@/lib/api";
+import { useStoreState } from "easy-peasy";
 import { FileText, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -26,21 +27,9 @@ export default function ExamDialog({ open, onOpenChange, exam, onSuccess }) {
     exam_description: "",
     exam_link: "",
   });
-  const [courses, setCourses] = useState([]);
+  const courses = useStoreState((state) => state.admin.courses);
   const [loading, setLoading] = useState(false);
   const [fetchingExam, setFetchingExam] = useState(false);
-
-  const fetchCourses = useCallback(async () => {
-    try {
-      const response = await api.get("/courses");
-      if (response.data.success) {
-        setCourses(response.data.courses || []);
-      }
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-      // Don't show error toast for courses fetch, just keep empty
-    }
-  }, []);
 
   const fetchExamDetails = useCallback(async () => {
     if (!exam?.exam_id) return;
@@ -72,7 +61,6 @@ export default function ExamDialog({ open, onOpenChange, exam, onSuccess }) {
   // Fetch courses and exam details when editing
   useEffect(() => {
     if (open) {
-      fetchCourses();
       if (exam) {
         fetchExamDetails();
       } else {
@@ -87,7 +75,7 @@ export default function ExamDialog({ open, onOpenChange, exam, onSuccess }) {
         });
       }
     }
-  }, [exam, open, fetchExamDetails, fetchCourses]);
+  }, [exam, open, fetchExamDetails]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

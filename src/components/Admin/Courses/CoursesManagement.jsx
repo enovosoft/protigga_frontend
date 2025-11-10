@@ -16,43 +16,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import api from "@/lib/api";
+import { useStoreActions, useStoreState } from "easy-peasy";
 import { Loader2, Plus, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 export default function CoursesManagement({ useLayout = true }) {
   const navigate = useNavigate();
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+  // Admin store state and actions
+  const courses = useStoreState((state) => state.admin.courses);
+  const loading = useStoreState((state) => state.admin.loading);
+  const fetchCourses = useStoreActions((actions) => actions.admin.fetchCourses);
+
+  // Local state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 10;
-
-  const fetchCourses = async () => {
-    setLoading(true);
-    try {
-      const response = await api.get("/courses");
-      if (response.data.success) {
-        let courses = response.data?.courses || [];
-
-        courses.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        setCourses(courses);
-      }
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-      toast.error("Failed to fetch courses");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCourses();
-  }, []);
 
   const handleAdd = () => {
     navigate("/admin/courses/new");
@@ -81,7 +65,7 @@ export default function CoursesManagement({ useLayout = true }) {
       toast.success(response.data?.message || "Course deleted successfully!");
       setDeleteDialogOpen(false);
       setCourseToDelete(null);
-      // Fetch courses again to update the list
+      // Refresh courses from store
       await fetchCourses();
     } catch (error) {
       await fetchCourses();

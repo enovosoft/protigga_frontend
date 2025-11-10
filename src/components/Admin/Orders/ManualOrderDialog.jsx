@@ -27,6 +27,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import api from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useStoreState } from "easy-peasy";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -82,7 +83,7 @@ const manualOrderSchema = z.object({
 
 export default function ManualOrderDialog({ onOrderCreated }) {
   const [open, setOpen] = useState(false);
-  const [books, setBooks] = useState([]);
+  const books = useStoreState((state) => state.admin.books);
   const [loading, setLoading] = useState(false);
 
   const form = useForm({
@@ -103,24 +104,6 @@ export default function ManualOrderDialog({ onOrderCreated }) {
       payment_method: "BKASH",
     },
   });
-
-  const fetchBooks = async () => {
-    try {
-      const response = await api.get("/books");
-      if (response.data.success) {
-        setBooks(response.data.books || []);
-      }
-    } catch (error) {
-      console.error("Error fetching books:", error);
-      toast.error("Failed to fetch books");
-    }
-  };
-
-  useEffect(() => {
-    if (open) {
-      fetchBooks();
-    }
-  }, [open]);
 
   const onSubmit = async (data) => {
     setLoading(true);

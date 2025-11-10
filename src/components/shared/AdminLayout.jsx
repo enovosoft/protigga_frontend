@@ -1,6 +1,8 @@
 import Footer from "@/components/Footer";
+import Loading from "@/components/shared/Loading";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useStoreActions, useStoreState } from "easy-peasy";
 import {
   Book,
   BookCheck,
@@ -18,6 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const AdminLayout = ({ children }) => {
@@ -27,9 +30,29 @@ const AdminLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
+  // Admin store state and actions
+  const initialFetch = useStoreState((state) => state.admin.initialFetch);
+  const loading = useStoreState((state) => state.admin.loading);
+  const error = useStoreState((state) => state.admin.error);
+  const fetchData = useStoreActions((actions) => actions.admin.fetchData);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  // Fetch admin data on admin layout if not already fetched
+  useEffect(() => {
+    if (!initialFetch && isAuthenticated && !isAuthLoading) {
+      fetchData();
+    }
+  }, [initialFetch, isAuthenticated, isAuthLoading, fetchData]);
+
+  // Show error toast if there's an error
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
   // Get role-based icon
   const getRoleIcon = () => {
     if (primaryRole === "admin") {
@@ -228,7 +251,13 @@ const AdminLayout = ({ children }) => {
 
           {/* Main Content */}
           <div className="flex-1 md:ml-0 p-4 lg:p-6 md:overflow-x-auto">
-            <div className="max-w-7xl mx-auto w-full">{children}</div>
+            <div className="max-w-7xl mx-auto w-full">
+              {loading && !initialFetch ? (
+                <Loading text="Loading Data" />
+              ) : (
+                children
+              )}
+            </div>
           </div>
         </div>
       </div>
