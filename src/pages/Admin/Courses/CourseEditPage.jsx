@@ -44,7 +44,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import api from "@/lib/api";
-import { useStoreState } from "easy-peasy";
+import { useStoreActions, useStoreState } from "easy-peasy";
 import {
   ArrowLeft,
   ChevronDown,
@@ -88,6 +88,9 @@ const validateCourseForm = (formData) => {
     errors.push("Expired date is required");
   }
 
+  if (!formData.quiz_count?.toString().trim()) {
+    errors.push("Quiz count is required");
+  }
   return errors;
 };
 
@@ -101,7 +104,7 @@ export default function CourseEditPage() {
   const [chapters, setChapters] = useState([]);
   const [expandedChapters, setExpandedChapters] = useState(new Set());
   const books = useStoreState((state) => state.admin.books);
-
+  const fetchCourses = useStoreActions((actions) => actions.admin.fetchCourses);
   // Loading states for chapter and topic operations
   const [savingChapter, setSavingChapter] = useState(false);
   const [savingTopic, setSavingTopic] = useState(false);
@@ -149,6 +152,7 @@ export default function CourseEditPage() {
   const fetchCourse = useCallback(
     async (isRefresh = false) => {
       try {
+        setLoading(true);
         const response = await api.get(`/control/course/${slug}`);
         if (response.data.success) {
           const courseData = response.data.course;
@@ -163,9 +167,14 @@ export default function CourseEditPage() {
             thumbnail: courseData.thumbnail || "",
             academy_name: courseData.course_details?.academy_name || "",
             description: courseData.course_details?.description || "",
-            related_books: (courseData.related_books || []).map(
-              (book) => book.slug
-            ),
+            related_books: (courseData.related_books || [])
+              .map((relatedBook) => {
+                const matchingBook = books.find(
+                  (book) => book.slug === relatedBook.slug
+                );
+                return matchingBook ? matchingBook.book_id : null;
+              })
+              .filter(Boolean),
             quiz_count: courseData.course_details?.quiz_count || "",
             assessment: courseData.course_details?.assessment || false,
             skill_level: courseData.course_details?.skill_level || "",
@@ -187,7 +196,7 @@ export default function CourseEditPage() {
         setLoading(false);
       }
     },
-    [slug, navigate]
+    [slug, navigate, books]
   );
 
   useEffect(() => {
@@ -300,6 +309,7 @@ export default function CourseEditPage() {
       toast.error(error.response?.data?.message || "Failed to save course");
     } finally {
       setSaving(false);
+      await fetchCourses();
     }
   };
 
@@ -626,7 +636,7 @@ export default function CourseEditPage() {
     );
   }
 
-  if (!isCreating && !course) {
+  if (!isCreating && !course && !loading) {
     return (
       <AdminLayout>
         <div className="text-center py-16">
@@ -768,7 +778,8 @@ export default function CourseEditPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="quiz_count">Quiz Count</Label>
+                <Label htmlFor="quiz_count">Quiz Count</Label>{" "}
+                <span className="text-destructive">*</span>
                 <Input
                   id="quiz_count"
                   name="quiz_count"

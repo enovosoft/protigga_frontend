@@ -74,6 +74,7 @@ export default function CoursesManagement({ useLayout = true }) {
       toast.error(error.response?.data?.message || "Failed to delete course");
     } finally {
       setDeleting(false);
+      await fetchCourses();
     }
   };
 

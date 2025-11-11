@@ -1,15 +1,17 @@
-import UserDashboardLayout from "@/components/shared/DashboardLayout";
 import Loading from "@/components/shared/Loading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import api from "@/lib/api";
 import {
   getEnrollmentStatusBadge,
   getPaymentMethodBadge,
   getPaymentStatusBadge,
 } from "@/lib/badgeUtils";
+import {
+  toggleEnrollmentBlock,
+  updateEnrollmentExpiry,
+} from "@/lib/enrollmentUtils";
 import { formatDate, formatPrice, getRelativeTime } from "@/lib/helper";
 import {
   ArrowLeft,
@@ -24,7 +26,6 @@ import {
   User,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export default function EnrollmentDetailsPage() {
@@ -46,72 +47,21 @@ export default function EnrollmentDetailsPage() {
   }, [enrollment, navigate]);
 
   const handleToggleBlock = async () => {
-    if (!enrollment) return;
-
-    setTogglingBlock(true);
-    // Toggle the block status locally
-    setEnrollment((prev) => ({
-      ...prev,
-      is_blocked: !prev.is_blocked,
-    }));
-
-    // Save the changes
-    await handleSaveChanges();
-    setTogglingBlock(false);
+    await toggleEnrollmentBlock(enrollment, setEnrollment, setTogglingBlock);
   };
 
   const handleSaveChanges = async () => {
-    if (!enrollment) return;
-
-    setSavingChanges(true);
-    try {
-      const payload = {
-        enrollment_id: enrollment.enrollment_id,
-        user_id: enrollment.user_id,
-        is_blocked: enrollment.is_blocked,
-      };
-
-      // Add expiry_date if it was edited or always include current
-      if (selectedExpiryDate) {
-        // Format to yyyy-mm-ddT00:00:00Z
-        const date = new Date(selectedExpiryDate);
-        const formattedDate = date
-          .toISOString()
-          .replace(/T\d{2}:\d{2}:\d{2}/, "T00:00:00");
-        payload.expiry_date = formattedDate;
-      } else {
-        // Send current expiry_date
-        payload.expiry_date = enrollment.expiry_date;
-      }
-
-      const response = await api.put("/enrollment", payload);
-
-      if (response.data.success) {
-        if (selectedExpiryDate) {
-          setEnrollment((prev) => ({
-            ...prev,
-            expiry_date: new Date(selectedExpiryDate).toISOString(),
-          }));
-          setEditingExpiry(false);
-          setSelectedExpiryDate("");
-          toast.success("Expiry date updated successfully!");
-        } else {
-          toast.success(
-            enrollment.is_blocked
-              ? "Enrollment blocked successfully!"
-              : "Enrollment unblocked successfully!"
-          );
-        }
-      } else {
-        toast.error(response.data.message || "Failed to update enrollment");
-      }
-    } catch (error) {
-      console.error("Save changes error:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to update enrollment"
+    if (selectedExpiryDate) {
+      const success = await updateEnrollmentExpiry(
+        enrollment,
+        selectedExpiryDate,
+        setEnrollment,
+        setSavingChanges
       );
-    } finally {
-      setSavingChanges(false);
+      if (success) {
+        setEditingExpiry(false);
+        setSelectedExpiryDate("");
+      }
     }
   };
 

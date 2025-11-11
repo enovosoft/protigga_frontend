@@ -151,7 +151,7 @@ const PaymentHistoryPage = () => {
                           </td>
                           <td className="px-4 py-3 text-sm">
                             {entry.type === "book_order" ? (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 text-center">
                                 Book Order
                               </span>
                             ) : entry.type === "enrollment" ? (

@@ -16,8 +16,8 @@ const PaymentHistoryPage = () => {
   const student = useStoreState((s) => s.student);
 
   const displayPayments = useMemo(() => {
-    const payments = student?.payments || [];
-    const bookOrders = student?.bookOrders || [];
+    const payments = student.payments || [];
+    const bookOrders = student.bookOrders || [];
     let list = [];
 
     // Add payments from payments array
@@ -29,7 +29,7 @@ const PaymentHistoryPage = () => {
         txnId: p.Txn_ID || p.book_order?.Txn_ID,
         meta: p.book_order
           ? {
-              book: bookOrders.find((bo) => bo.payment.Txn_ID === p.Txn_ID)
+              book: bookOrders.find((bo) => bo.payment?.Txn_ID === p.Txn_ID)
                 ?.book,
             }
           : null,
@@ -38,7 +38,7 @@ const PaymentHistoryPage = () => {
 
     // Add payments from bookOrders that might not be in payments array
     bookOrders.forEach((bo) => {
-      const exists = list.some((item) => item.txnId === bo.payment.Txn_ID);
+      const exists = list.some((item) => item.txnId === bo.payment?.Txn_ID);
       if (!exists) {
         list.push({
           payment: bo.payment,
@@ -47,7 +47,7 @@ const PaymentHistoryPage = () => {
             bo.payment.tran_date ||
             bo.payment.book_order?.createdAt ||
             bo.payment.createdAt,
-          txnId: bo.payment.Txn_ID || bo.payment.book_order?.Txn_ID,
+          txnId: bo.payment?.Txn_ID || bo.payment?.book_order?.Txn_ID,
           meta: { book: bo.book },
         });
       }
@@ -149,17 +149,17 @@ const PaymentHistoryPage = () => {
                           <td className="px-4 py-3 text-sm hidden lg:table-cell">
                             {formatDate(entry.date)}
                           </td>
-                          <td className="px-4 py-3 text-sm">
+                          <td className="px-4 py-3 text-sm ">
                             {entry.type === "book_order" ? (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              <span className="block mx-auto w-fit   px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 ">
                                 Book Order
                               </span>
                             ) : entry.type === "enrollment" ? (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              <span className="block mx-auto w-fit   px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 ">
                                 Enrollment
                               </span>
                             ) : (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                              <span className="block mx-auto w-fit   px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                 {entry.type.replace("_", " ")}
                               </span>
                             )}

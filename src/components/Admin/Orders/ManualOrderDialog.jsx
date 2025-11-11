@@ -93,7 +93,7 @@ export default function ManualOrderDialog({ onOrderCreated }) {
       product_price: 0,
       quantity: 1,
       address: "",
-      Txn_ID: "MANUAL",
+      Txn_ID: "",
       book_id: "",
       alternative_phone: "",
       discount_amount: 0,

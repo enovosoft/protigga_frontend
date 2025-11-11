@@ -76,14 +76,12 @@ export default function BooksManagement({ useLayout = true }) {
       setDeleteDialogOpen(false);
       setBookToDelete(null);
       // Refresh books from store
-      await fetchBooks();
     } catch (error) {
-      await fetchBooks();
-
       console.error("Delete error:", error);
       toast.error(error.response?.data?.message || "Failed to delete book");
     } finally {
       setDeleting(false);
+      await fetchBooks();
     }
   };
 

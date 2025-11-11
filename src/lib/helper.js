@@ -34,16 +34,36 @@ export const cleanupImageUrls = (imageUrls) => {
 };
 
 export const getRelativeTime = (date) => {
-  return formatDistanceToNow(new Date(date), { addSuffix: true });
+  if (!date) return "N/A";
+
+  try {
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+      return "Invalid date";
+    }
+    return formatDistanceToNow(dateObj, { addSuffix: true });
+  } catch (error) {
+    return "Invalid date";
+  }
 };
 export const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  if (!dateString) return "N/A";
+
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return "Invalid date";
+    }
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch (error) {
+    return "Invalid date";
+  }
 };
 
 export const formatPrice = (price) => {

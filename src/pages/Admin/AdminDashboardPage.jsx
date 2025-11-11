@@ -30,7 +30,6 @@ import {
   Eye,
   GraduationCap,
   Search,
-  TrendingUp,
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -106,23 +105,24 @@ export default function AdminDashboardPage() {
       description: "Combined revenue from books and courses",
     },
     {
+      title: "Total Paid",
+      value: financeData ? formatPrice(financeData.totalPaid) : "0",
+      icon: Banknote,
+      description: "Total amount paid",
+    },
+    {
       title: "Total Withdrawable Amount",
       value: financeData ? formatPrice(financeData.withrawable) : "0",
       icon: Banknote,
       description: "Total amount available for withdrawal from Payment Gateway",
     },
     {
-      title: "Average Order Value",
-      value: financeData ? formatPrice(financeData.average_order_value) : "0",
-      icon: DollarSign,
-      description: "Average value per order",
+      title: "Total Due",
+      value: financeData ? formatPrice(financeData.totalDue) : "0",
+      icon: AlertCircle,
+      description: "Total amount due",
     },
-    {
-      title: "Revenue Growth",
-      value: financeData ? `${financeData.revenue_growth}%` : "0%",
-      icon: TrendingUp,
-      description: "Growth from last period",
-    },
+
     {
       title: "Pending Book Orders",
       value: financeData ? financeData.pending_book_orders : 0,
@@ -220,7 +220,11 @@ export default function AdminDashboardPage() {
 
     // Process book sales
     bookSales?.forEach((item) => {
-      const key = item[timeKey];
+      const key =
+        item[timeKey]?.split("-").length == 3
+          ? item[timeKey]?.split("-")[2]
+          : item[timeKey];
+
       if (!groupedData[key]) {
         groupedData[key] = { books: 0, courses: 0 };
       }
@@ -229,7 +233,10 @@ export default function AdminDashboardPage() {
 
     // Process course sales
     courseSales?.forEach((item) => {
-      const key = item[timeKey];
+      const key =
+        item[timeKey]?.split("-").length == 3
+          ? item[timeKey]?.split("-")[2]
+          : item[timeKey];
       if (!groupedData[key]) {
         groupedData[key] = { books: 0, courses: 0 };
       }

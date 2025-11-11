@@ -2,29 +2,49 @@ import UserDashboardLayout from "@/components/shared/DashboardLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   getEnrollmentStatusBadge,
   getPaymentMethodBadge,
   getPaymentStatusBadge,
   getUserStatusBadge,
 } from "@/lib/badgeUtils";
+import {
+  toggleEnrollmentBlock,
+  updateEnrollmentExpiry,
+} from "@/lib/enrollmentUtils";
 import { formatDate, formatPrice, getRelativeTime } from "@/lib/helper";
 import {
   ArrowLeft,
   BookOpen,
   Calendar,
+  Edit,
   GraduationCap,
+  Loader2,
   Phone,
+  Search,
+  Shield,
+  ShieldOff,
   ShoppingBag,
   User,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export default function UserDetailsPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = location.state?.user || null;
+  const [user, setUser] = useState(location.state?.user || null);
+
+  // Search states
+  const [enrollmentSearch, setEnrollmentSearch] = useState("");
+  const [bookOrderSearch, setBookOrderSearch] = useState("");
+
+  // Editing states for enrollments
+  const [editingEnrollmentExpiry, setEditingEnrollmentExpiry] = useState(null);
+  const [selectedExpiryDate, setSelectedExpiryDate] = useState("");
+  const [togglingEnrollmentBlock, setTogglingEnrollmentBlock] = useState(null);
+  const [togglingBookOrderBlock, setTogglingBookOrderBlock] = useState(null);
 
   useEffect(() => {
     // If no user data in state, redirect back to users
@@ -32,6 +52,61 @@ export default function UserDetailsPage() {
       navigate("/dashboard", { replace: true });
     }
   }, [user, navigate]);
+
+  // Handler functions for enrollment management
+  const handleToggleEnrollmentBlock = async (enrollment) => {
+    setTogglingEnrollmentBlock(enrollment.enrollment_id);
+    const success = await toggleEnrollmentBlock(
+      enrollment,
+      (updater) => {
+        // Update the enrollment in the user state
+        setUser((prevUser) => ({
+          ...prevUser,
+          enrollments: prevUser.enrollments.map((e) =>
+            e.enrollment_id === enrollment.enrollment_id ? updater(e) : e
+          ),
+        }));
+      },
+      () => setTogglingEnrollmentBlock(null)
+    );
+    if (!success) {
+      setTogglingEnrollmentBlock(null);
+    }
+  };
+
+  const handleUpdateEnrollmentExpiry = async (enrollment) => {
+    const success = await updateEnrollmentExpiry(
+      enrollment,
+      selectedExpiryDate,
+      (updater) => {
+        // Update the enrollment in the user state
+        setUser((prevUser) => ({
+          ...prevUser,
+          enrollments: prevUser.enrollments.map((e) =>
+            e.enrollment_id === enrollment.enrollment_id ? updater(e) : e
+          ),
+        }));
+      },
+      () => {} // No loading state needed for expiry update
+    );
+    if (success) {
+      setEditingEnrollmentExpiry(null);
+      setSelectedExpiryDate("");
+    }
+  };
+
+  // Filter functions
+  const filteredEnrollments =
+    user?.enrollments?.filter((enrollment) =>
+      enrollment.course?.course_title
+        ?.toLowerCase()
+        .includes(enrollmentSearch.toLowerCase())
+    ) || [];
+
+  const filteredBookOrders =
+    user?.book_orders?.filter((order) =>
+      order.book?.title?.toLowerCase().includes(bookOrderSearch.toLowerCase())
+    ) || [];
 
   const getStatusBadge = (isVerified, isBlocked) => {
     if (isBlocked) {
@@ -207,12 +282,22 @@ export default function UserDetailsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ShoppingBag className="w-5 h-5" />
-                  Recent Book Orders
+                  Book Orders ({filteredBookOrders.length})
                 </CardTitle>
+                {/* Search */}
+                <div className="flex items-center gap-2 mt-4">
+                  <Search className="w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by book name..."
+                    value={bookOrderSearch}
+                    onChange={(e) => setBookOrderSearch(e.target.value)}
+                    className="max-w-sm"
+                  />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {user.book_orders.slice(0, 5).map((order, index) => (
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {filteredBookOrders.map((order, index) => (
                     <div key={index} className="border rounded-lg p-4">
                       <div className="flex justify-between items-start mb-2">
                         <div>
@@ -226,7 +311,6 @@ export default function UserDetailsPage() {
                         <div className="flex flex-col gap-1 items-end">
                           {order.payment?.status &&
                             getPaymentStatusBadge(order.payment.status)}
-                          {user.is_blocked && getUserStatusBadge(false, true)}
                         </div>
                       </div>
 
@@ -297,6 +381,11 @@ export default function UserDetailsPage() {
                       )}
                     </div>
                   ))}
+                  {filteredBookOrders.length === 0 && bookOrderSearch && (
+                    <p className="text-center text-muted-foreground py-4">
+                      No book orders match your search.
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -308,15 +397,25 @@ export default function UserDetailsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <GraduationCap className="w-5 h-5" />
-                  Recent Enrollments
+                  Enrollments ({filteredEnrollments.length})
                 </CardTitle>
+                {/* Search */}
+                <div className="flex items-center gap-2 mt-4">
+                  <Search className="w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by course name..."
+                    value={enrollmentSearch}
+                    onChange={(e) => setEnrollmentSearch(e.target.value)}
+                    className="max-w-sm"
+                  />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {user.enrollments.slice(0, 5).map((enrollment, index) => (
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {filteredEnrollments.map((enrollment, index) => (
                     <div key={index} className="border rounded-lg p-4">
                       <div className="flex justify-between items-start mb-2">
-                        <div>
+                        <div className="flex-1">
                           <h4 className="font-medium">
                             {enrollment.course?.course_title ||
                               "Unknown Course"}
@@ -325,11 +424,33 @@ export default function UserDetailsPage() {
                             Enrollment ID: {enrollment.enrollment_id}
                           </p>
                         </div>
-                        <div className="flex flex-col gap-1 items-end">
+                        <div className="flex flex-col gap-1 items-end ml-4">
                           {enrollment.status &&
                             getEnrollmentStatusBadge(enrollment.status)}
-
-                          {user.is_blocked && getUserStatusBadge(false, true)}
+                          {enrollment.is_blocked &&
+                            getUserStatusBadge(false, true)}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              handleToggleEnrollmentBlock(enrollment)
+                            }
+                            disabled={
+                              togglingEnrollmentBlock ===
+                              enrollment.enrollment_id
+                            }
+                            className="flex items-center gap-1 mt-1"
+                          >
+                            {togglingEnrollmentBlock ===
+                            enrollment.enrollment_id ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : enrollment.is_blocked ? (
+                              <ShieldOff className="w-3 h-3" />
+                            ) : (
+                              <Shield className="w-3 h-3" />
+                            )}
+                            {enrollment.is_blocked ? "Unblock" : "Block"}
+                          </Button>
                         </div>
                       </div>
 
@@ -365,6 +486,81 @@ export default function UserDetailsPage() {
                         </div>
                       </div>
 
+                      {/* Expiry Date Section */}
+                      <div className="mt-2 pt-2 border-t">
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm">
+                            <span className="text-muted-foreground">
+                              Expiry:
+                            </span>
+                            {editingEnrollmentExpiry ===
+                            enrollment.enrollment_id ? (
+                              <div className="flex items-center gap-2 mt-1">
+                                <Input
+                                  type="datetime-local"
+                                  value={selectedExpiryDate}
+                                  onChange={(e) =>
+                                    setSelectedExpiryDate(e.target.value)
+                                  }
+                                  className="w-auto h-8"
+                                />
+                                <Button
+                                  size="sm"
+                                  onClick={() =>
+                                    handleUpdateEnrollmentExpiry(enrollment)
+                                  }
+                                  className="h-8"
+                                >
+                                  Save
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setEditingEnrollmentExpiry(null);
+                                    setSelectedExpiryDate("");
+                                  }}
+                                  className="h-8"
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="font-medium">
+                                  {formatDate(enrollment.expiry_date)}
+                                </span>
+                                {enrollment.expiry_date && (
+                                  <span className="text-primary/70 text-xs">
+                                    ({getRelativeTime(enrollment.expiry_date)})
+                                  </span>
+                                )}
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => {
+                                    if (enrollment.expiry_date) {
+                                      setEditingEnrollmentExpiry(
+                                        enrollment.enrollment_id
+                                      );
+                                      setSelectedExpiryDate(
+                                        new Date(enrollment.expiry_date)
+                                          .toISOString()
+                                          .slice(0, 16)
+                                      );
+                                    }
+                                  }}
+                                  className="h-6 w-6 p-0"
+                                  disabled={!enrollment.expiry_date}
+                                >
+                                  <Edit className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
                       {enrollment.payment && (
                         <div className="mt-2 pt-2 border-t">
                           <div className="flex justify-between items-center text-sm">
@@ -380,6 +576,11 @@ export default function UserDetailsPage() {
                       )}
                     </div>
                   ))}
+                  {filteredEnrollments.length === 0 && enrollmentSearch && (
+                    <p className="text-center text-muted-foreground py-4">
+                      No enrollments match your search.
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>

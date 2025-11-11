@@ -36,7 +36,7 @@ const PaymentDetailsPage = () => {
   const courseEnrollment = payment?.course_enrollment;
 
   const relatedBook = bookOrders.find(
-    (bo) => bo.payment.Txn_ID === payment?.Txn_ID
+    (bo) => bo.payment?.Txn_ID === payment?.Txn_ID
   )?.book;
   const relatedCourse = student?.enrollments?.find(
     (e) => e.id === courseEnrollment?.course_id

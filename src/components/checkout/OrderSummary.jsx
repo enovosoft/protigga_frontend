@@ -134,15 +134,10 @@ export default function OrderSummary({
               type="number"
               min="1"
               max="10000"
-              value={quantity || 1}
+              value={quantity}
               onChange={(e) => {
-                const value = parseInt(e.target.value) || 1;
-                setQuantity(Math.min(Math.max(value, 1), 10000));
-              }}
-              onBlur={(e) => {
-                if (!e.target.value || e.target.value < 1) {
-                  setQuantity(1);
-                }
+                const value = parseInt(e.target.value);
+                setQuantity(value);
               }}
               className="w-full"
             />

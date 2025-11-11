@@ -129,7 +129,11 @@ export default function ManualEnrollmentDialog({ onEnrollmentCreated }) {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const response = await api.post("/manual/enrollment", data);
+      const payload = {
+        ...data,
+        expiry_date: new Date(data.expiry_date).toISOString(),
+      };
+      const response = await api.post("/manual/enrollment", payload);
       if (response.data.success) {
         toast.success("Manual enrollment created successfully");
         setOpen(false);

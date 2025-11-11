@@ -20,6 +20,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import api from "@/lib/api";
+import { useStoreActions } from "easy-peasy";
 import { Book, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -73,6 +74,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [fetchingBook, setFetchingBook] = useState(false);
 
+  const fetchBooks = useStoreActions((actions) => actions.admin.fetchBooks);
   const fetchBookDetails = useCallback(async () => {
     if (!book?.slug) return;
 
@@ -204,6 +206,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
       toast.error(error.response?.data?.message || "Failed to save book");
     } finally {
       setLoading(false);
+      await fetchBooks();
     }
   };
 
