@@ -145,7 +145,6 @@ export default function FeaturedCourses() {
                   <Carousel
                     opts={{
                       align: "start",
-                      loop: true,
                     }}
                     className="w-full max-w-6xl mx-auto"
                   >

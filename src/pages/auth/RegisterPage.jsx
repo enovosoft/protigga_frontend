@@ -22,12 +22,12 @@ import {
   Phone,
   User,
 } from "lucide-react";
+import { motion } from "motion/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
-
 const registerSchema = z
   .object({
     fullName: z.string().min(2, "Full name must be at least 2 characters"),
@@ -90,164 +90,214 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-accent/20 to-secondary/10 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-accent/20 to-secondary/10 p-3 sm:p-4">
       {/* Back Button */}
       <Button
         variant="secondary"
         size="sm"
-        className="fixed top-4 left-4 z-10 gap-2"
+        className="fixed top-3 sm:top-4 left-3 sm:left-4 z-10 gap-2"
         onClick={() => navigate("/")}
       >
         <ArrowLeft className="h-4 w-4" />
         Back
       </Button>
 
-      <Card className="w-full max-w-md shadow-xl border-border/50">
-        <CardHeader className="space-y-3 text-center">
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-            <User className="w-8 h-8 text-primary" />
-          </div>
-          <CardTitle className="text-2xl font-bold text-primary">
-            Create Account
-          </CardTitle>
-          <CardDescription className="text-base">
-            Sign up to get started with your learning journey
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form
-            onSubmit={registerForm.handleSubmit(onRegisterSubmit)}
-            className="space-y-5"
-          >
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Full Name</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="fullName"
-                  type="text"
-                  placeholder="Enter your full name"
-                  className="pl-10"
-                  {...registerForm.register("fullName")}
-                />
-              </div>
-              {registerForm.formState.errors.fullName && (
-                <p className="text-sm text-destructive">
-                  {registerForm.formState.errors.fullName.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <div className="absolute left-11 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground flex items-center">
-                  <span className="text-sm font-medium">+880</span>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="w-full max-w-md"
+      >
+        <Card className="shadow-xl border-border/50">
+          <CardHeader className="space-y-3 text-center pb-3 sm:pb-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                delay: 0.1,
+                duration: 0.4,
+                type: "spring",
+                stiffness: 200,
+              }}
+              className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-full flex items-center justify-center"
+            >
+              <User className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+            >
+              <CardTitle className="text-xl sm:text-2xl font-bold text-primary">
+                Create Account
+              </CardTitle>
+              <CardDescription className="text-sm sm:text-base">
+                Sign up to get started with your learning journey
+              </CardDescription>
+            </motion.div>
+          </CardHeader>
+          <CardContent>
+            <motion.form
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.4 }}
+              onSubmit={registerForm.handleSubmit(onRegisterSubmit)}
+              className="space-y-4 sm:space-y-5"
+            >
+              <div className="space-y-2">
+                <Label
+                  htmlFor="fullName"
+                  className="text-sm sm:text-base font-medium"
+                >
+                  Full Name
+                </Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="Enter your full name"
+                    className="pl-10 h-10 sm:h-11"
+                    {...registerForm.register("fullName")}
+                  />
                 </div>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="1XXXXXXXXX"
-                  className="pl-20"
-                  {...registerForm.register("phone")}
-                />
+                {registerForm.formState.errors.fullName && (
+                  <p className="text-xs sm:text-sm text-destructive">
+                    {registerForm.formState.errors.fullName.message}
+                  </p>
+                )}
               </div>
-              {registerForm.formState.errors.phone && (
-                <p className="text-sm text-destructive">
-                  {registerForm.formState.errors.phone.message}
-                </p>
-              )}
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Create a password"
-                  className="pl-10 pr-10"
-                  {...registerForm.register("password")}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              <div className="space-y-2">
+                <Label
+                  htmlFor="phone"
+                  className="text-sm sm:text-base font-medium"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
+                  Phone Number
+                </Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <div className="absolute left-11 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground flex items-center">
+                    <span className="text-sm font-medium">+880</span>
+                  </div>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="1XXXXXXXXX"
+                    className="pl-20 h-10 sm:h-11"
+                    {...registerForm.register("phone")}
+                  />
+                </div>
+                {registerForm.formState.errors.phone && (
+                  <p className="text-xs sm:text-sm text-destructive">
+                    {registerForm.formState.errors.phone.message}
+                  </p>
+                )}
               </div>
-              {registerForm.formState.errors.password && (
-                <p className="text-sm text-destructive">
-                  {registerForm.formState.errors.password.message}
-                </p>
-              )}
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm your password"
-                  className="pl-10 pr-10"
-                  {...registerForm.register("confirmPassword")}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              <div className="space-y-2">
+                <Label
+                  htmlFor="password"
+                  className="text-sm sm:text-base font-medium"
                 >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
+                  Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Create a password"
+                    className="pl-10 pr-10 h-10 sm:h-11"
+                    {...registerForm.register("password")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+                {registerForm.formState.errors.password && (
+                  <p className="text-xs sm:text-sm text-destructive">
+                    {registerForm.formState.errors.password.message}
+                  </p>
+                )}
               </div>
-              {registerForm.formState.errors.confirmPassword && (
-                <p className="text-sm text-destructive">
-                  {registerForm.formState.errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
 
-            <Button type="submit" className="w-full h-11" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating Account...
-                </>
-              ) : (
-                <>
-                  Create Account
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </>
-              )}
-            </Button>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="confirmPassword"
+                  className="text-sm sm:text-base font-medium"
+                >
+                  Confirm Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm your password"
+                    className="pl-10 pr-10 h-10 sm:h-11"
+                    {...registerForm.register("confirmPassword")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+                {registerForm.formState.errors.confirmPassword && (
+                  <p className="text-xs sm:text-sm text-destructive">
+                    {registerForm.formState.errors.confirmPassword.message}
+                  </p>
+                )}
+              </div>
 
-            <div className="text-center text-sm">
-              <span className="text-muted-foreground">
-                Already have an account?{" "}
-              </span>
-              <Link
-                to="/auth/login"
-                className="text-secondary hover:text-secondary/80 font-medium transition-colors"
+              <Button
+                type="submit"
+                className="w-full h-10 sm:h-11 text-sm sm:text-base"
+                disabled={isLoading}
               >
-                Sign in
-              </Link>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating Account...
+                  </>
+                ) : (
+                  <>
+                    Create Account
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
+              </Button>
+
+              <div className="text-center text-xs sm:text-sm">
+                <span className="text-muted-foreground">
+                  Already have an account?{" "}
+                </span>
+                <Link
+                  to="/auth/login"
+                  className="text-secondary hover:text-secondary/80 font-medium transition-colors"
+                >
+                  Sign in
+                </Link>
+              </div>
+            </motion.form>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 }

@@ -20,7 +20,7 @@ import {
   Lock,
   Phone,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
@@ -42,11 +42,13 @@ const otpPasswordSchema = z
   });
 
 export default function ResetPasswordPage() {
-  const [step, setStep] = useState("phone"); // 'phone' or 'otp-password'
+  const [step, setStep] = useState("phone"); // 'phone' or 'otp'
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [resendTimer, setResendTimer] = useState(180); // 3 minutes in seconds
+  const [canResend, setCanResend] = useState(false);
   const navigate = useNavigate();
 
   const phoneForm = useForm({
@@ -65,6 +67,30 @@ export default function ResetPasswordPage() {
     },
   });
 
+  // Timer effect for resend countdown
+  useEffect(() => {
+    let interval;
+    if (resendTimer > 0 && !canResend && step === "otp") {
+      interval = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            setCanResend(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer, canResend, step]);
+
+  // Format timer display
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
   const onPhoneSubmit = async (data) => {
     setIsLoading(true);
     try {
@@ -73,6 +99,8 @@ export default function ResetPasswordPage() {
       });
       setPhoneNumber(data.phone);
       setStep("otp");
+      setResendTimer(180); // Reset to 3 minutes
+      setCanResend(false);
       toast.success(response.data.message || "OTP sent to your phone number");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to send OTP");
@@ -101,8 +129,21 @@ export default function ResetPasswordPage() {
   };
 
   const resendOtp = async () => {
-    // Simply call onPhoneSubmit to resend OTP
-    await onPhoneSubmit({ phone: phoneNumber });
+    if (!canResend) return;
+
+    setIsLoading(true);
+    try {
+      const response = await apiInstance.post("/auth/reset-password/send-otp", {
+        phone: `+880${phoneNumber}`,
+      });
+      setResendTimer(180); // Reset to 3 minutes
+      setCanResend(false);
+      toast.success(response.data.message || "OTP resent successfully");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to resend OTP");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // OTP + Password Step
@@ -239,10 +280,16 @@ export default function ResetPasswordPage() {
                 <button
                   type="button"
                   onClick={resendOtp}
-                  disabled={isLoading}
-                  className="text-sm text-secondary hover:text-secondary/80 font-medium transition-colors"
+                  disabled={!canResend || isLoading}
+                  className={`text-sm font-medium transition-colors ${
+                    canResend
+                      ? "text-secondary hover:text-secondary/80"
+                      : "text-muted-foreground cursor-not-allowed"
+                  }`}
                 >
-                  Didn't receive code? Resend OTP
+                  {canResend
+                    ? "Didn't receive code? Resend OTP"
+                    : `Resend OTP in ${formatTime(resendTimer)}`}
                 </button>
               </div>
 

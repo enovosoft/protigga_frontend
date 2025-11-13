@@ -504,7 +504,7 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
       {/* Watermark */}
       {profile?.phone && playing && (
         <div
-          className="absolute pointer-events-none select-none z-40 text-secondary/30 text-lg font-medium "
+          className="absolute pointer-events-none select-none z-40 text-secondary/30 text-xs sm:text-sm lg:text-base font-medium"
           style={{
             top: `${watermarkPosition.top}px`,
             left: `${watermarkPosition.left}px`,
@@ -533,9 +533,9 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
         </div>
 
         {/* Bottom Controls */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3 sm:p-4">
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-2             sm:p-4">
           {/* Progress Bar */}
-          <div className="mb-2 sm:mb-3">
+          <div>
             <Slider
               value={[played * 100]}
               onValueChange={handleSeekChange}
@@ -545,7 +545,7 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
               step={0.1}
               className="w-full"
             />
-            <div className="flex justify-between text-xs text-white/70 mt-2">
+            <div className="flex justify-between text-xs text-white/70 mt-1 ">
               <span>{formatTime(played * duration)}</span>
               <span>{formatTime(duration)}</span>
             </div>
@@ -560,7 +560,7 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
                 variant="ghost"
                 size="sm"
                 onClick={handleSkipBack}
-                className="text-white hover:bg-white/20 relative w-10 h-10 sm:w-11 sm:h-11 p-1 flex-shrink-0"
+                className="text-white hover:bg-white/20 relative w-10 h-10 sm:w-11 sm:h-11  flex-shrink-0"
                 title="Rewind 10 seconds"
               >
                 <Rewind className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -573,7 +573,7 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
                 variant="ghost"
                 size="sm"
                 onClick={handlePlayPause}
-                className="text-white hover:bg-white/20 w-11 h-11 sm:w-12 sm:h-12 p-1 flex-shrink-0"
+                className="text-white hover:bg-white/20 w-11 h-11 sm:w-12 sm:h-12flex-shrink-0"
               >
                 {playing ? (
                   <Pause className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -587,7 +587,7 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
                 variant="ghost"
                 size="sm"
                 onClick={handleSkipForward}
-                className="text-white hover:bg-white/20 relative w-10 h-10 sm:w-11 sm:h-11 p-1 flex-shrink-0"
+                className="text-white hover:bg-white/20 relative w-10 h-10 sm:w-11 sm:h-11 flex-shrink-0"
                 title="Fast forward 10 seconds"
               >
                 <FastForward className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -615,7 +615,7 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
                 variant="ghost"
                 size="sm"
                 onClick={handleMute}
-                className="text-white hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 p-1 flex-shrink-0"
+                className="text-white hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 flex-shrink-0"
               >
                 {muted || volume === 0 ? (
                   <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -683,7 +683,7 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
                 variant="ghost"
                 size="sm"
                 onClick={handleFullscreen}
-                className="text-white hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 p-1 flex-shrink-0"
+                className="text-white hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 flex-shrink-0"
                 title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
               >
                 {isFullscreen ? (

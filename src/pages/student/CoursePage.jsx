@@ -272,44 +272,44 @@ export default function CoursePage() {
 
   return (
     <StudentDashboardLayout container={false}>
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6">
         {/* Left Navigation - Chapters and Topics */}
-        <div className="lg:col-span-1 order-3 lg:order-1">
+        <div className="xl:col-span-1 order-3 xl:order-1">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clapperboard className="w-5 h-5" />
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Clapperboard className="w-4 h-4 sm:w-5 sm:h-5" />
                 Course Content
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 p-2">
+            <CardContent className="space-y-2 sm:space-y-3 p-2 sm:p-4">
               {course.chapters?.map((chapter, chapterIndex) => (
                 <Collapsible
                   key={chapter.chapter_id}
                   open={expandedChapters[chapter.chapter_id]}
                   onOpenChange={() => toggleChapter(chapter.chapter_id)}
                 >
-                  <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-accent/50 rounded-xl transition-all duration-200 border border-transparent hover:border-border/50 group">
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                        <Play className="w-4 h-4 text-primary" />
+                  <CollapsibleTrigger className="flex items-center justify-between w-full p-2 sm:p-3 hover:bg-accent/50 rounded-lg sm:rounded-xl transition-all duration-200 border border-transparent hover:border-border/50 group">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                        <Play className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                       </div>
-                      <span className="font-bold text-left text-sm text-foreground group-hover:text-primary transition-colors truncate">
+                      <span className="font-bold text-left text-xs sm:text-sm text-foreground group-hover:text-primary transition-colors truncate">
                         {chapter.title}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                    <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                      <span className="text-xs text-muted-foreground bg-muted px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
                         {chapter.topics?.length || 0} lectures
                       </span>
                       {expandedChapters[chapter.chapter_id] ? (
-                        <ChevronDown className="w-4 h-4 flex-shrink-0 text-primary" />
+                        <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 text-primary" />
                       ) : (
-                        <ChevronRight className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
+                        <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 text-muted-foreground" />
                       )}
                     </div>
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="space-y-1 pl-4 pt-2 pb-2">
+                  <CollapsibleContent className="space-y-1 pl-2 sm:pl-4 pt-1 sm:pt-2 pb-1 sm:pb-2">
                     {chapter.topics?.map((topic, topicIndex) => {
                       // Calculate global topic number
                       let globalTopicNumber = 1;
@@ -331,17 +331,17 @@ export default function CoursePage() {
                       return (
                         <div
                           key={topic.chapter_topic_id}
-                          className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all duration-200 group border ${
+                          className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-lg cursor-pointer transition-all duration-200 group border ${
                             isSelected
                               ? "bg-primary/15 border-primary/20 shadow-md ring-1 ring-primary/10"
                               : "hover:bg-accent/40 hover:border-accent/60 border-transparent hover:shadow-sm"
                           }`}
                           onClick={() => handleTopicSelect(topic)}
                         >
-                          <div className="flex items-center gap-2 min-w-0 flex-1">
-                            <div className="flex items-center gap-2 flex-shrink-0">
+                          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+                            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                               <Video
-                                className={`w-4 h-4 transition-colors duration-200 ${
+                                className={`w-3 h-3 sm:w-4 sm:h-4 transition-colors duration-200 ${
                                   isSelected
                                     ? "text-primary"
                                     : isCompleted
@@ -350,7 +350,7 @@ export default function CoursePage() {
                                 }`}
                               />
                               <span
-                                className={`text-sm font-semibold transition-colors duration-200 ${
+                                className={`text-xs sm:text-sm font-semibold transition-colors duration-200 ${
                                   isSelected
                                     ? "text-primary"
                                     : isCompleted
@@ -363,7 +363,7 @@ export default function CoursePage() {
                             </div>
                             <div className="min-w-0 flex-1">
                               <span
-                                className={`text-sm font-medium block truncate transition-colors duration-200 ${
+                                className={`text-xs sm:text-sm font-medium block truncate transition-colors duration-200 ${
                                   isSelected
                                     ? "text-primary"
                                     : isCompleted
@@ -386,12 +386,12 @@ export default function CoursePage() {
                               )}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
+                          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                             {isCompleted && (
-                              <Check className="w-4 h-4 text-green-600" />
+                              <Check className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
                             )}
                             {isSelected && (
-                              <Play className="w-3 h-3 text-primary fill-primary" />
+                              <Play className="w-2 h-2 sm:w-3 sm:h-3 text-primary fill-primary" />
                             )}
                           </div>
                         </div>
@@ -405,12 +405,14 @@ export default function CoursePage() {
         </div>
 
         {/* Main Content Area */}
-        <div className="lg:col-span-3 order-1 lg:order-2">
+        <div className="xl:col-span-3 order-1 xl:order-2">
           <Card>
-            <CardHeader>
-              <CardTitle>{course.course_title}</CardTitle>
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="text-lg sm:text-xl">
+                {course.course_title}
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4  p-1 lg:p-4">
+            <CardContent className="space-y-3 sm:space-y-4 p-2 sm:p-4 lg:p-6">
               {/* Video Content Area */}
               <VideoPlayer
                 key={selectedTopic?.chapter_topic_id || "no-topic"}
@@ -425,29 +427,36 @@ export default function CoursePage() {
               />
 
               {/* Navigation Controls */}
-              <div className="flex items-center justify-between gap-3 pt-3">
+              <div className="flex items-center justify-between gap-2 sm:gap-3 pt-2 sm:pt-3">
                 <Button
                   onClick={handlePreviousTopic}
                   disabled={!hasPreviousTopic()}
                   variant="outline"
+                  size="sm"
+                  className="flex-1 sm:flex-initial"
                 >
-                  <ChevronLeft className="w-4 h-4" />
-                  <span className="text-sm font-medium">
-                    Previous <span className="hidden md:inline">Lecture</span>
+                  <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="text-xs sm:text-sm font-medium ml-1">
+                    Previous <span className="hidden sm:inline">Lecture</span>
                   </span>
                 </Button>
 
-                <Button onClick={handleNextTopic} disabled={!hasNextTopic()}>
-                  <span className="text-sm font-medium">
-                    Next <span className="hidden md:inline">Lecture</span>
+                <Button
+                  onClick={handleNextTopic}
+                  disabled={!hasNextTopic()}
+                  size="sm"
+                  className="flex-1 sm:flex-initial"
+                >
+                  <span className="text-xs sm:text-sm font-medium mr-1">
+                    Next <span className="hidden sm:inline">Lecture</span>
                   </span>
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
               </div>
 
               {/* Topic Title and Description */}
-              <div className="border-t pt-4">
-                <h3 className="font-semibold text-lg mb-2">
+              <div className="border-t pt-3 sm:pt-4">
+                <h3 className="font-semibold text-base sm:text-lg mb-2">
                   {selectedTopic
                     ? selectedTopic.title
                     : "Select a topic to view content"}

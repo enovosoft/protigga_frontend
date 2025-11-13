@@ -45,9 +45,9 @@ export default function VerifyAccountPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-accent/20 to-secondary/10 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-accent/20 to-secondary/10 p-3 sm:p-4">
         {/* Back Button */}
-        <div className="fixed top-4 left-4 z-50">
+        <div className="fixed top-3 sm:top-4 left-3 sm:left-4 z-50">
           <button
             onClick={() => navigate("/")}
             className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-foreground hover:text-secondary transition-colors bg-card hover:bg-accent rounded-md border border-border"
@@ -59,7 +59,9 @@ export default function VerifyAccountPage() {
 
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-          <p className="mt-4 text-muted-foreground">Sending OTP...</p>
+          <p className="mt-4 text-muted-foreground text-sm sm:text-base">
+            Sending OTP...
+          </p>
         </div>
       </div>
     );
