@@ -378,14 +378,13 @@ export default function AdminDashboardPage() {
                     </div>
                   ))
                 ) : (
-                  // Actual book sales data
                   <>
                     {financeData?.book_sales?.slice(0, 5).map((book) => (
                       <div
                         key={book.book_id}
-                        className="flex items-center justify-between"
+                        className="flex items-center justify-between "
                       >
-                        <div className="flex-1">
+                        <div className="flex-1 truncate">
                           <p className="text-sm font-medium truncate">
                             {book.book_name}
                           </p>
@@ -422,7 +421,7 @@ export default function AdminDashboardPage() {
                           <TableBody>
                             {financeData?.book_sales?.map((book) => (
                               <TableRow key={book.book_id}>
-                                <TableCell className="font-medium">
+                                <TableCell className="font-medium truncate">
                                   {book.book_name}
                                 </TableCell>
                                 <TableCell>{book.total_orders}</TableCell>
@@ -466,14 +465,13 @@ export default function AdminDashboardPage() {
                     </div>
                   ))
                 ) : (
-                  // Actual course sales data
                   <>
                     {financeData?.course_sales?.slice(0, 5).map((course) => (
                       <div
                         key={course.course_id}
                         className="flex items-center justify-between"
                       >
-                        <div className="flex-1">
+                        <div className="flex-1 truncate">
                           <p className="text-sm font-medium truncate">
                             {course.course_name}
                           </p>
@@ -510,7 +508,7 @@ export default function AdminDashboardPage() {
                           <TableBody>
                             {financeData?.course_sales?.map((course) => (
                               <TableRow key={course.course_id}>
-                                <TableCell className="font-medium">
+                                <TableCell className="font-medium truncate">
                                   {course.course_name}
                                 </TableCell>
                                 <TableCell>{course.total_orders}</TableCell>

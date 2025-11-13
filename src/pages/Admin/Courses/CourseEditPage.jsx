@@ -1292,8 +1292,10 @@ export default function CourseEditPage() {
               </div>
 
               {/* Selection Summary */}
-              <div className="text-sm text-muted-foreground">
-                {courseForm.related_books.length} book(s) selected
+              <div className="text-sm text-muted-foreground flex justify-between items-center px-2">
+                <span> {courseForm.related_books.length} book(s) selected</span>
+
+                <span> {books.length} Book(s) total </span>
               </div>
             </div>
 

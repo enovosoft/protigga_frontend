@@ -76,20 +76,32 @@ export default function CoursePage() {
     isFetched,
   ]);
 
-  // Auto-select first topic when course loads
+  // Auto-select first topic when course loads or changes
   useEffect(() => {
-    if (course?.chapters?.length > 0 && !selectedTopic) {
+    if (course?.chapters?.length > 0) {
       // Find the first chapter with topics
       const firstChapter = course.chapters.find(
         (chapter) => chapter.topics?.length > 0
       );
       if (firstChapter && firstChapter.topics?.length > 0) {
-        setSelectedTopic(firstChapter.topics[0]);
-        // Expand the first chapter
-        setExpandedChapters((prev) => ({
-          ...prev,
-          [firstChapter.chapter_id]: true,
-        }));
+        // Check if the current selected topic belongs to this course
+        const currentTopicBelongsToThisCourse = course.chapters.some(
+          (chapter) =>
+            chapter.topics?.some(
+              (topic) =>
+                topic.chapter_topic_id === selectedTopic?.chapter_topic_id
+            )
+        );
+
+        // If no topic selected or current topic doesn't belong to this course, select first topic
+        if (!selectedTopic || !currentTopicBelongsToThisCourse) {
+          setSelectedTopic(firstChapter.topics[0]);
+          // Expand the first chapter
+          setExpandedChapters((prev) => ({
+            ...prev,
+            [firstChapter.chapter_id]: true,
+          }));
+        }
       }
     }
   }, [course, selectedTopic]);

@@ -1,6 +1,8 @@
 import Loading from "@/components/shared/Loading";
 import StudentDashboardLayout from "@/components/shared/StudentDashboardLayout";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +15,7 @@ import { differenceInMinutes, format } from "date-fns";
 import { useStoreState } from "easy-peasy";
 import {
   AlertTriangle,
+  Bell,
   Book,
   Calendar,
   Clock,
@@ -20,9 +23,9 @@ import {
   CreditCard,
   ExternalLink,
   GraduationCap,
-  MessageSquare,
   PlayCircle,
   User,
+  Video,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -30,18 +33,34 @@ import { useNavigate } from "react-router-dom";
 export default function StudentDashboard() {
   const navigate = useNavigate();
 
-  const { loading, exams, liveClasses } = useStoreState(
-    (state) => state.student
-  );
+  const {
+    loading,
 
-  // Helper function to format duration in HH:MM format
-  const formatDuration = (minutes) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    if (hours > 0) {
-      return `${hours}:${mins.toString().padStart(2, "0")} hrs`;
+    liveClasses,
+    exams,
+    announcements,
+  } = useStoreState((state) => state.student);
+
+  // Copy to clipboard function
+  const copyToClipboard = async (text, label) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(`${label} copied to clipboard!`);
+    } catch (err) {
+      toast.error("Failed to copy to clipboard");
     }
-    return `${mins} min`;
+  };
+
+  const formatDuration = (minutes) => {
+    if (minutes < 60) {
+      return `${minutes} min`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    if (remainingMinutes === 0) {
+      return `${hours}h`;
+    }
+    return `${hours}h ${remainingMinutes}m`;
   };
 
   // Check for ongoing exams
@@ -81,12 +100,6 @@ export default function StudentDashboard() {
       onClick: () => navigate("/dashboard/exams"),
     },
     {
-      title: "Announcements",
-      description: "View course announcements and important updates.",
-      icon: MessageSquare,
-      onClick: () => navigate("/dashboard/announcements"),
-    },
-    {
       title: "My Profile",
       description: "Update your personal information and preferences.",
       icon: User,
@@ -122,9 +135,209 @@ export default function StudentDashboard() {
                 courses, notes, and books.
               </p>
             </div>
+            {/* Live Classes Section */}
+            {liveClasses && liveClasses.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <Video className="w-5 h-5" />
+                  Live Classes
+                </h3>
+                <div className="space-y-3">
+                  {liveClasses.map((liveClass) => {
+                    const startTime = new Date(liveClass.start_time);
+                    const endTime = new Date(liveClass.end_time);
+                    const now = new Date();
+                    const isOngoing = now >= startTime && now <= endTime;
+                    const isUpcoming = now < startTime;
+                    const duration = differenceInMinutes(endTime, startTime);
 
+                    return (
+                      <Card
+                        key={liveClass.id}
+                        className={`transition-all duration-200 hover:shadow-md ${
+                          isOngoing
+                            ? "ring-2 ring-green-500/30 bg-green-50"
+                            : isUpcoming
+                            ? "ring-2 ring-blue-500/30 bg-blue-50"
+                            : ""
+                        }`}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`p-2 rounded-lg ${
+                                isOngoing
+                                  ? "bg-green-500 text-white animate-pulse"
+                                  : isUpcoming
+                                  ? "bg-blue-500 text-white"
+                                  : "bg-gray-500 text-white"
+                              }`}
+                            >
+                              <Video className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-2">
+                                <h4 className="font-semibold text-foreground truncate">
+                                  {liveClass.title}
+                                </h4>
+                                <div className="flex gap-2">
+                                  {isOngoing && (
+                                    <Badge className="bg-green-500 text-white">
+                                      <Bell className="w-3 h-3 mr-1" />
+                                      Live Now
+                                    </Badge>
+                                  )}
+                                  {isUpcoming && (
+                                    <Badge variant="secondary">
+                                      <Clock className="w-3 h-3 mr-1" />
+                                      Upcoming
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  {format(startTime, "MMM dd, h:mm a")}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Clock className="w-3 h-3" />
+                                  {formatDuration(duration)}
+                                </span>
+                              </div>
+                              {liveClass.description && (
+                                <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                                  {liveClass.description}
+                                </p>
+                              )}
+                              <div className="flex gap-2 mt-3">
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button
+                                      size="sm"
+                                      className={
+                                        isOngoing
+                                          ? "bg-green-600 hover:bg-green-700"
+                                          : ""
+                                      }
+                                    >
+                                      <PlayCircle className="w-4 h-4 mr-2" />
+                                      Join Class
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="max-w-md">
+                                    <DialogHeader>
+                                      <DialogTitle className="flex items-center gap-2">
+                                        <Video className="w-5 h-5" />
+                                        {liveClass.title}
+                                      </DialogTitle>
+                                      <DialogDescription>
+                                        Class details and join information
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="space-y-4">
+                                      <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <div>
+                                          <span className="text-muted-foreground">
+                                            Start Time:
+                                          </span>
+                                          <p className="font-medium">
+                                            {format(startTime, "MMM dd, yyyy")}
+                                            <br />
+                                            {format(startTime, "h:mm a")}
+                                          </p>
+                                        </div>
+                                        <div>
+                                          <span className="text-muted-foreground">
+                                            Duration:
+                                          </span>
+                                          <p className="font-medium">
+                                            {formatDuration(duration)}
+                                          </p>
+                                        </div>
+                                      </div>
+                                      {liveClass.description && (
+                                        <div>
+                                          <span className="text-muted-foreground text-sm">
+                                            Description:
+                                          </span>
+                                          <p className="text-sm mt-1">
+                                            {liveClass.description}
+                                          </p>
+                                        </div>
+                                      )}
+                                      <div className="space-y-3">
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-sm font-medium">
+                                            Meeting ID:
+                                          </span>
+                                          <code className="bg-muted px-2 py-1 rounded text-sm flex-1">
+                                            {liveClass.meeting_id}
+                                          </code>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() =>
+                                              copyToClipboard(
+                                                liveClass.meeting_id,
+                                                "Meeting ID"
+                                              )
+                                            }
+                                          >
+                                            <Copy className="w-3 h-3" />
+                                          </Button>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-sm font-medium">
+                                            Password:
+                                          </span>
+                                          <code className="bg-muted px-2 py-1 rounded text-sm flex-1">
+                                            {liveClass.meeting_password}
+                                          </code>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() =>
+                                              copyToClipboard(
+                                                liveClass.meeting_password,
+                                                "Meeting Password"
+                                              )
+                                            }
+                                          >
+                                            <Copy className="w-3 h-3" />
+                                          </Button>
+                                        </div>
+                                      </div>
+                                      <div className="flex gap-2">
+                                        <Button
+                                          className="flex-1"
+                                          onClick={() =>
+                                            window.open(
+                                              liveClass.meeting_link ||
+                                                liveClass.join_url,
+                                              "_blank"
+                                            )
+                                          }
+                                        >
+                                          <ExternalLink className="w-4 h-4 mr-2" />
+                                          Join Meeting
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </DialogContent>
+                                </Dialog>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             {/* Ongoing Exam Notification */}
-            {ongoingExams.length > 0 && (
+            {ongoingExams && ongoingExams.length > 0 && (
               <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <div className="flex items-center gap-3">
                   <AlertTriangle className="w-5 h-5 text-yellow-600" />
@@ -143,276 +356,6 @@ export default function StudentDashboard() {
                         View Exam{ongoingExams.length > 1 ? "s" : ""}
                       </button>
                     </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Live Classes Section */}
-            {liveClasses && liveClasses.length > 0 && (
-              <div className="mb-8">
-                <div className="bg-gradient-to-r from-primary/10 via-secondary/5 to-primary/10 rounded-xl p-6 border border-primary/20 shadow-lg">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 bg-primary rounded-lg shadow-md">
-                        <PlayCircle className="w-6 h-6 text-primary-foreground" />
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-bold text-foreground">
-                          Live Classes
-                        </h3>
-                        <p className="text-muted-foreground">
-                          Join your Live sessions
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {liveClasses.map((liveClass) => {
-                      const startTime = new Date(liveClass.start_time);
-                      const endTime = new Date(liveClass.end_time);
-                      const now = new Date();
-                      const isOngoing = now >= startTime && now <= endTime;
-                      const isUpcoming = now < startTime;
-                      const duration = differenceInMinutes(endTime, startTime);
-
-                      const copyToClipboard = async (text, label) => {
-                        try {
-                          await navigator.clipboard.writeText(text);
-                          toast.success(`${label} copied to clipboard!`);
-                        } catch {
-                          toast.error("Failed to copy to clipboard");
-                        }
-                      };
-
-                      return (
-                        <div
-                          key={liveClass.live_class_id}
-                          className={`group relative bg-card border rounded-xl p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${
-                            isOngoing
-                              ? "ring-2 ring-success shadow-success/20 bg-success/5"
-                              : isUpcoming
-                              ? "hover:border-primary/50"
-                              : "opacity-75"
-                          }`}
-                        >
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <h4 className="font-semibold text-base line-clamp-2 group-hover:text-primary transition-colors">
-                                  {liveClass.title}
-                                </h4>
-                                {isOngoing && (
-                                  <span className="px-2 py-1 bg-success text-success-foreground text-xs font-medium rounded-full animate-pulse">
-                                    LIVE
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <User className="w-4 h-4 text-muted-foreground" />
-                                <p className="text-sm text-muted-foreground font-medium">
-                                  {liveClass.teacher_name}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="space-y-3 mb-4">
-                            <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                              <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
-                              <div>
-                                <p className="text-sm font-medium">
-                                  {format(startTime, "EEE, MMM d, yyyy")}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                              <Clock className="w-4 h-4 text-secondary flex-shrink-0" />
-                              <div>
-                                <p className="text-sm font-medium">
-                                  {format(startTime, "h:mm a")} -{" "}
-                                  {format(endTime, "h:mm a")}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  {formatDuration(duration)}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant={isOngoing ? "success" : "default"}
-                                size="sm"
-                                className={`w-full transition-all duration-200 ${
-                                  isOngoing
-                                    ? "hover:bg-success/90 shadow-md hover:shadow-lg"
-                                    : "hover:shadow-md"
-                                }`}
-                              >
-                                {isOngoing ? (
-                                  <>
-                                    <PlayCircle className="w-4 h-4 mr-2" />
-                                    Join Live Class
-                                  </>
-                                ) : isUpcoming ? (
-                                  <>
-                                    <Calendar className="w-4 h-4 mr-2" />
-                                    View Details
-                                  </>
-                                ) : (
-                                  <>
-                                    <Clock className="w-4 h-4 mr-2" />
-                                    View Recording
-                                  </>
-                                )}
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-md">
-                              <DialogHeader>
-                                <DialogTitle className="flex items-center gap-3">
-                                  <div
-                                    className={`p-2 rounded-lg ${
-                                      isOngoing
-                                        ? "bg-success text-success-foreground"
-                                        : "bg-primary text-primary-foreground"
-                                    }`}
-                                  >
-                                    <PlayCircle className="w-5 h-5" />
-                                  </div>
-                                  <div>
-                                    <div className="flex items-center gap-2">
-                                      {liveClass.title}
-                                      {isOngoing && (
-                                        <span className="px-2 py-1 bg-success text-success-foreground text-xs font-medium rounded-full">
-                                          LIVE
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                </DialogTitle>
-                                <DialogDescription>
-                                  Live class details and meeting information
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                    <label className="text-sm font-medium text-muted-foreground">
-                                      Teacher
-                                    </label>
-                                    <p className="text-sm font-medium">
-                                      {liveClass.teacher_name}
-                                    </p>
-                                  </div>
-                                  <div>
-                                    <label className="text-sm font-medium text-muted-foreground">
-                                      Duration
-                                    </label>
-                                    <p className="text-sm font-medium">
-                                      {formatDuration(duration)}
-                                    </p>
-                                  </div>
-                                </div>
-
-                                <div>
-                                  <label className="text-sm font-medium text-muted-foreground">
-                                    Description
-                                  </label>
-                                  <p className="text-sm">
-                                    {liveClass.description}
-                                  </p>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                    <label className="text-sm font-medium text-muted-foreground">
-                                      Date
-                                    </label>
-                                    <p className="text-sm font-medium">
-                                      {format(startTime, "EEEE, MMMM d, yyyy")}
-                                    </p>
-                                  </div>
-                                  <div>
-                                    <label className="text-sm font-medium text-muted-foreground">
-                                      Time
-                                    </label>
-                                    <p className="text-sm font-medium">
-                                      {format(startTime, "h:mm a")}
-                                    </p>
-                                  </div>
-                                </div>
-
-                                <div>
-                                  <label className="text-sm font-medium text-muted-foreground">
-                                    Meeting ID
-                                  </label>
-                                  <div className="flex items-center gap-2">
-                                    <p className="text-sm font-mono bg-muted p-2 rounded flex-1">
-                                      {liveClass.meeting_id}
-                                    </p>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() =>
-                                        copyToClipboard(
-                                          liveClass.meeting_id,
-                                          "Meeting ID"
-                                        )
-                                      }
-                                    >
-                                      <Copy className="w-4 h-4" />
-                                    </Button>
-                                  </div>
-                                </div>
-
-                                <div>
-                                  <label className="text-sm font-medium text-muted-foreground">
-                                    Meeting Password
-                                  </label>
-                                  <div className="flex items-center gap-2">
-                                    <p className="text-sm font-mono bg-muted p-2 rounded flex-1">
-                                      {liveClass.meeting_password}
-                                    </p>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() =>
-                                        copyToClipboard(
-                                          liveClass.meeting_password,
-                                          "Meeting Password"
-                                        )
-                                      }
-                                    >
-                                      <Copy className="w-4 h-4" />
-                                    </Button>
-                                  </div>
-                                </div>
-
-                                <Button
-                                  className={`w-full ${
-                                    isOngoing
-                                      ? "bg-success hover:bg-success/90 text-success-foreground"
-                                      : ""
-                                  }`}
-                                  onClick={() =>
-                                    window.open(liveClass.join_url, "_blank")
-                                  }
-                                >
-                                  <ExternalLink className="w-4 h-4 mr-2" />
-                                  {isOngoing
-                                    ? "Join Live Class"
-                                    : "Open Class Link"}
-                                </Button>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                      );
-                    })}
                   </div>
                 </div>
               </div>

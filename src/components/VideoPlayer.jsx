@@ -423,7 +423,6 @@ const VideoPlayer = ({ url, title, courseSlug, topicId, onProgressUpdate }) => {
         <div className="text-center">
           <Play className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
           <p className="text-muted-foreground">Unsupported video format</p>
-          <p className="text-xs text-muted-foreground mt-2">{normalizedUrl}</p>
         </div>
       </div>
     );

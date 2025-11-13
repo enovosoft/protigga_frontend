@@ -427,30 +427,6 @@ export default function UserDetailsPage() {
                         <div className="flex flex-col gap-1 items-end ml-4">
                           {enrollment.status &&
                             getEnrollmentStatusBadge(enrollment.status)}
-                          {enrollment.is_blocked &&
-                            getUserStatusBadge(false, true)}
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() =>
-                              handleToggleEnrollmentBlock(enrollment)
-                            }
-                            disabled={
-                              togglingEnrollmentBlock ===
-                              enrollment.enrollment_id
-                            }
-                            className="flex items-center gap-1 mt-1"
-                          >
-                            {togglingEnrollmentBlock ===
-                            enrollment.enrollment_id ? (
-                              <Loader2 className="w-3 h-3 animate-spin" />
-                            ) : enrollment.is_blocked ? (
-                              <ShieldOff className="w-3 h-3" />
-                            ) : (
-                              <Shield className="w-3 h-3" />
-                            )}
-                            {enrollment.is_blocked ? "Unblock" : "Block"}
-                          </Button>
                         </div>
                       </div>
 
@@ -539,6 +515,7 @@ export default function UserDetailsPage() {
                                   size="sm"
                                   variant="ghost"
                                   onClick={() => {
+                                    console.log(enrollment);
                                     if (enrollment.expiry_date) {
                                       setEditingEnrollmentExpiry(
                                         enrollment.enrollment_id
@@ -551,13 +528,37 @@ export default function UserDetailsPage() {
                                     }
                                   }}
                                   className="h-6 w-6 p-0"
-                                  disabled={!enrollment.expiry_date}
+                                  // disabled={!enrollment.expiry_date}
                                 >
                                   <Edit className="w-3 h-3" />
                                 </Button>
                               </div>
                             )}
                           </div>
+                          {enrollment.is_blocked &&
+                            getUserStatusBadge(false, true)}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              handleToggleEnrollmentBlock(enrollment)
+                            }
+                            disabled={
+                              togglingEnrollmentBlock ===
+                              enrollment.enrollment_id
+                            }
+                            className="flex items-center gap-1 mt-1"
+                          >
+                            {togglingEnrollmentBlock ===
+                            enrollment.enrollment_id ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : enrollment.is_blocked ? (
+                              <ShieldOff className="w-3 h-3" />
+                            ) : (
+                              <Shield className="w-3 h-3" />
+                            )}
+                            {enrollment.is_blocked ? "Unblock" : "Block"}
+                          </Button>
                         </div>
                       </div>
 

@@ -3,6 +3,7 @@ import { CookiesProvider } from "react-cookie";
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter as Router, Routes } from "react-router-dom";
 import DevToolsProtection from "./components/shared/DevToolsProtection";
+import ErrorBoundary from "./components/shared/ErrorBoundary";
 import { AuthProvider } from "./contexts/AuthContext";
 import { protectedRoutes } from "./pages/student/protectedRoutes";
 import { adminRoutes } from "./routes/adminRoutes";
@@ -11,7 +12,7 @@ import { publicRoutes } from "./routes/publicRoutes";
 
 function App() {
   return (
-    <>
+    <ErrorBoundary>
       <CookiesProvider>
         <DevToolsProtection />
         <StoreProvider store={store}>
@@ -50,7 +51,7 @@ function App() {
           </AuthProvider>
         </StoreProvider>
       </CookiesProvider>
-    </>
+    </ErrorBoundary>
   );
 }
 

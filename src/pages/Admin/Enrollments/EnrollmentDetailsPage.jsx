@@ -1,3 +1,4 @@
+import UserDashboardLayout from "@/components/shared/DashboardLayout";
 import Loading from "@/components/shared/Loading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,6 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-
 export default function EnrollmentDetailsPage() {
   const navigate = useNavigate();
   const location = useLocation();
