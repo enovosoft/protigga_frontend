@@ -24,7 +24,7 @@ class ErrorBoundary extends Component {
 
   handleGoBack = () => {
     this.setState({ hasError: false });
-    window.history.back();
+    window.history.go(-1);
   };
 
   handleGoHome = () => {

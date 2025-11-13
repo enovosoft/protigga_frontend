@@ -1,3 +1,4 @@
+import PinMessage from "@/components/shared/PinMessage";
 import { Button } from "@/components/ui/button";
 import {
   Card,
