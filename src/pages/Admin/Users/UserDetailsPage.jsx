@@ -1,4 +1,5 @@
 import UserDashboardLayout from "@/components/shared/DashboardLayout";
+import Loading from "@/components/shared/Loading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,8 +44,7 @@ export default function UserDetailsPage() {
   // Editing states for enrollments
   const [editingEnrollmentExpiry, setEditingEnrollmentExpiry] = useState(null);
   const [selectedExpiryDate, setSelectedExpiryDate] = useState("");
-  const [togglingEnrollmentBlock, setTogglingEnrollmentBlock] = useState(null);
-  const [togglingBookOrderBlock, setTogglingBookOrderBlock] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // If no user data in state, redirect back to users
@@ -55,9 +55,11 @@ export default function UserDetailsPage() {
 
   // Handler functions for enrollment management
   const handleToggleEnrollmentBlock = async (enrollment) => {
-    setTogglingEnrollmentBlock(enrollment.enrollment_id);
+    setIsLoading(true);
+    // Ensure enrollment has user_id
+    const enrollmentWithUserId = { ...enrollment, user_id: user.user_id };
     const success = await toggleEnrollmentBlock(
-      enrollment,
+      enrollmentWithUserId,
       (updater) => {
         // Update the enrollment in the user state
         setUser((prevUser) => ({
@@ -67,16 +69,19 @@ export default function UserDetailsPage() {
           ),
         }));
       },
-      () => setTogglingEnrollmentBlock(null)
+      () => setIsLoading(false) // This will be called in finally block
     );
     if (!success) {
-      setTogglingEnrollmentBlock(null);
+      setIsLoading(false);
     }
   };
 
   const handleUpdateEnrollmentExpiry = async (enrollment) => {
+    setIsLoading(true);
+    // Ensure enrollment has user_id
+    const enrollmentWithUserId = { ...enrollment, user_id: user.user_id };
     const success = await updateEnrollmentExpiry(
-      enrollment,
+      enrollmentWithUserId,
       selectedExpiryDate,
       (updater) => {
         // Update the enrollment in the user state
@@ -87,11 +92,13 @@ export default function UserDetailsPage() {
           ),
         }));
       },
-      () => {} // No loading state needed for expiry update
+      () => setIsLoading(false) // This will be called in finally block
     );
     if (success) {
       setEditingEnrollmentExpiry(null);
       setSelectedExpiryDate("");
+    } else {
+      setIsLoading(false);
     }
   };
 
@@ -153,6 +160,7 @@ export default function UserDetailsPage() {
 
   return (
     <UserDashboardLayout>
+      {isLoading && <Loading text="Updating enrollment..." />}
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -543,14 +551,10 @@ export default function UserDetailsPage() {
                             onClick={() =>
                               handleToggleEnrollmentBlock(enrollment)
                             }
-                            disabled={
-                              togglingEnrollmentBlock ===
-                              enrollment.enrollment_id
-                            }
+                            disabled={isLoading}
                             className="flex items-center gap-1 mt-1"
                           >
-                            {togglingEnrollmentBlock ===
-                            enrollment.enrollment_id ? (
+                            {isLoading ? (
                               <Loader2 className="w-3 h-3 animate-spin" />
                             ) : enrollment.is_blocked ? (
                               <ShieldOff className="w-3 h-3" />
