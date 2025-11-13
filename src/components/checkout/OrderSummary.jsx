@@ -50,38 +50,38 @@ export default function OrderSummary({
 
   return (
     <Card className="border-border bg-card shadow-sm">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
-          <ShoppingCart className="w-5 h-5 text-primary" />
+      <CardHeader className="pb-3 sm:pb-4">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg font-semibold text-foreground">
+          <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
           Order Summary
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="p-3 overflow-hidden ">
+      <CardContent className="space-y-3 sm:space-y-4">
+        <div className="p-2 sm:p-3 overflow-hidden">
           <ImageFallback
             src={product.book_image || product.thumbnail}
             alt={product.title}
-            className="w-full  rounded-2xl transition-transform object-cover "
+            className="w-full rounded-xl sm:rounded-2xl transition-transform object-cover"
           />
         </div>
-        <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg border border-border/50">
-          <div className="p-3 bg-primary/10 rounded-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 sm:p-4 bg-muted/30 rounded-lg border border-border/50">
+          <div className="p-2 sm:p-3 bg-primary/10 rounded-lg flex-shrink-0 hidden sm:block">
             {isBook ? (
-              <BookOpen className="w-6 h-6 text-primary" />
+              <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
             ) : (
-              <BookOpen className="w-6 h-6 text-primary" />
+              <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground truncate">
+            <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">
               {product?.title || product?.course_title}
             </h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               {isBook ? "Book" : "Course"}
             </p>
           </div>
-          <div className="text-right">
-            <p className="text-xl lg:text-2xl font-bold text-primary">
+          <div className="text-right sm:text-left">
+            <p className="text-lg sm:text-xl lg:text-2xl font-bold text-primary">
               ৳{product.price}
             </p>
           </div>
@@ -90,11 +90,11 @@ export default function OrderSummary({
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Tag className="w-4 h-4 text-primary" />
-            <Label className="text-sm font-medium text-foreground">
+            <Label className="text-sm sm:text-base font-medium text-foreground">
               Promo Code (Optional)
             </Label>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Input
               placeholder="Enter promo code"
               value={promoCode}
@@ -106,14 +106,14 @@ export default function OrderSummary({
               type="button"
               onClick={onApplyPromo}
               disabled={promoApplied || !promoCode?.trim()}
-              className="px-4"
+              className="px-3 sm:px-4 w-full sm:w-auto"
             >
               Apply
             </Button>
           </div>
           {promoApplied && promoData && (
             <div className="bg-success/50 border border-success/40 p-3 rounded-lg">
-              <p className="text-sm text-primary font-medium">
+              <p className="text-xs sm:text-sm text-primary font-medium">
                 Promo code applied! You saved{" "}
                 {promoData.Discount_type === "percentage"
                   ? `${promoData.Discount}%`
@@ -126,7 +126,7 @@ export default function OrderSummary({
         {/* Quantity Input - Only for Books */}
         {isBook && (
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-foreground">
+            <Label className="text-sm sm:text-base font-medium text-foreground">
               Quantity
             </Label>
             <Input
@@ -142,7 +142,7 @@ export default function OrderSummary({
               className="w-full"
             />
             {quantity >= 10000 && (
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Maximum quantity is 10,000
               </p>
             )}
@@ -151,14 +151,14 @@ export default function OrderSummary({
 
         {/* Price Breakdown */}
         <div className="border-t border-border pt-4 space-y-3">
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-sm sm:text-base">
             <span className="text-muted-foreground">Subtotal:</span>
             <span className="font-medium text-foreground">
               ৳{calculateSubtotal()}
             </span>
           </div>
           {promoApplied && (
-            <div className="flex justify-between text-sm text-success">
+            <div className="flex justify-between text-sm sm:text-base text-success">
               <span>
                 Discount{" "}
                 {promoData.Discount_type === "percentage"
@@ -171,7 +171,7 @@ export default function OrderSummary({
           )}
 
           {isBook && (
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-sm sm:text-base">
               <span className="text-muted-foreground">Delivery Fee:</span>
               <span className="font-medium text-foreground">
                 {paymentType === "sslcommerz" &&
@@ -184,7 +184,7 @@ export default function OrderSummary({
             </div>
           )}
           <div className="border-t border-border pt-3">
-            <div className="flex justify-between text-lg font-bold">
+            <div className="flex justify-between text-lg sm:text-xl font-bold">
               <span className="text-foreground">Total:</span>
               <span className="text-primary">৳{calculateTotal()}</span>
             </div>

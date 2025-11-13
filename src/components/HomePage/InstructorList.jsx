@@ -1,29 +1,54 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { INSTRUCTORS } from "@/config/data";
 import { Award, BookOpen, GraduationCap, User, User2 } from "lucide-react";
+import { motion } from "motion/react";
 import ImageFallback from "../shared/ImageFallback";
 
 export default function InstructorList() {
   return (
-    <section className="pt-16 md:pt-24 pb-4 md:pb-8 bg-secondary/10">
+    <motion.section
+      className="pt-16 md:pt-24 pb-4 md:pb-8 bg-secondary/10"
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+    >
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-semibold text-primary mb-4 font-primary">
+          <motion.h2
+            className="text-3xl md:text-4xl font-semibold text-primary mb-4 font-primary hover:scale-105 transition-transform duration-300"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+          >
             আমাদের এক্সপার্ট টিম
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          </motion.h2>
+          <motion.p
+            className="text-muted-foreground text-lg max-w-2xl mx-auto hover:text-foreground transition-colors duration-300"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.4 }}
+          >
             তোমার সেরা প্রস্তুতির জন্য আমাদের এক্সপার্ট ইন্সট্রাক্টরদের সাথে
             পরিচিত হও
-          </p>
+          </motion.p>
         </div>
 
         {/* Instructor Grid */}
-        <div className="flex flex-wrap justify-center gap-6">
+        <motion.div
+          className="flex flex-wrap justify-center gap-6"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.6 }}
+        >
           {INSTRUCTORS.map((instructor) => (
             <Card
               key={instructor.id}
-              className="group hover:shadow-xl transition-all duration-300 hover:border-secondary/50 overflow-hidden"
+              className="group hover:shadow-xl transition-all duration-300 hover:border-secondary/50 overflow-hidden hover:scale-105 cursor-pointer"
             >
               <CardContent className="p-6">
                 {/* Instructor Image */}
@@ -73,8 +98,8 @@ export default function InstructorList() {
               </CardContent>
             </Card>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }

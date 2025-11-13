@@ -521,11 +521,11 @@ export default function CheckoutForm() {
   return (
     <main className="flex-1 container mx-auto px-4 py-8 lg:py-12">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8 lg:mb-12">
-          <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-4 font-primary">
+        <div className="text-center mb-6 sm:mb-8 lg:mb-12">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4 font-primary">
             Checkout
           </h1>
-          <p className="text-muted-foreground text-base lg:text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-4">
             Complete your order for{" "}
             <span className="font-semibold text-primary">
               {product?.title || product?.course_title}

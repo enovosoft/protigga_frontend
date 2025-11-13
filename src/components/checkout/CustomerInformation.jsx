@@ -47,21 +47,21 @@ export default function CustomerInformation({
 
   return (
     <Card className="border-border bg-card shadow-sm">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
-          <User className="w-5 h-5 text-primary" />
+      <CardHeader className="pb-3 sm:pb-4">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg font-semibold text-foreground">
+          <User className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
           Order Details
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6">
         {/* User Information - Readonly */}
-        <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-          <h3 className="text-sm font-medium text-foreground">
+        <div className="bg-muted/50 rounded-lg p-3 sm:p-4 space-y-3">
+          <h3 className="text-sm sm:text-base font-medium text-foreground">
             Account Information
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-foreground">
+              <Label className="text-sm sm:text-base font-medium text-foreground">
                 Full Name
               </Label>
               <Input
@@ -72,7 +72,7 @@ export default function CustomerInformation({
             </div>
             {isBook && (
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-foreground">
+                <Label className="text-sm sm:text-base font-medium text-foreground">
                   Phone Number
                 </Label>
                 <Input
@@ -86,14 +86,14 @@ export default function CustomerInformation({
         </div>
 
         {/* Customer Information Form */}
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-4 sm:space-y-6">
           {/* Course-specific fields */}
           {!isBook && (
             <>
               <div className="space-y-2">
                 <Label
                   htmlFor="whatsapp_number"
-                  className="text-sm font-medium text-foreground"
+                  className="text-sm sm:text-base font-medium text-foreground"
                 >
                   WhatsApp Number <span className="text-destructive">*</span>
                 </Label>
@@ -117,7 +117,7 @@ export default function CustomerInformation({
                   title="WhatsApp number must be in the format +8801XXXXXXXXX. If you have a different number linked with whatsapp use that."
                   className="w-full"
                 />
-                <p className="text-xs text-muted-foreground ">
+                <p className="text-xs sm:text-sm text-muted-foreground ">
                   If you have a different whatsapp number, enter that.
                 </p>
                 {validationErrors.whatsapp_number && (
@@ -130,7 +130,7 @@ export default function CustomerInformation({
               <div className="space-y-2">
                 <Label
                   htmlFor="fb_name"
-                  className="text-sm font-medium text-foreground"
+                  className="text-sm sm:text-base font-medium text-foreground"
                 >
                   Facebook Profile Name{" "}
                   <span className="text-destructive">*</span>
@@ -143,7 +143,7 @@ export default function CustomerInformation({
                   required
                   className="w-full"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   Enter your Facebook profile name
                 </p>
                 {validationErrors.fb_name && (
@@ -160,7 +160,7 @@ export default function CustomerInformation({
             <div className="space-y-2">
               <Label
                 htmlFor="alternative_phone"
-                className="text-sm font-medium text-foreground"
+                className="text-sm sm:text-base font-medium text-foreground"
               >
                 Alternative Phone Number (Optional)
               </Label>
@@ -183,7 +183,7 @@ export default function CustomerInformation({
                 title="Phone number must be in the format +8801XXXXXXXXX"
                 className="w-full"
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Alternative phone number must start with +880 and be 14 digits
                 total
               </p>
@@ -198,7 +198,7 @@ export default function CustomerInformation({
           <div className="space-y-2">
             <Label
               htmlFor="address"
-              className="text-sm font-medium text-foreground"
+              className="text-sm sm:text-base font-medium text-foreground"
             >
               Address <span className="text-destructive">*</span>
             </Label>
@@ -218,11 +218,11 @@ export default function CustomerInformation({
           </div>
 
           {/* Address and Location Fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
               <Label
                 htmlFor="city"
-                className="text-sm font-medium text-foreground"
+                className="text-sm sm:text-base font-medium text-foreground"
               >
                 Thana / State <span className="text-destructive">*</span>
               </Label>
@@ -243,7 +243,7 @@ export default function CustomerInformation({
             <div className="space-y-2">
               <Label
                 htmlFor="district"
-                className="text-sm font-medium text-foreground"
+                className="text-sm sm:text-base font-medium text-foreground"
               >
                 District <span className="text-destructive">*</span>
               </Label>
@@ -265,7 +265,7 @@ export default function CustomerInformation({
             <div className="space-y-2">
               <Label
                 htmlFor="zipCode"
-                className="text-sm font-medium text-foreground"
+                className="text-sm sm:text-base font-medium text-foreground"
               >
                 Zip Code <span className="text-destructive">*</span>
               </Label>
@@ -287,7 +287,7 @@ export default function CustomerInformation({
             <div className="space-y-2">
               <Label
                 htmlFor="division"
-                className="text-sm font-medium text-foreground"
+                className="text-sm sm:text-base font-medium text-foreground"
               >
                 Division <span className="text-destructive">*</span>
               </Label>
@@ -321,7 +321,7 @@ export default function CustomerInformation({
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <CreditCard className="w-4 h-4 text-primary" />
-              <Label className="text-sm font-medium text-foreground">
+              <Label className="text-sm sm:text-base font-medium text-foreground">
                 Payment Method <span className="text-destructive">*</span>
               </Label>
             </div>
@@ -335,7 +335,7 @@ export default function CustomerInformation({
               {getPaymentOptions().map((option) => (
                 <div
                   key={option.value}
-                  className={`flex items-start space-x-3 p-6 border rounded-lg transition-colors cursor-pointer ${
+                  className={`flex items-start space-x-3 p-4 sm:p-6 border rounded-lg transition-colors cursor-pointer ${
                     paymentType === option.value
                       ? "border-primary bg-primary/5"
                       : "border-border hover:bg-muted/30"
@@ -356,7 +356,7 @@ export default function CustomerInformation({
                     </div>
                   </div>
                   <div className="flex-1">
-                    <Label className="cursor-pointer font-medium text-foreground">
+                    <Label className="cursor-pointer font-medium text-sm sm:text-base text-foreground">
                       {option.label}
                     </Label>
                   </div>
@@ -369,7 +369,7 @@ export default function CustomerInformation({
           {isBook && paymentType === "cod" && (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium text-foreground">
+                <Label className="text-sm sm:text-base font-medium text-foreground">
                   Delivery Area <span className="text-destructive">*</span>
                 </Label>
               </div>
@@ -379,7 +379,7 @@ export default function CustomerInformation({
                 className="space-y-3"
               >
                 <div
-                  className={`flex items-start space-x-3 p-4 border rounded-lg transition-colors cursor-pointer ${
+                  className={`flex items-start space-x-3 p-3 sm:p-4 border rounded-lg transition-colors cursor-pointer ${
                     deliveryArea === "inside_dhaka"
                       ? "border-primary bg-primary/5"
                       : "border-border hover:bg-muted/30"
@@ -400,17 +400,17 @@ export default function CustomerInformation({
                     </div>
                   </div>
                   <div className="flex-1">
-                    <Label className="cursor-pointer font-medium text-foreground">
+                    <Label className="cursor-pointer font-medium text-sm sm:text-base text-foreground">
                       Inside Dhaka
                     </Label>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       Delivery charge: ৳80
                     </p>
                   </div>
                 </div>
 
                 <div
-                  className={`flex items-start space-x-3 p-4 border rounded-lg transition-colors cursor-pointer ${
+                  className={`flex items-start space-x-3 p-3 sm:p-4 border rounded-lg transition-colors cursor-pointer ${
                     deliveryArea === "outside_dhaka"
                       ? "border-primary bg-primary/5"
                       : "border-border hover:bg-muted/30"
@@ -431,10 +431,10 @@ export default function CustomerInformation({
                     </div>
                   </div>
                   <div className="flex-1">
-                    <Label className="cursor-pointer font-medium text-foreground">
+                    <Label className="cursor-pointer font-medium text-sm sm:text-base text-foreground">
                       Outside Dhaka
                     </Label>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       Delivery charge: ৳160
                     </p>
                   </div>
@@ -453,7 +453,7 @@ export default function CustomerInformation({
           />
           <Button
             type="submit"
-            className="w-full h-11 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="w-full h-10 sm:h-11 text-sm sm:text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             Pay now ৳{paymentType === "sslcommerz" ? totalAmount : "200"}
             {/* Pay now ৳

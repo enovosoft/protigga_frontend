@@ -21,6 +21,7 @@ import {
   ShoppingCart,
   XCircle,
 } from "lucide-react";
+import { motion } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -165,10 +166,21 @@ export default function CourseDetailsPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-12">
+      <motion.main
+        className="flex-1 container mx-auto px-4 py-12"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="max-w-7xl mx-auto">
           {/* Course Title - At the very top */}
-          <div className="mb-8">
+          <motion.div
+            className="mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             <h1 className="text-3xl md:text-4xl font-bold text-foreground">
               {course.course_title}
             </h1>
@@ -178,12 +190,18 @@ export default function CourseDetailsPage() {
                 <span>{course.academy_name}</span>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Responsive Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Desktop: Course Card on Left */}
-            <div className="lg:col-span-1 order-2 lg:order-1">
+            <motion.div
+              className="lg:col-span-1 order-2 lg:order-1"
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               <div className="sticky top-6">
                 <Card className="overflow-hidden">
                   <CardHeader className="p-0">
@@ -283,10 +301,16 @@ export default function CourseDetailsPage() {
                   </CardContent>
                 </Card>
               </div>
-            </div>
+            </motion.div>
 
             {/* Main Content - Tabs and Content */}
-            <div className="lg:col-span-2 order-1 lg:order-2 space-y-6">
+            <motion.div
+              className="lg:col-span-2 order-1 lg:order-2 space-y-6"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
               {/* Tabs */}
               <div className="border-b border-border">
                 <div className="flex gap-6 overflow-x-auto">
@@ -344,24 +368,24 @@ export default function CourseDetailsPage() {
                         >
                           <button
                             onClick={() => toggleChapter(chapterIndex)}
-                            className="w-full flex items-center justify-between p-4 bg-muted/30 hover:bg-muted/50 transition-colors text-left"
+                            className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-muted/30 hover:bg-muted/50 transition-colors text-left gap-2 sm:gap-3"
                           >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 min-w-0 flex-1">
                               <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                                 <BookOpen className="w-4 h-4 text-primary" />
                               </div>
-                              <span className="font-medium text-foreground">
+                              <span className="font-medium text-foreground text-sm sm:text-base truncate">
                                 {chapter.title}
                               </span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-muted-foreground">
+                            <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
+                              <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
                                 {chapter.topics?.length || 0} topics
                               </span>
                               {expandedChapters[chapterIndex] ? (
-                                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                                <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground flex-shrink-0" />
                               ) : (
-                                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground flex-shrink-0" />
                               )}
                             </div>
                           </button>
@@ -371,15 +395,15 @@ export default function CourseDetailsPage() {
                               {chapter.topics?.map((topic, topicIndex) => (
                                 <div
                                   key={topicIndex}
-                                  className={`flex items-center gap-3 p-3 hover:bg-muted/30 transition-colors ${
+                                  className={`flex items-center gap-3 p-3 sm:p-4 hover:bg-muted/30 transition-colors ${
                                     topicIndex !== chapter.topics.length - 1
                                       ? "border-b border-border/50"
                                       : ""
                                   }`}
                                 >
-                                  <div className="flex items-center gap-2 flex-1">
-                                    <Play className="w-4 h-4 text-primary" />
-                                    <span className="text-sm font-medium text-foreground">
+                                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    <Play className="w-4 h-4 text-primary flex-shrink-0" />
+                                    <span className="text-sm font-medium text-foreground truncate">
                                       {topic.title}
                                     </span>
                                   </div>
@@ -390,9 +414,9 @@ export default function CourseDetailsPage() {
                         </div>
                       ))
                     ) : (
-                      <div className="text-center py-8">
+                      <div className="text-center py-8 px-4">
                         <BookOpen className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-                        <p className="text-muted-foreground">
+                        <p className="text-muted-foreground text-sm sm:text-base">
                           Curriculum details will be updated soon.
                         </p>
                       </div>
@@ -456,13 +480,14 @@ export default function CourseDetailsPage() {
               <div className="hidden lg:block">
                 <RelatedBooksSection books={course.related_books} />
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
+
         <div className="lg:hidden mt-12">
           <RelatedBooksSection books={course.related_books} />
         </div>
-      </main>
+      </motion.main>
 
       <Footer />
     </div>

@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import api from "@/lib/api";
 import { BookOpen, Search } from "lucide-react";
+import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-
 export default function CoursesPage() {
   const [courses, setCourses] = useState([]);
   const [batches, setBatches] = useState([]);
@@ -94,7 +94,7 @@ export default function CoursesPage() {
             {/* Search Skeleton */}
             <div className="space-y-6 mb-12">
               <div className="flex justify-start">
-                <Skeleton className="h-10 w-full max-w-md rounded-lg" />
+                <Skeleton className="h-10 w-full max-w-md  mx-auto rounded-lg" />
               </div>
               <div className="flex justify-center gap-3 flex-wrap">
                 {Array.from({ length: 4 }).map((_, index) => (
@@ -127,9 +127,20 @@ export default function CoursesPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-12">
+      <motion.main
+        className="flex-1 container mx-auto px-4 py-12"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             <h1 className="text-4xl font-bold text-foreground mb-4">
               Explore Our Courses
             </h1>
@@ -137,11 +148,17 @@ export default function CoursesPage() {
               Discover a wide range of courses designed to help you achieve your
               learning goals
             </p>
-          </div>
+          </motion.div>
 
           {/* Search and Filter */}
           {courses.length > 0 && (
-            <div className="space-y-8 mb-12">
+            <motion.div
+              className="space-y-8 mb-12"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               {/* Enhanced Search Bar */}
               <div className="flex justify-center">
                 <div className="relative w-full max-w-lg">
@@ -200,7 +217,7 @@ export default function CoursesPage() {
                   </Button>
                 ))}
               </div>
-            </div>
+            </motion.div>
           )}
 
           {courses.length === 0 ? (
@@ -219,28 +236,37 @@ export default function CoursesPage() {
             </div>
           ) : (
             <div className="space-y-12">
-              {Object.entries(groupedCourses).map(([batch, batchCourses]) => (
-                <div key={batch} className="space-y-6">
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-2xl font-bold text-primary">
-                      <span className="text-secondary">{batch}</span> Batch
-                    </h2>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                    {batchCourses.map((course) => (
-                      <CourseCard
-                        key={course.course_id || course.id}
-                        course={course}
-                        className="transition-transform duration-200 hover:-translate-y-1 select-none cursor-pointer"
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
+              {Object.entries(groupedCourses).map(
+                ([batch, batchCourses], index) => (
+                  <motion.div
+                    key={batch}
+                    className="space-y-6"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-2xl font-bold text-primary">
+                        <span className="text-secondary">{batch}</span> Batch
+                      </h2>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                      {batchCourses.map((course) => (
+                        <CourseCard
+                          key={course.course_id || course.id}
+                          course={course}
+                          className="transition-transform duration-200 hover:-translate-y-1 select-none cursor-pointer"
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                )
+              )}
             </div>
           )}
         </div>
-      </main>
+      </motion.main>
 
       <Footer />
     </div>

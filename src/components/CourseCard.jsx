@@ -16,12 +16,12 @@ export default function CourseCard({ course, className }) {
   return (
     <Card
       className={cn(
-        `overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col `,
+        `group overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full min-h-[340px] lg:min-h-[380px]`,
         className
       )}
     >
       <CardHeader className="p-0">
-        <div className="relative aspect-video overflow-hidden bg-muted">
+        <div className="relative w-full h-40 md:h-48 overflow-hidden bg-muted">
           <ImageFallback
             src={thumbnail}
             alt={course_title}
@@ -41,7 +41,7 @@ export default function CourseCard({ course, className }) {
         </div>
       </CardHeader>
 
-      <CardContent className="p-6 flex flex-col flex-grow">
+      <CardContent className="p-4 flex flex-col flex-1">
         <h3 className="text-base lg:text-lg font-medium text-foreground line-clamp-2">
           {course_title}
         </h3>
@@ -51,7 +51,7 @@ export default function CourseCard({ course, className }) {
         </div>
       </CardContent>
 
-      <CardFooter className="p-6 pt-0 mt-auto">
+      <CardFooter className="p-4 pt-0">
         <Link className="w-full" to={`/courses/${slug}`}>
           <Button className="w-full">Enroll Now</Button>
         </Link>

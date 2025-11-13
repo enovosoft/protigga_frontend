@@ -15,6 +15,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import apiInstance from "@/lib/api";
 import { BookOpen, Eye, ShoppingCart } from "lucide-react";
+import { motion } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
@@ -132,12 +133,23 @@ export default function BookDetailsPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-12">
+      <motion.main
+        className="flex-1 container mx-auto px-4 py-12"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="max-w-7xl mx-auto">
           {/* Responsive Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {/* Left Side - Image */}
-            <div className="order-1 lg:order-1 ">
+            <motion.div
+              className="order-1 lg:order-1"
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               <div className="sticky top-6">
                 <Card className="overflow-hidden relative">
                   <CardHeader className="p-0">
@@ -145,7 +157,7 @@ export default function BookDetailsPage() {
                       <ImageFallback
                         src={book.book_image}
                         alt={book.title}
-                        className=" transition-transform duration-300 hover:scale-110 cursor-zoom-in max-w-sm mx-auto"
+                        className="w-full h-auto transition-transform duration-300 hover:scale-105 cursor-zoom-in object-contain"
                       />
                     </div>
                     <div className="absolute top-3 right-3">
@@ -174,58 +186,91 @@ export default function BookDetailsPage() {
                   </CardHeader>
                 </Card>
               </div>
-            </div>
+            </motion.div>
 
             {/* Right Side - Content */}
-            <div className="order-2 lg:order-2 space-y-6">
+            <motion.div
+              className="order-2 lg:order-2 space-y-6"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
               {/* Title */}
               <div>
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-2">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-2 leading-tight">
                   {book.title}
                 </h1>
               </div>
 
               {/* Price and Author */}
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold text-primary">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <span className="text-2xl md:text-3xl font-bold text-primary">
                   ৳{book.price}
                 </span>
-                <span className="text-sm text-muted-foreground">
-                  by {book.writter || "Unknown"}
+                <span className="text-sm md:text-base text-muted-foreground">
+                  by{" "}
+                  <span className="font-medium">
+                    {book.writter || "Unknown"}
+                  </span>
                 </span>
               </div>
 
               {/* Description */}
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="prose prose-sm max-w-none">
-                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line font-primary">
-                      {book.description ||
-                        "No description available for this book."}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+              >
+                <Card className="shadow-sm">
+                  <CardContent className="pt-6 px-4 sm:px-6">
+                    <div className="prose prose-sm sm:prose-base max-w-none">
+                      <p className="text-muted-foreground leading-relaxed whitespace-pre-line font-primary text-sm sm:text-base">
+                        {book.description ||
+                          "No description available for this book."}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button className="flex-1" size="lg" onClick={handleOrderNow}>
+              <motion.div
+                className="flex flex-col sm:flex-row gap-3 w-full"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.8 }}
+              >
+                <Button
+                  className="w-full"
+                  size="lg"
+                  onClick={handleOrderNow}
+                  disabled={book.stock === 0}
+                >
                   <ShoppingCart className="w-5 h-5 mr-2" />
-                  Order Now
+                  {book.stock === 0 ? "Out of Stock" : "Order Now"}
                 </Button>
 
                 {book.demo_file_link && (
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="outline" size="lg" className="flex-1">
+                      <Button
+                        variant="outlineFill"
+                        className="w-full"
+                        size="lg"
+                      >
                         <Eye className="w-5 h-5 mr-2" />
                         Show Demo
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col w-[95vw] sm:w-[90vw] md:w-[80vw] lg:w-[70vw]">
                       <DialogHeader className="flex-shrink-0">
-                        <DialogTitle>{book.title} - Demo</DialogTitle>
-                        <DialogDescription>
+                        <DialogTitle className="text-lg sm:text-xl">
+                          {book.title} - Demo
+                        </DialogTitle>
+                        <DialogDescription className="text-sm sm:text-base">
                           Preview of the book content
                         </DialogDescription>
                       </DialogHeader>
@@ -241,11 +286,11 @@ export default function BookDetailsPage() {
                     </DialogContent>
                   </Dialog>
                 )}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
-      </main>
+      </motion.main>
 
       <Footer />
     </div>

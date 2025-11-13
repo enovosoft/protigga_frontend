@@ -4,8 +4,9 @@ import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import apiInstance from "@/lib/api";
-import { Book, Search } from "lucide-react";
+import api from "@/lib/api";
+import { BookOpen, Search } from "lucide-react";
+import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 export default function BooksPage() {
@@ -22,7 +23,7 @@ export default function BooksPage() {
 
   const fetchBooks = async () => {
     try {
-      const response = await apiInstance.get("/books");
+      const response = await api.get("/books");
       const booksData = response.data.books || [];
       setBooks(booksData);
       // extract unique batches and preserve order
@@ -88,23 +89,34 @@ export default function BooksPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-12">
+      <motion.main
+        className="flex-1 container mx-auto px-4 py-12"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             <h1 className="text-4xl font-bold text-foreground mb-4">
               Our Books
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Browse our collection of educational books to support your studies
             </p>
-          </div>
+          </motion.div>
 
           {isLoading ? (
             <>
               {/* Search and Filter Skeleton */}
               <div className="space-y-8 mb-8">
                 <div className="flex justify-start">
-                  <Skeleton className="h-12 w-full max-w-lg rounded-xl" />
+                  <Skeleton className="h-12 mx-auto w-full max-w-lg rounded-xl" />
                 </div>
                 <div className="flex justify-center gap-2 sm:gap-3 flex-wrap">
                   {Array.from({ length: 5 }).map((_, index) => (
@@ -131,7 +143,13 @@ export default function BooksPage() {
             <>
               {/* Search and Filter */}
               {books.length > 0 && (
-                <div className="space-y-8 mb-8">
+                <motion.div
+                  className="space-y-8 mb-8"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
                   {/* Search Bar */}
                   <div className="flex justify-center">
                     <div className="relative w-full max-w-lg">
@@ -190,49 +208,59 @@ export default function BooksPage() {
                       </Button>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {books.length === 0 ? (
                 <div className="text-center py-16">
-                  <Book className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                  <BookOpen className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                   <p className="text-muted-foreground text-lg">
                     No books available at the moment
                   </p>
                 </div>
               ) : filteredBooks.length === 0 ? (
                 <div className="text-center py-16">
-                  <Book className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                  <BookOpen className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                   <p className="text-muted-foreground text-lg">
                     No books found matching your search criteria
                   </p>
                 </div>
               ) : (
                 <div className="space-y-12">
-                  {Object.entries(groupedBooks).map(([batch, batchBooks]) => (
-                    <div key={batch} className="space-y-6">
-                      <div className="flex items-center gap-3">
-                        <h2 className="text-2xl font-bold text-primary">
-                          <span className="text-secondary">{batch}</span> Books
-                        </h2>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-                        {batchBooks.map((book) => (
-                          <BookCard
-                            key={book.book_id || book.slug}
-                            book={book}
-                            className="hover:scale-105 transition-transform duration-300 select-none cursor-pointer"
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                  {Object.entries(groupedBooks).map(
+                    ([batch, batchBooks], index) => (
+                      <motion.div
+                        key={batch}
+                        className="space-y-6"
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: index * 0.1 }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <h2 className="text-2xl font-bold text-primary">
+                            <span className="text-secondary">{batch}</span>{" "}
+                            Books
+                          </h2>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                          {batchBooks.map((book) => (
+                            <BookCard
+                              key={book.book_id || book.slug}
+                              book={book}
+                              className="hover:scale-105 transition-transform duration-300 select-none cursor-pointer"
+                            />
+                          ))}
+                        </div>
+                      </motion.div>
+                    )
+                  )}
                 </div>
               )}
             </>
           )}
         </div>
-      </main>
+      </motion.main>
 
       <Footer />
     </div>

@@ -31,7 +31,7 @@ export default function Navbar() {
             onClick={closeMobileMenu}
           >
             {/* <h1 className="text-2xl font-semibold text-primary font-primary">
-              প্রতিজ্ঞা
+               animatio
             </h1> */}
             <img src="/logo.png" className="max-w-[100px]" />
           </Link>

@@ -7,11 +7,12 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
+import { scrollAppear, scrollFadeInRight } from "@/lib/animations";
 import api from "@/lib/api";
 import { Info } from "lucide-react";
+import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import BookCard from "../BookCard";
-
 export default function FeaturedBooks() {
   const [books, setBooks] = useState({});
   const [loading, setLoading] = useState(true);
@@ -21,7 +22,7 @@ export default function FeaturedBooks() {
       try {
         const response = await api.get("/books?featured=true");
         if (response.data.success) {
-          const mappedBooks = response.data.books.reduce((store, book) => {
+          const mappedBooks = response.data.books?.reduce((store, book) => {
             if (store[book.batch]) {
               store[book.batch].push({
                 ...book,
@@ -133,7 +134,7 @@ export default function FeaturedBooks() {
         {/* Books Carousel */}
         {!loading && books && Object.keys(books).length > 0
           ? Object.keys(books).map((batch) => (
-              <div key={batch} className="mb-12">
+              <motion.div key={batch} className="mb-12" {...scrollAppear}>
                 <div className="flex items-center mb-6 gap-2">
                   <h3 className="text-2xl font-semibold text-primary">
                     <span className="text-secondary">{batch} </span> ব্যাচের
@@ -154,9 +155,9 @@ export default function FeaturedBooks() {
                           key={book.book_id}
                           className="pl-2 md:pl-4 basis-4/5 xs:basis-1/2 sm:basis-1/3 lg:basis-1/4 hover:-translate-y-2 cursor-pointer duration-300 "
                         >
-                          <div className="p-1">
+                          <motion.div className="p-1" {...scrollFadeInRight}>
                             <BookCard book={book} />
-                          </div>
+                          </motion.div>
                         </CarouselItem>
                       ))}
                     </CarouselContent>
@@ -168,7 +169,7 @@ export default function FeaturedBooks() {
                     }
                   </Carousel>
                 </div>
-              </div>
+              </motion.div>
             ))
           : !loading && (
               <div className="flex flex-col items-center justify-center py-12">

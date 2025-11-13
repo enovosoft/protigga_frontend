@@ -8,12 +8,13 @@ class ErrorBoundary extends Component {
     super(props);
     this.state = {
       hasError: false,
+      error: null,
     };
   }
 
-  static getDerivedStateFromError() {
+  static getDerivedStateFromError(error) {
     // Update state so the next render will show the fallback UI
-    return { hasError: true };
+    return { hasError: true, error };
   }
 
   componentDidCatch(error, errorInfo) {
@@ -43,6 +44,12 @@ class ErrorBoundary extends Component {
               <CardTitle className="text-xl">Something Went Wrong</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-center">
+              {import.meta.env.DEV && (
+                <div className="p-4 bg-muted rounded-md text-left text-sm overflow-auto max-h-48">
+                  <strong className="block mb-2">Error Details:</strong>
+                  <pre>{this.state.error && this.state.error.toString()}</pre>
+                </div>
+              )}
               <p className="text-muted-foreground">
                 Something went wrong while accessing this page. Please try
                 refreshing the page or go back to the homepage.

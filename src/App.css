@@ -55,3 +55,63 @@
 .pdf-loading {
   animation: pdf-loading 1s linear infinite;
 }
+
+.bouncing-element {
+  width: 50px;
+  height: 50px;
+  background-color: dodgerblue;
+  position: relative; /* Needed for positioning */
+  animation: bounceRight 2s infinite; /* Apply the animation */
+}
+
+@keyframes bounceRight {
+  0% {
+    transform: translateX(0); /* Start at original position */
+    animation-timing-function: cubic-bezier(
+      0.25,
+      0.46,
+      0.45,
+      0.94
+    ); /* Ease-out */
+  }
+  25% {
+    transform: translateX(100px); /* Move right */
+    animation-timing-function: cubic-bezier(
+      0.55,
+      0.085,
+      0.68,
+      0.53
+    ); /* Ease-in */
+  }
+  50% {
+    transform: translateX(80px); /* Bounce back slightly */
+    animation-timing-function: cubic-bezier(
+      0.25,
+      0.46,
+      0.45,
+      0.94
+    ); /* Ease-out */
+  }
+  75% {
+    transform: translateX(100px); /* Move right again */
+    animation-timing-function: cubic-bezier(
+      0.55,
+      0.085,
+      0.68,
+      0.53
+    ); /* Ease-in */
+  }
+  100% {
+    transform: translateX(0); /* Return to original position */
+    animation-timing-function: cubic-bezier(
+      0.25,
+      0.46,
+      0.45,
+      0.94
+    ); /* Ease-out */
+  }
+}
+
+body {
+  display: none;
+}

@@ -1,18 +1,43 @@
 import { Facebook, Mail, MessageCircle, Phone, Youtube } from "lucide-react";
+import { motion } from "motion/react";
 
 function Contact() {
   return (
-    <div className="py-6 lg:py-12 px-4 bg-secondary/10 rounded-lg w-full">
+    <motion.div
+      className="py-6 lg:py-12 px-4 bg-secondary/10 rounded-lg w-full"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+    >
       <div className="text-center mb-8">
-        <h3 className="text-2xl font-semibold text-primary mb-2">
+        <motion.h3
+          className="text-2xl font-semibold text-primary mb-2 hover:scale-105 transition-transform duration-300"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
+        >
           আমাদের সাথে যুক্ত থাকুন
-        </h3>
-        <p className="text-muted-foreground">
+        </motion.h3>
+        <motion.p
+          className="text-muted-foreground hover:text-foreground transition-colors duration-300"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.5, ease: "easeOut", delay: 0.4 }}
+        >
           আরও আপডেট পেতে আমাদের সোশ্যাল মিডিয়া ফলো করুন
-        </p>
+        </motion.p>
       </div>
 
-      <div className="flex justify-center gap-6 flex-wrap">
+      <motion.div
+        className="flex justify-center gap-6 flex-wrap"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.5, ease: "easeOut", delay: 0.6 }}
+      >
         {/* YouTube Channel */}
         <a
           href="https://www.youtube.com/@momentazwoarmomit"
@@ -56,9 +81,15 @@ function Contact() {
           <MessageCircle className="w-6 h-6" />
           <span className="font-medium">WhatsApp</span>
         </a>
-      </div>
+      </motion.div>
 
-      <div className="flex flex-col mt-6 gap-2 align-center justify-start">
+      <motion.div
+        className="flex flex-col mt-6 gap-2 align-center justify-start"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.5, ease: "easeOut", delay: 0.8 }}
+      >
         <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
           <Mail className="w-4 h-4" />
           <span>ইমেইল: </span>
@@ -76,8 +107,8 @@ function Contact() {
             +880 1533-381836
           </a>
         </p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

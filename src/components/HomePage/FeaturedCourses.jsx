@@ -7,13 +7,17 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
+import { scrollAppear, scrollFadeInLeft } from "@/lib/animations";
 import apiInstance from "@/lib/api";
+import { motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CourseCard from "../CourseCard";
 
 export default function FeaturedCourses() {
   const [courses, setCourses] = useState({});
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchFeaturedCourses = async () => {
       try {
@@ -128,55 +132,60 @@ export default function FeaturedCourses() {
           <div className="animate-pulse">{renderSkeletonCards()}</div>
         )}
         {/* Courses Carousel */}
-        {!loading && courses && Object.keys(courses).length > 0 ? (
-          Object.keys(courses).map((batch) => (
-            <div key={batch} className="mb-12">
-              <div className="flex items-center mb-6 gap-2">
-                <h3 className="text-2xl font-semibold text-primary">
-                  <span className="text-secondary">{batch} </span> ব্যাচের সেরা
-                  কোর্সসমূহ
-                </h3>
-              </div>
-              <div className="relative ">
-                <Carousel
-                  opts={{
-                    align: "start",
-                    loop: true,
-                  }}
-                  className="w-full max-w-6xl mx-auto"
-                >
-                  <CarouselContent className="-ml-2 md:-ml-4">
-                    {courses[batch].map((course) => (
-                      <CarouselItem
-                        key={course.course_id}
-                        className="pl-2 md:pl-4 basis-4/5 xs:basis-1/2 sm:basis-1/3 lg:basis-1/4 hover:-translate-y-2 cursor-pointer duration-300 "
-                      >
-                        <div className="p-1">
-                          <CourseCard course={course} />
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  {
-                    <CarouselPrevious className="flex h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg -left-4 md:-left-10" />
-                  }
-                  {
-                    <CarouselNext className="flex h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg -right-4 md:-right-10" />
-                  }
-                </Carousel>
-              </div>
-            </div>
-          ))
-        ) : (
-          <span className="text-muted-foreground text-center block">
-            {" "}
-            এই মুহূর্তে কোন ফিচার্ড কোর্স নেই, তবে খুব শীঘ্রই আসছে ...{" "}
-          </span>
-        )}
+        {!loading && courses && Object.keys(courses).length > 0
+          ? Object.keys(courses).map((batch) => (
+              <motion.div key={batch} className="mb-12" {...scrollAppear}>
+                <div className="flex items-center mb-6 gap-2">
+                  <h3 className="text-2xl font-semibold text-primary">
+                    <span className="text-secondary">{batch} </span> ব্যাচের
+                    সেরা কোর্সসমূহ
+                  </h3>
+                </div>
+                <div className="relative ">
+                  <Carousel
+                    opts={{
+                      align: "start",
+                      loop: true,
+                    }}
+                    className="w-full max-w-6xl mx-auto"
+                  >
+                    <CarouselContent className="-ml-2 md:-ml-4">
+                      {courses[batch].map((course) => (
+                        <CarouselItem
+                          key={course.course_id}
+                          className="pl-2 md:pl-4 basis-4/5 xs:basis-1/2 sm:basis-1/3 lg:basis-1/4 hover:-translate-y-2 cursor-pointer duration-300 "
+                        >
+                          <motion.div className="p-1" {...scrollFadeInLeft}>
+                            <CourseCard course={course} />
+                          </motion.div>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    {
+                      <CarouselPrevious className="flex h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg -left-4 md:-left-10" />
+                    }
+                    {
+                      <CarouselNext className="flex h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground border-0 shadow-lg -right-4 md:-right-10" />
+                    }
+                  </Carousel>
+                </div>
+              </motion.div>
+            ))
+          : !loading && (
+              <span className="text-muted-foreground text-center block">
+                {" "}
+                এই মুহূর্তে কোন ফিচার্ড কোর্স নেই, তবে খুব শীঘ্রই আসছে ...{" "}
+              </span>
+            )}
 
         {/* View All Button */}
         <div className="text-center mt-12">
-          <Button variant="secondary" size="lg" className="min-w-[200px]">
+          <Button
+            variant="secondary"
+            size="lg"
+            className="min-w-[200px]"
+            onClick={() => navigate("/courses")}
+          >
             সকল কোর্স দেখুন
           </Button>
         </div>
