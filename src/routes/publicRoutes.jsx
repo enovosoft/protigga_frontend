@@ -11,6 +11,7 @@ import NotesViewPage from "../pages/Public/NotesViewPage";
 import PrivacyPolicyPage from "../pages/Public/PrivacyPolicyPage";
 import ReturnRefundPolicyPage from "../pages/Public/ReturnRefundPolicyPage";
 import TermsConditionsPage from "../pages/Public/TermsConditionsPage";
+import AboutUsPage from "../pages/Public/AboutUsPage";
 export const publicRoutes = (
   <>
     <Route path="/" element={<HomePage />} />
@@ -24,6 +25,7 @@ export const publicRoutes = (
     <Route path="/terms-conditions" element={<TermsConditionsPage />} />
     <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
     <Route path="/return-refund-policy" element={<ReturnRefundPolicyPage />} />
+  <Route path="/about-us" element={<AboutUsPage />} />
     <Route path="*" element={<NotFoundPage />} />
   </>
 );

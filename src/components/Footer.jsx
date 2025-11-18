@@ -84,7 +84,7 @@ export default function Footer({ className }) {
             <ul className="space-y-2">
               <li>
                 <Link
-                  to="/#contact"
+                  to="/about-us"
                   className="text-primary-foreground/80 hover:text-secondary transition-colors text-sm"
                 >
                   About Us
@@ -137,7 +137,7 @@ export default function Footer({ className }) {
                 <span>{CONTACT.email}</span>
               </li>
               <li className="text-xs text-primary-foreground/60 mt-3">
-                <strong>Trade License:</strong> {CONTACT.tradeLicense}
+                <strong>TIN:</strong> {CONTACT.tin}
               </li>
             </ul>
           </div>
@@ -159,7 +159,6 @@ export default function Footer({ className }) {
                   alt="Payment Methods"
                   className="hidden sm:block lg:hidden  object-contain"
                 />
-
                 <img
                   src="/Payment2.png"
                   alt="Payment Methods"
