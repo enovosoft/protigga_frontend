@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { CreditCard, User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import {
   Select,
@@ -34,6 +36,8 @@ export default function CustomerInformation({
   totalAmount = 0,
   deliveryFee = 0,
   user = null,
+  isAgreementAccepted = false,
+  setIsAgreementAccepted = () => {},
 }) {
   const getPaymentOptions = () => {
     if (isBook) {
@@ -451,9 +455,63 @@ export default function CustomerInformation({
               )?.description
             }
           />
+
+          {/* Terms & Conditions Agreement */}
+          <div className="bg-muted/50 rounded-lg p-4 border border-border">
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="agreement"
+                checked={isAgreementAccepted}
+                onCheckedChange={setIsAgreementAccepted}
+                className="mt-1"
+              />
+              <div className="space-y-1 flex-1">
+                <Label
+                  htmlFor="agreement"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  I agree to the Terms & Conditions{" "}
+                  <span className="text-destructive">*</span>
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  By proceeding, you agree to our{" "}
+                  <Link
+                    to="/terms-conditions"
+                    target="_blank"
+                    className="text-primary hover:underline font-semibold"
+                  >
+                    Terms & Conditions
+                  </Link>
+                  ,{" "}
+                  <Link
+                    to="/privacy-policy"
+                    target="_blank"
+                    className="text-primary hover:underline font-semibold"
+                  >
+                    Privacy Policy
+                  </Link>
+                  , and{" "}
+                  <Link
+                    to="/return-refund-policy"
+                    target="_blank"
+                    className="text-primary hover:underline font-semibold"
+                  >
+                    Return & Refund Policy
+                  </Link>
+                  .
+                </p>
+                {validationErrors.isAgreementAccepted && (
+                  <p className="text-xs text-destructive mt-1">
+                    {validationErrors.isAgreementAccepted}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
           <Button
             type="submit"
-            className="w-full h-10 sm:h-11 text-sm sm:text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="w-full h-10 sm:h-11 text-sm sm:text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Pay now ৳{paymentType === "sslcommerz" ? totalAmount : "200"}
             {/* Pay now ৳

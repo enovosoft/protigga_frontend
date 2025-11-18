@@ -36,6 +36,9 @@ const bookCheckoutSchema = z.object({
     .regex(/^\+8801[0-9]{9}$/, "Phone number must be in format +8801XXXXXXXXX")
     .optional()
     .or(z.literal("")),
+  isAgreementAccepted: z.boolean().refine((val) => val === true, {
+    message: "You must accept the Terms & Conditions",
+  }),
 });
 
 const courseCheckoutSchema = z.object({
@@ -61,6 +64,9 @@ const courseCheckoutSchema = z.object({
   zipCode: z.string().regex(/^[0-9]{4}$/, "Zip code must be exactly 4 digits"),
   division: z.string().refine((val) => val && val.length > 0, {
     message: "Division is required",
+  }),
+  isAgreementAccepted: z.boolean().refine((val) => val === true, {
+    message: "You must accept the Terms & Conditions",
   }),
 });
 
@@ -92,6 +98,7 @@ export default function CheckoutForm() {
   const [deliveryArea, setDeliveryArea] = useState("inside_dhaka"); // Default to inside_dhaka
   const [quantity, setQuantity] = useState(1);
   const [validationErrors, setValidationErrors] = useState({});
+  const [isAgreementAccepted, setIsAgreementAccepted] = useState(false);
   // Form state
   const [formData, setFormData] = useState({ ...initialFormData });
 
@@ -324,8 +331,10 @@ export default function CheckoutForm() {
 
     // Validate form data with appropriate Zod schema
     const schema = isBook ? bookCheckoutSchema : courseCheckoutSchema;
+    const formDataWithAgreement = { ...formData, isAgreementAccepted };
+
     try {
-      schema.parse(formData);
+      schema.parse(formDataWithAgreement);
       setValidationErrors({}); // Clear any previous errors
 
       const orderData = {
@@ -570,6 +579,8 @@ export default function CheckoutForm() {
             totalAmount={calculateTotal()}
             deliveryFee={deliveryFee}
             user={user}
+            isAgreementAccepted={isAgreementAccepted}
+            setIsAgreementAccepted={setIsAgreementAccepted}
           />
         </div>
       </div>
