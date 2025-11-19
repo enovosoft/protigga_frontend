@@ -42,9 +42,9 @@ export const DUMMY_RELATED_BOOKS = [
 export const CONTACT = {
   email: "tazwoarbusiness@gmail.com",
   phone: "+880 1533-381836",
-  address: "House # 123, Road # 456, Dhanmondi R/A, Dhaka-1205, Bangladesh",
+  address: "Rasulpur, Etavara, Keraniganj model, Dhaka - 1313, Bangladesh",
   tin: "822749690574",
-  established: "2019",
+  tradeLicense: "20252613817002393",
   founder: "Momen Tazwoar Momit",
   supportEmail: "support@protigga.com",
   socialLinks: {

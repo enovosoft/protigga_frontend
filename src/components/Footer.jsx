@@ -137,7 +137,8 @@ export default function Footer({ className }) {
                 <span>{CONTACT.email}</span>
               </li>
               <li className="text-xs text-primary-foreground/60 mt-3">
-                <strong>TIN:</strong> {CONTACT.tin}
+                {/* <strong>TIN:</strong> {CONTACT.tin} */}
+                <strong>Trade License:</strong> {CONTACT.tradeLicense}
               </li>
             </ul>
           </div>

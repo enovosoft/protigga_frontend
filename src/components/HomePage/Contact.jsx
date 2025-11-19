@@ -50,9 +50,13 @@ function Contact() {
               <div className="flex items-center gap-2 text-sm">
                 <Building className="w-4 h-4 text-primary flex-shrink-0" />
                 <div>
-                  <span className="block font-medium">TIN:</span>
+                  {/* <span className="block font-medium">TIN:</span>
                   <span className="block text-muted-foreground">
                     {CONTACT.tin}
+                  </span> */}
+                  <span className="block font-medium">Trade License:</span>
+                  <span className="block text-muted-foreground">
+                    {CONTACT.tradeLicense}
                   </span>
                 </div>
               </div>
