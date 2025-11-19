@@ -4,7 +4,7 @@ export const INSTRUCTORS = [
   {
     id: 1,
     name: "Momen Tazwoar Momit",
-    subject: "CEO, Protigga",
+    subject: "CEO, Protigya",
     experience: "10 years",
     institution: "BUET",
     students: 5000,
@@ -46,7 +46,7 @@ export const CONTACT = {
   tin: "822749690574",
   tradeLicense: "20252613817002393",
   founder: "Momen Tazwoar Momit",
-  supportEmail: "support@protigga.com",
+  supportEmail: "support@protigya.com",
   socialLinks: {
     youtube: "https://www.youtube.com/@momentazwoarmomit",
     facebookPage: "https://www.facebook.com/Momentazwoarmomit",
@@ -62,7 +62,7 @@ export const TEAM = [
     role: "CEO",
     bio: "Founder and CEO. Passionate about accessible education and curriculum development.",
     image: "/momit.jpg",
-    email: "momen@protigga.com",
+    email: "momen@protigya.com",
   },
   {
     id: 2,
@@ -70,7 +70,7 @@ export const TEAM = [
     role: "CTO",
     bio: "Leads engineering and platform reliability. Loves building scalable systems.",
     image: "/logo.jpeg",
-    email: "rashed@protigga.com",
+    email: "rashed@protigya.com",
   },
   {
     id: 3,
@@ -78,7 +78,7 @@ export const TEAM = [
     role: "Head of Content",
     bio: "Oversees content creation and quality assurance for courses and books.",
     image: "/logo.jpeg",
-    email: "sadia@protigga.com",
+    email: "sadia@protigya.com",
   },
   {
     id: 4,
@@ -86,7 +86,7 @@ export const TEAM = [
     role: "Head of Operations",
     bio: "Manages logistics, partnerships and customer support operations.",
     image: "/logo.jpeg",
-    email: "arif@protigga.com",
+    email: "arif@protigya.com",
   },
   {
     id: 5,
@@ -94,7 +94,7 @@ export const TEAM = [
     role: "Head of Curriculum",
     bio: "Designs comprehensive curricula and assessments for courses across levels.",
     image: "/logo.jpeg",
-    email: "tahmina@protigga.com",
+    email: "tahmina@protigya.com",
   },
   {
     id: 6,
@@ -102,6 +102,6 @@ export const TEAM = [
     role: "Head of Partnerships",
     bio: "Builds institutional partnerships, B2B alliances and strategic ties.",
     image: "/logo.jpeg",
-    email: "rafi@protigga.com",
+    email: "rafi@protigya.com",
   },
 ];

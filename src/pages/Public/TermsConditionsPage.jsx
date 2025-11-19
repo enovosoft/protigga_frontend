@@ -22,7 +22,7 @@ export default function TermsConditionsPage() {
                       1. Acceptance of Terms
                     </h2>
                     <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                      By accessing and using প্রতিজ্ঞা (Protigga) website and
+                      By accessing and using প্রতিজ্ঞা (Protigya) website and
                       services, you accept and agree to be bound by the terms
                       and provision of this agreement.
                     </p>

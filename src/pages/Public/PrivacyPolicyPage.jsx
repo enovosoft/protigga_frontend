@@ -22,7 +22,7 @@ export default function PrivacyPolicyPage() {
                       1. Information We Collect
                     </h2>
                     <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-4">
-                      প্রতিজ্ঞা (Protigga) collects information to provide
+                      প্রতিজ্ঞা (Protigya) collects information to provide
                       better services to our users. We collect information in
                       the following ways:
                     </p>

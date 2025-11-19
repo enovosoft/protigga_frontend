@@ -22,7 +22,7 @@ export default function ReturnRefundPolicyPage() {
                       1. Overview
                     </h2>
                     <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                      At প্রতিজ্ঞা (Protigga), we strive to provide high-quality
+                      At প্রতিজ্ঞা (Protigya), we strive to provide high-quality
                       educational content and books. This policy outlines our
                       return and refund procedures for both digital courses and
                       physical books.

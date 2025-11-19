@@ -312,7 +312,7 @@ const PaymentDetailsPage = () => {
           {/* Footer */}
           <div className="border-t pt-4 text-center print:border-t-0 print:pt-2">
             <p className="text-sm text-muted-foreground print:text-xs">
-              Thank you for trusting Protigga!
+              Thank you for trusting Protigya!
             </p>
             <div className="mt-4 print:hidden">
               <Button onClick={() => navigate(-1)}>Close</Button>
