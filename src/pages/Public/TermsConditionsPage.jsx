@@ -63,12 +63,10 @@ export default function TermsConditionsPage() {
                     </p>
                     <ul className="list-disc pl-6 text-sm sm:text-base text-muted-foreground space-y-2">
                       <li>
-                        Books will be delivered within 7-10 working days inside
+                        Books will be delivered within 3-4 working days inside
                         Dhaka
                       </li>
-                      <li>
-                        Outside Dhaka delivery may take 10-15 working days
-                      </li>
+                      <li>Outside Dhaka delivery may take 4-6 working days</li>
                       <li>
                         Delivery charges are additional and will be clearly
                         mentioned during checkout

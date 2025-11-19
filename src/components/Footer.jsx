@@ -146,7 +146,7 @@ export default function Footer({ className }) {
 
         {/* Payment Gateway Information Banner */}
         <div className="border-t border-primary/20 pt-6 mt-8">
-          <div className="bg-gradient-to-r from-secondary/10 to-primary/10 rounded-lg p-4 mb-6">
+          <div className="bg-gradient-to-l from-secondary/10 to-primary/10 rounded-lg p-4 mb-6">
             <div className="flex flex-col items-center justify-center w-full">
               <div className="flex items-center justify-center gap-2">
                 <img
@@ -156,6 +156,12 @@ export default function Footer({ className }) {
                 />
 
                 <img
+                  src="/payment0.png"
+                  alt="Payment Methods"
+                  className="hidden sm:block   object-contain"
+                />
+
+                {/* <img
                   src="/Payment4.png"
                   alt="Payment Methods"
                   className="hidden sm:block lg:hidden  object-contain"
@@ -169,7 +175,7 @@ export default function Footer({ className }) {
                   src="/Payment1.png"
                   alt="Payment Methods"
                   className="hidden 2xl:block object-contain"
-                />
+                /> */}
               </div>
             </div>
           </div>
