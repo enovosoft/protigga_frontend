@@ -2,7 +2,6 @@ import { StoreProvider, store } from "@/store";
 import { CookiesProvider } from "react-cookie";
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter as Router, Routes } from "react-router-dom";
-import DevToolsProtection from "./components/shared/DevToolsProtection";
 import ErrorBoundary from "./components/shared/ErrorBoundary";
 import { AuthProvider } from "./contexts/AuthContext";
 import { protectedRoutes } from "./pages/student/protectedRoutes";
@@ -14,7 +13,6 @@ function App() {
   return (
     <ErrorBoundary>
       <CookiesProvider>
-        <DevToolsProtection />
         <StoreProvider store={store}>
           <AuthProvider>
             <Router>
