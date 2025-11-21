@@ -196,7 +196,11 @@ const PaymentDetailsPage = () => {
                 <div className="flex justify-between">
                   <span>Paid Amount:</span>
                   <span className="text-green-600">
-                    {formatPrice(payment.paid_amount)}
+                    {formatPrice(
+                      payment.delevery_charge === 60
+                        ? payment.paid_amount + payment.delevery_charge
+                        : payment.paid_amount
+                    )}
                   </span>
                 </div>
 

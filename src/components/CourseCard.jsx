@@ -20,42 +20,42 @@ export default function CourseCard({ course, className }) {
         className
       )}
     >
-      <CardHeader className="p-0">
-        <div className="relative w-full h-40 md:h-48 overflow-hidden bg-muted">
-          <ImageFallback
-            src={thumbnail}
-            alt={course_title}
-            className="group-hover:scale-105 transition-transform duration-300"
-            icon={BookOpen}
-            text="Course Thumbnail"
-          />
-          {/* Batch Tag */}
-          {batch && (
-            <div className="absolute top-3 right-3">
-              <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                <BookOpen className="w-3 h-3" />
-                {batch}
-              </span>
-            </div>
-          )}
-        </div>
-      </CardHeader>
+      <Link className="w-full" to={`/courses/${slug}`}>
+        <CardHeader className="p-0">
+          <div className="relative w-full h-40 md:h-48 overflow-hidden bg-muted">
+            <ImageFallback
+              src={thumbnail}
+              alt={course_title}
+              className="group-hover:scale-105 transition-transform duration-300"
+              icon={BookOpen}
+              text="Course Thumbnail"
+            />
+            {/* Batch Tag */}
+            {batch && (
+              <div className="absolute top-3 right-3">
+                <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                  <BookOpen className="w-3 h-3" />
+                  {batch}
+                </span>
+              </div>
+            )}
+          </div>
+        </CardHeader>
 
-      <CardContent className="p-4 flex flex-col flex-1">
-        <h3 className="text-base lg:text-lg font-medium text-foreground line-clamp-2">
-          {course_title}
-        </h3>
+        <CardContent className="p-4 flex flex-col flex-1">
+          <h3 className="text-base lg:text-lg font-medium text-foreground line-clamp-2">
+            {course_title}
+          </h3>
 
-        <div className="flex items-center justify-between mt-auto">
-          <span className="text-2xl font-medium text-primary">৳{price}</span>
-        </div>
-      </CardContent>
+          <div className="flex items-center justify-between mt-auto">
+            <span className="text-2xl font-medium text-primary">৳{price}</span>
+          </div>
+        </CardContent>
 
-      <CardFooter className="p-4 pt-0">
-        <Link className="w-full" to={`/courses/${slug}`}>
+        <CardFooter className="p-4 pt-0">
           <Button className="w-full">Enroll Now</Button>
-        </Link>
-      </CardFooter>
+        </CardFooter>
+      </Link>
     </Card>
   );
 }
