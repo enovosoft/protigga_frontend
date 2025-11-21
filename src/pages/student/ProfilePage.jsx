@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useStoreActions, useStoreState } from "easy-peasy";
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -25,6 +26,8 @@ export default function ProfilePage() {
     password: "",
     confirm_password: "",
   });
+  const [showPrevPassword, setShowPrevPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -90,38 +93,98 @@ export default function ProfilePage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <Label htmlFor="prev_password">Current Password</Label>
-                    <Input
-                      id="prev_password"
-                      name="prev_password"
-                      type="password"
-                      value={formData.prev_password}
-                      onChange={handleInputChange}
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        id="prev_password"
+                        name="prev_password"
+                        type={showPrevPassword ? "text" : "password"}
+                        value={formData.prev_password}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="Enter current password"
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        aria-label={
+                          showPrevPassword
+                            ? "Hide current password"
+                            : "Show current password"
+                        }
+                        onClick={() => setShowPrevPassword((s) => !s)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showPrevPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <Label htmlFor="password">New Password</Label>
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        name="password"
+                        type={showNewPassword ? "text" : "password"}
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="Enter new password"
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        aria-label={
+                          showNewPassword
+                            ? "Hide new password"
+                            : "Show new password"
+                        }
+                        onClick={() => setShowNewPassword((s) => !s)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showNewPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <Label htmlFor="confirm_password">
                       Confirm New Password
                     </Label>
-                    <Input
-                      id="confirm_password"
-                      name="confirm_password"
-                      type="password"
-                      value={formData.confirm_password}
-                      onChange={handleInputChange}
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        id="confirm_password"
+                        name="confirm_password"
+                        type={showNewPassword ? "text" : "password"}
+                        value={formData.confirm_password}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="Re-enter new password"
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        aria-label={
+                          showNewPassword
+                            ? "Hide confirm password"
+                            : "Show confirm password"
+                        }
+                        onClick={() => setShowNewPassword((s) => !s)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showNewPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   <Button type="submit" className="w-full">
                     Change Password

@@ -3,11 +3,14 @@ import { CONTACT } from "@/config/data";
 import {
   Building,
   Facebook,
+  Globe,
+  Instagram,
   Mail,
   MapPin,
   MessageCircle,
   Phone,
-  Youtube,
+  Users,
+  Youtube
 } from "lucide-react";
 
 function Contact() {
@@ -100,49 +103,104 @@ function Contact() {
         </div>
       </div>
 
-      <div className="flex justify-center gap-6 flex-wrap">
-        {/* YouTube Channel */}
+      <div className="flex justify-center gap-4 flex-wrap">
+        {/* Protigya YouTube Channel */}
         <a
-          href={CONTACT.socialLinks.youtube}
-          className="flex items-center gap-3 px-6 py-3 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 rounded-lg transition-colors duration-200 border border-red-200 hover:border-red-300"
+          href={CONTACT.socialLinks.protigyaYoutube}
+          className="flex items-center justify-center w-12 h-12 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 rounded-full transition-all duration-200 border border-red-200 hover:border-red-300 hover:scale-110"
           target="_blank"
           rel="noopener noreferrer"
+          title="Protigya YouTube"
         >
           <Youtube className="w-6 h-6" />
-          <span className="font-medium">YouTube</span>
         </a>
 
-        {/* Facebook Page */}
+        {/* Momit's YouTube Channel */}
+        <a
+          href={CONTACT.socialLinks.youtube}
+          className="flex items-center justify-center w-12 h-12 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 rounded-full transition-all duration-200 border border-red-200 hover:border-red-300 hover:scale-110"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Momit's YouTube"
+        >
+          <Youtube className="w-6 h-6" />
+        </a>
+
+        {/* Protigya Facebook Page */}
+        <a
+          href={CONTACT.socialLinks.protigyaFacebookPage}
+          className="flex items-center justify-center w-12 h-12 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 rounded-full transition-all duration-200 border border-blue-200 hover:border-blue-300 hover:scale-110"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Protigya Facebook"
+        >
+          <Facebook className="w-6 h-6" />
+        </a>
+
+        {/* Momit's Facebook Page */}
         <a
           href={CONTACT.socialLinks.facebookPage}
-          className="flex items-center gap-3 px-6 py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 rounded-lg transition-colors duration-200 border border-blue-200 hover:border-blue-300"
+          className="flex items-center justify-center w-12 h-12 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 rounded-full transition-all duration-200 border border-blue-200 hover:border-blue-300 hover:scale-110"
           target="_blank"
           rel="noopener noreferrer"
+          title="Momit's Facebook"
         >
           <Facebook className="w-6 h-6" />
-          <span className="font-medium">Facebook Page</span>
         </a>
 
-        {/* Facebook Profile */}
+        {/* Facebook Group */}
         <a
-          href={CONTACT.socialLinks.facebookProfile}
-          className="flex items-center gap-3 px-6 py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 rounded-lg transition-colors duration-200 border border-blue-200 hover:border-blue-300"
+          href={CONTACT.socialLinks.facebookGroup}
+          className="flex items-center justify-center w-12 h-12 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 rounded-full transition-all duration-200 border border-blue-200 hover:border-blue-300 hover:scale-110"
           target="_blank"
           rel="noopener noreferrer"
+          title="Facebook Group"
         >
-          <Facebook className="w-6 h-6" />
-          <span className="font-medium">Facebook Profile</span>
+          <Users className="w-6 h-6" />
+        </a>
+
+        {/* Instagram */}
+        <a
+          href={CONTACT.socialLinks.instagram}
+          className="flex items-center justify-center w-12 h-12 bg-pink-50 hover:bg-pink-100 text-pink-600 hover:text-pink-700 rounded-full transition-all duration-200 border border-pink-200 hover:border-pink-300 hover:scale-110"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Instagram"
+        >
+          <Instagram className="w-6 h-6" />
+        </a>
+
+        {/* TikTok */}
+        <a
+          href={CONTACT.socialLinks.tiktok}
+          className="flex items-center justify-center w-12 h-12 bg-gray-50 hover:bg-gray-100 text-gray-900 hover:text-black rounded-full transition-all duration-200 border border-gray-200 hover:border-gray-300 hover:scale-110"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="TikTok"
+        >
+          <img src="/tiktok.png" alt="TikTok" className="w-6 h-6 object-contain" />
         </a>
 
         {/* WhatsApp */}
         <a
           href={CONTACT.socialLinks.whatsapp}
-          className="flex items-center gap-3 px-6 py-3 bg-green-50 hover:bg-green-100 text-green-600 hover:text-green-700 rounded-lg transition-colors duration-200 border border-green-200 hover:border-green-300"
+          className="flex items-center justify-center w-12 h-12 bg-green-50 hover:bg-green-100 text-green-600 hover:text-green-700 rounded-full transition-all duration-200 border border-green-200 hover:border-green-300 hover:scale-110"
           target="_blank"
           rel="noopener noreferrer"
+          title="WhatsApp"
         >
           <MessageCircle className="w-6 h-6" />
-          <span className="font-medium">WhatsApp</span>
+        </a>
+
+        {/* Smart Shohay */}
+        <a
+          href={CONTACT.socialLinks.smartShohay}
+          className="flex items-center justify-center w-12 h-12 bg-purple-50 hover:bg-purple-100 text-purple-600 hover:text-purple-700 rounded-full transition-all duration-200 border border-purple-200 hover:border-purple-300 hover:scale-110"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Smart Shohay"
+        >
+          <Globe className="w-6 h-6" />
         </a>
       </div>
     </div>

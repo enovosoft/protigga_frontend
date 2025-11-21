@@ -68,7 +68,6 @@ export default function ReturnRefundPolicyPage() {
                       <ul className="list-disc pl-6 text-sm sm:text-base text-muted-foreground space-y-2">
                         <li>Course access after 7 working days of purchase</li>
                         <li>Change of mind or personal circumstances</li>
-                        <li>Completion of more than 25% of course content</li>
                         <li>Violation of terms and conditions</li>
                       </ul>
                     </div>
@@ -98,7 +97,9 @@ export default function ReturnRefundPolicyPage() {
                         </li>
                         <li>Original packaging and invoice required</li>
                         <li>No damage, writing, or highlighting</li>
-                        <li>Books delivered with defects or printing errors</li>
+                        <li>
+                          Books delivered with more than 2% printing defects
+                        </li>
                       </ul>
                     </div>
 

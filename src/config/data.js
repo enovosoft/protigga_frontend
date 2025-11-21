@@ -49,59 +49,30 @@ export const CONTACT = {
   supportEmail: "support@protigya.com",
   socialLinks: {
     youtube: "https://www.youtube.com/@momentazwoarmomit",
+    protigyaYoutube: "https://www.youtube.com/@ProtigyaEdu", 
     facebookPage: "https://www.facebook.com/Momentazwoarmomit",
-    facebookProfile: "https://www.facebook.com/Momentazwoarmomit",
+    protigyaFacebookPage: "https://www.facebook.com/profile.php?id=61582424907091", 
+    facebookGroup: "https://www.facebook.com/groups2971542009642680",
+    instagram: "https://www.instagram.com/momit_here", 
+    tiktok: "https://www.tiktok.com/@momentazwoar", 
     whatsapp: "https://wa.me/1533381836",
+    smartShohay: "https://smartsohay.com/"
   },
 };
 
 export const TEAM = [
   {
     id: 1,
+    name: "Md Rabiul Islam Rony",
+    role: "Chairman",
+    bio: "Experienced educationist dedicated to improving learning outcomes.",
+    image: "/chairman.jpeg",
+  },
+  {
+    id: 2,
     name: "Momen Tazwoar Momit",
     role: "CEO",
     bio: "Founder and CEO. Passionate about accessible education and curriculum development.",
     image: "/momit.jpg",
-    email: "momen@protigya.com",
-  },
-  {
-    id: 2,
-    name: "Rashed Khan",
-    role: "CTO",
-    bio: "Leads engineering and platform reliability. Loves building scalable systems.",
-    image: "/logo.jpeg",
-    email: "rashed@protigya.com",
-  },
-  {
-    id: 3,
-    name: "Sadia Noor",
-    role: "Head of Content",
-    bio: "Oversees content creation and quality assurance for courses and books.",
-    image: "/logo.jpeg",
-    email: "sadia@protigya.com",
-  },
-  {
-    id: 4,
-    name: "Arif Hasan",
-    role: "Head of Operations",
-    bio: "Manages logistics, partnerships and customer support operations.",
-    image: "/logo.jpeg",
-    email: "arif@protigya.com",
-  },
-  {
-    id: 5,
-    name: "Tahmina Rahman",
-    role: "Head of Curriculum",
-    bio: "Designs comprehensive curricula and assessments for courses across levels.",
-    image: "/logo.jpeg",
-    email: "tahmina@protigya.com",
-  },
-  {
-    id: 6,
-    name: "Rafi Uddin",
-    role: "Head of Partnerships",
-    bio: "Builds institutional partnerships, B2B alliances and strategic ties.",
-    image: "/logo.jpeg",
-    email: "rafi@protigya.com",
   },
 ];

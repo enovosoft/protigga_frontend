@@ -1,3 +1,4 @@
+import ImageFallback from "@/components/shared/ImageFallback";
 import Loading from "@/components/shared/Loading";
 import StudentDashboardLayout from "@/components/shared/StudentDashboardLayout";
 import { Badge } from "@/components/ui/badge";
@@ -11,18 +12,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
+import { getAnnouncementStatusBadge } from "@/lib/badgeUtils";
 import { differenceInMinutes, format } from "date-fns";
 import { useStoreState } from "easy-peasy";
 import {
+  AlertCircle,
   AlertTriangle,
   Bell,
   Book,
   Calendar,
+  CheckCircle2,
   Clock,
   Copy,
   CreditCard,
   ExternalLink,
   GraduationCap,
+  MessageSquare,
   PlayCircle,
   User,
   Video,
@@ -62,6 +68,31 @@ export default function StudentDashboard() {
     }
     return `${hours}h ${remainingMinutes}m`;
   };
+
+  const isAnnouncementActive = (announcement) => {
+    const now = new Date();
+    const startDate = new Date(announcement.start_date);
+    const endDate = new Date(announcement.end_date);
+    return (
+      announcement.status === "active" && now >= startDate && now <= endDate
+    );
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "active":
+        return CheckCircle2;
+      case "scheduled":
+        return Clock;
+      case "expired":
+        return AlertCircle;
+      default:
+        return AlertCircle;
+    }
+  };
+
+  const activeAnnouncements = announcements?.filter(isAnnouncementActive) || [];
+  const activeAnnouncementsCount = activeAnnouncements.length;
 
   // Check for ongoing exams
   const ongoingExams =
@@ -128,12 +159,101 @@ export default function StudentDashboard() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="md:col-span-2 lg:col-span-3">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-2">Student Dashboard</h2>
-              <p className="text-muted-foreground">
-                Welcome to your learning dashboard. Here you can access your
-                courses, notes, and books.
-              </p>
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Student Dashboard</h2>
+                <p className="text-muted-foreground">
+                  Welcome to your learning dashboard.
+                </p>
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="relative shrink-0 rounded-full w-12 h-12 shadow-sm hover:shadow-md hover:bg-primary/5 transition-all border-primary/20 ml-auto"
+                  >
+                    <Bell className="h-6 w-6 text-primary" />
+                    {activeAnnouncementsCount > 0 && (
+                      <Badge
+                        variant="destructive"
+                        className="absolute -top-1 -right-1 h-6 w-6 flex items-center justify-center rounded-full p-0 text-xs border-2 border-background animate-pulse "
+                      >
+                        {activeAnnouncementsCount}
+                      </Badge>
+                    )}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2 text-xl">
+                      <MessageSquare className="w-6 h-6 text-primary" />
+                      Announcements
+                    </DialogTitle>
+                    <DialogDescription>
+                      Stay updated with the latest news and notices.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex-1 overflow-y-auto pr-2 -mr-2">
+                    <div className="space-y-4 py-4">
+                      {activeAnnouncements.length > 0 ? (
+                        activeAnnouncements.map((announcement) => {
+                          const StatusIcon = getStatusIcon(announcement.status);
+                          return (
+                            <Card
+                              key={announcement.id}
+                              className="transition-all duration-200 hover:shadow-md ring-1 ring-border/50"
+                            >
+                              <CardContent className="p-5">
+                                <div className="flex items-start gap-4">
+                                  <div className="p-2 bg-primary/10 rounded-full shrink-0">
+                                    <StatusIcon className="w-5 h-5 text-primary" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-start justify-between gap-2 mb-2">
+                                      <h4 className="font-bold text-lg text-foreground">
+                                        {announcement.title}
+                                      </h4>
+                                      <div className="shrink-0">
+                                        {getAnnouncementStatusBadge(
+                                          announcement.status
+                                        )}
+                                      </div>
+                                    </div>
+                                    {announcement.description && (
+                                      <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                                        {announcement.description}
+                                      </div>
+                                    )}
+                                    {announcement.attachment_url && (
+                                      <div className="mt-4 bg-muted/30 p-2 rounded-lg border border-border/50 inline-block">
+                                        <ImageFallback
+                                          src={announcement.attachment_url}
+                                          alt="Announcement Attachment"
+                                          className="max-h-64 w-auto object-contain rounded shadow-sm"
+                                        />
+                                      </div>
+                                    )}
+ 
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground ">
+                          <div className="p-4 bg-muted rounded-full mb-4">
+                            <Bell className="w-8 h-8 opacity-50" />
+                          </div>
+                          <p className="text-lg font-medium">No active announcements</p>
+                          <p className="text-sm">Check back later for updates.</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
             {/* Live Classes Section */}
             {liveClasses && liveClasses.length > 0 && (

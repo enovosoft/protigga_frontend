@@ -113,7 +113,11 @@ const studentStore = {
         actions.setError(response.data?.message || "Failed to change password");
       }
     } catch (err) {
-      actions.setError(err.message || "Failed to change password");
+      actions.setError(
+        err.response?.data?.errors[0]?.message ||
+          err.message ||
+          "Failed to change password"
+      );
     } finally {
       actions.setLoading(false);
     }

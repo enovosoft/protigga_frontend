@@ -1,6 +1,6 @@
 import { CONTACT } from "@/config/data";
 import { cn } from "@/lib/utils";
-import { Facebook, Mail, MapPin, Phone, Youtube } from "lucide-react";
+import { Facebook, Instagram, Mail, MapPin, Phone, Youtube } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Footer({ className }) {
@@ -13,21 +13,41 @@ export default function Footer({ className }) {
             <img src="/logo.jpeg" alt="Logo" className="max-w-40 rounded-2xl" />
             <div className="flex gap-3">
               <a
-                href={CONTACT.socialLinks.facebookPage}
+                href={CONTACT.socialLinks.protigyaFacebookPage}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-primary-foreground/10 hover:bg-secondary flex items-center justify-center transition-colors"
+                title="Protigya Facebook"
               >
                 <Facebook className="w-5 h-5" />
               </a>
               <a
-                href={CONTACT.socialLinks.youtube}
+                href={CONTACT.socialLinks.protigyaYoutube}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-primary-foreground/10 hover:bg-secondary flex items-center justify-center transition-colors"
+                title="Protigya YouTube"
               >
                 <Youtube className="w-5 h-5" />
               </a>
+              <a
+                href={CONTACT.socialLinks.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-primary-foreground/10 hover:bg-secondary flex items-center justify-center transition-colors"
+                title="Instagram"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
+              {/* <a
+                href={CONTACT.socialLinks.tiktok}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-primary-foreground/10 hover:bg-secondary flex items-center justify-center transition-colors"
+                title="TikTok"
+              >
+                <img src="/tiktok.png" alt="TikTok" className="w-5 h-5 object-contain" />
+              </a> */}
             </div>
           </div>
 

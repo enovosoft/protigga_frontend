@@ -97,14 +97,6 @@ export default function AboutUsPage() {
                               {member.role}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <a
-                              href={`mailto:${member.email}`}
-                              className="text-primary hover:underline text-sm"
-                            >
-                              {member.email}
-                            </a>
-                          </div>
                         </div>
                         <p className="text-sm text-muted-foreground mt-2">
                           {member.bio}
