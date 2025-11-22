@@ -12,11 +12,13 @@ import api from "@/lib/api";
 import { Info } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import BookCard from "../BookCard";
+
 export default function FeaturedBooks() {
   const [books, setBooks] = useState({});
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchFeaturedBooks = async () => {
       try {
@@ -181,7 +183,12 @@ export default function FeaturedBooks() {
 
         {/* View All Button */}
         <div className="text-center mt-12">
-          <Button variant="secondary" size="lg" className="min-w-[200px]">
+          <Button
+            variant="secondary"
+            size="lg"
+            className="min-w-[200px]"
+            onClick={() => navigate("/courses")}
+          >
             সকল বই দেখুন
           </Button>
         </div>
