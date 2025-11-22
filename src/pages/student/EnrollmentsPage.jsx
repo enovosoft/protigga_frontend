@@ -1,5 +1,6 @@
 import ImageFallback from "@/components/shared/ImageFallback";
 import PinMessage from "@/components/shared/PinMessage";
+import ScrollToTop from "@/components/shared/ScrollToTop";
 import StudentDashboardLayout from "@/components/shared/StudentDashboardLayout";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -91,9 +92,11 @@ export default function EnrollmentsPage() {
                         <StatusIcon className="w-5 h-5 mt-0.5 text-primary" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
-                            <h4 className="font-semibold text-foreground truncate">
-                              {announcement.title}
-                            </h4>
+                            <div className="min-w-0">
+                              <h4 className="font-semibold text-foreground truncate">
+                                {announcement.title}
+                              </h4>
+                            </div>
                             {getAnnouncementStatusBadge(announcement.status)}
                           </div>
                           {announcement.description && (
@@ -107,6 +110,14 @@ export default function EnrollmentsPage() {
                               alt="Announcement Attachment"
                               className="mt-2 max-h-48 object-contain rounded"
                             />
+                          )}
+                          {announcement.course_title && (
+                            <p className="text-xs text-muted-foreground mt-1 truncate">
+                              Course:{" "}
+                              <span className="font-medium">
+                                {announcement.course_title}
+                              </span>
+                            </p>
                           )}
                         </div>
                       </div>
@@ -165,6 +176,7 @@ export default function EnrollmentsPage() {
           </div>
         )}
       </div>
+      <ScrollToTop />
     </StudentDashboardLayout>
   );
 }

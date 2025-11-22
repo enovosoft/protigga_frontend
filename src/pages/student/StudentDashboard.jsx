@@ -211,9 +211,11 @@ export default function StudentDashboard() {
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-start justify-between gap-2 mb-2">
-                                      <h4 className="font-bold text-lg text-foreground">
-                                        {announcement.title}
-                                      </h4>
+                                      <div className="min-w-0">
+                                        <h4 className="font-bold text-lg text-foreground truncate">
+                                          {announcement.title}
+                                        </h4>
+                                      </div>
                                       <div className="shrink-0">
                                         {getAnnouncementStatusBadge(
                                           announcement.status
@@ -234,7 +236,14 @@ export default function StudentDashboard() {
                                         />
                                       </div>
                                     )}
- 
+                                    {announcement.course_title && (
+                                      <p className="text-xs text-muted-foreground mt-1 truncate">
+                                        Course:{" "}
+                                        <span className="font-medium">
+                                          {announcement.course_title}
+                                        </span>
+                                      </p>
+                                    )}
                                   </div>
                                 </div>
                               </CardContent>
@@ -246,8 +255,12 @@ export default function StudentDashboard() {
                           <div className="p-4 bg-muted rounded-full mb-4">
                             <Bell className="w-8 h-8 opacity-50" />
                           </div>
-                          <p className="text-lg font-medium">No active announcements</p>
-                          <p className="text-sm">Check back later for updates.</p>
+                          <p className="text-lg font-medium">
+                            No active announcements
+                          </p>
+                          <p className="text-sm">
+                            Check back later for updates.
+                          </p>
                         </div>
                       )}
                     </div>
@@ -270,11 +283,17 @@ export default function StudentDashboard() {
                     const isOngoing = now >= startTime && now <= endTime;
                     const isUpcoming = now < startTime;
                     const duration = differenceInMinutes(endTime, startTime);
+                    const courseAnnouncementsCount =
+                      announcements?.filter(
+                        (a) =>
+                          a.course_id === liveClass.course_id &&
+                          isAnnouncementActive(a)
+                      ).length || 0;
 
                     return (
                       <Card
                         key={liveClass.id}
-                        className={`transition-all duration-200 hover:shadow-md ${
+                        className={`transition-all duration-200 hover:shadow-md relative ${
                           isOngoing
                             ? "ring-2 ring-green-500/30 bg-green-50"
                             : isUpcoming
@@ -284,16 +303,120 @@ export default function StudentDashboard() {
                       >
                         <CardContent className="p-4">
                           <div className="flex items-center gap-3">
-                            <div
-                              className={`p-2 rounded-lg ${
-                                isOngoing
-                                  ? "bg-green-500 text-white animate-pulse"
-                                  : isUpcoming
-                                  ? "bg-blue-500 text-white"
-                                  : "bg-gray-500 text-white"
-                              }`}
-                            >
-                              <Video className="w-4 h-4" />
+                            <div>
+                              <div
+                                className={`p-2 rounded-lg ${
+                                  isOngoing
+                                    ? "bg-green-500 text-white animate-pulse"
+                                    : isUpcoming
+                                    ? "bg-blue-500 text-white"
+                                    : "bg-gray-500 text-white"
+                                }`}
+                              >
+                                <Video className="w-4 h-4" />
+                              </div>
+
+                              {/* Course specific announcements bell overlay */}
+                              {announcements && (
+                                <div className="absolute top-2 -right-2">
+                                  <Dialog>
+                                    <DialogTrigger asChild>
+                                      <Button
+                                        size="icon"
+                                        variant="outline"
+                                        className="shrink-0 w-8 h-8 rounded-full bg-background/80 backdrop-blur"
+                                      >
+                                        <Bell className="w-4 h-4" />
+                                      </Button>
+                                    </DialogTrigger>
+                                    {courseAnnouncementsCount > 0 && (
+                                      <Badge
+                                        variant="destructive"
+                                        className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center rounded-full text-xs border-2 border-background"
+                                      >
+                                        {courseAnnouncementsCount}
+                                      </Badge>
+                                    )}
+                                    <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+                                      <DialogHeader>
+                                        <DialogTitle className="flex items-center gap-2 text-xl">
+                                          <Bell className="w-5 h-5 text-primary" />
+                                          Announcements -{" "}
+                                          {liveClass.course_title}
+                                        </DialogTitle>
+                                        <DialogDescription>
+                                          Latest announcements for this course
+                                        </DialogDescription>
+                                      </DialogHeader>
+                                      <div className="flex-1 overflow-y-auto pr-2 -mr-2">
+                                        <div className="space-y-4 py-4">
+                                          {announcements
+                                            .filter(
+                                              (a) =>
+                                                a.course_id ===
+                                                liveClass.course_id
+                                            )
+                                            .filter(isAnnouncementActive)
+                                            .map((announcement) => {
+                                              const StatusIcon = getStatusIcon(
+                                                announcement.status
+                                              );
+                                              return (
+                                                <Card
+                                                  key={announcement.id}
+                                                  className="transition-all duration-200 hover:shadow-md ring-1 ring-border/50"
+                                                >
+                                                  <CardContent className="p-5">
+                                                    <div className="flex items-start gap-4">
+                                                      <div className="p-2 bg-primary/10 rounded-full shrink-0">
+                                                        <StatusIcon className="w-5 h-5 text-primary" />
+                                                      </div>
+                                                      <div className="flex-1 min-w-0">
+                                                        <div className="flex items-start justify-between gap-2 mb-2">
+                                                          <h4 className="font-bold text-lg text-foreground">
+                                                            {announcement.title}
+                                                          </h4>
+                                                          <div className="shrink-0">
+                                                            {getAnnouncementStatusBadge(
+                                                              announcement.status
+                                                            )}
+                                                          </div>
+                                                        </div>
+                                                        {announcement.description && (
+                                                          <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                                                            {
+                                                              announcement.description
+                                                            }
+                                                          </div>
+                                                        )}
+                                                      </div>
+                                                    </div>
+                                                  </CardContent>
+                                                </Card>
+                                              );
+                                            })}
+                                          {announcements.filter(
+                                            (a) =>
+                                              a.course_id ===
+                                                liveClass.course_id &&
+                                              isAnnouncementActive(a)
+                                          ).length === 0 && (
+                                            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground ">
+                                              <div className="p-4 bg-muted rounded-full mb-4">
+                                                <Bell className="w-8 h-8 opacity-50" />
+                                              </div>
+                                              <p className="text-lg font-medium">
+                                                No active announcements for this
+                                                course
+                                              </p>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </DialogContent>
+                                  </Dialog>
+                                </div>
+                              )}
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between gap-2">
@@ -303,7 +426,7 @@ export default function StudentDashboard() {
                                 <div className="flex gap-2">
                                   {isOngoing && (
                                     <Badge className="bg-green-500 text-white">
-                                      <Bell className="w-3 h-3 mr-1" />
+                                      <div className="size-1.5 bg-red-400 animate-pulse rounded-full"></div>
                                       Live Now
                                     </Badge>
                                   )}
@@ -446,6 +569,7 @@ export default function StudentDashboard() {
                                     </div>
                                   </DialogContent>
                                 </Dialog>
+                                {/* Right-side duplicate bell removed - bell overlay on left icon now handles course announcements */}
                               </div>
                             </div>
                           </div>

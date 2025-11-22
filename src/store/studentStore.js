@@ -70,14 +70,26 @@ const studentStore = {
       (enrollment) => enrollment.course?.exams || []
     );
 
-    // Live Classes: extract from enrollments
+    // Live Classes: extract from enrollments and attach course meta
     state.liveClasses = (payload.user?.enrollments || []).flatMap(
-      (enrollment) => enrollment.course?.live_classes || []
+      (enrollment) =>
+        (enrollment.course?.live_classes || []).map((lc) => ({
+          ...lc,
+          course_id: enrollment.course?.course_id || "",
+          course_title: enrollment.course?.course_title || "",
+          course_slug: enrollment.course?.slug || "",
+        }))
     );
 
-    // Announcements: extract from enrollments
+    // Announcements: extract from enrollments and attach course meta
     state.announcements = (payload.user?.enrollments || []).flatMap(
-      (enrollment) => enrollment.course?.announcements || []
+      (enrollment) =>
+        (enrollment.course?.announcements || []).map((announcement) => ({
+          ...announcement,
+          course_id: enrollment.course?.course_id || "",
+          course_title: enrollment.course?.course_title || "",
+          course_slug: enrollment.course?.slug || "",
+        }))
     );
 
     // Book Orders: keep as is
