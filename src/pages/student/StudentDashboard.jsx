@@ -389,6 +389,16 @@ export default function StudentDashboard() {
                                                             }
                                                           </div>
                                                         )}
+
+                                                        {announcement.attachment_url && (
+                                                          <ImageFallback
+                                                            src={
+                                                              announcement.attachment_url
+                                                            }
+                                                            alt="Announcement Attachment"
+                                                            className="mt-2 max-h-48 object-contain rounded"
+                                                          />
+                                                        )}
                                                       </div>
                                                     </div>
                                                   </CardContent>
