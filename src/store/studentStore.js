@@ -107,7 +107,11 @@ const studentStore = {
         actions.setError(response.data?.message || "Failed to load user");
       }
     } catch (err) {
-      actions.setError(err.data?.message || "Failed to load user");
+      actions.setError(
+        err.response?.data?.errors[0]?.message ||
+          err.response?.data?.message ||
+          "Failed to load user"
+      );
     } finally {
       actions.setLoading(false);
       actions.setFetched(true);
@@ -127,7 +131,7 @@ const studentStore = {
     } catch (err) {
       actions.setError(
         err.response?.data?.errors[0]?.message ||
-          err.message ||
+          err.response?.data?.message ||
           "Failed to change password"
       );
     } finally {
