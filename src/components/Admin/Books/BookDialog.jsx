@@ -164,7 +164,7 @@ export default function BookDialog({ open, onOpenChange, book, onSuccess }) {
     if (!validationResult.success) {
       toast.error(
         validationResult.error?.issues[0].message ||
-          "Validation errors found. Please check the form."
+          " Please Enter all required fields with correct information."
       );
       return;
     }

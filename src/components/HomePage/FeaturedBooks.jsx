@@ -187,7 +187,7 @@ export default function FeaturedBooks() {
             variant="secondary"
             size="lg"
             className="min-w-[200px]"
-            onClick={() => navigate("/courses")}
+            onClick={() => navigate("/books")}
           >
             সকল বই দেখুন
           </Button>

@@ -14,6 +14,7 @@ import {
   MessageSquare,
   Package,
   PlayCircle,
+  Settings,
   Shield,
   Ticket,
   User,
@@ -149,6 +150,12 @@ const AdminLayout = ({ children }) => {
       label: "Promo Codes",
       icon: Ticket,
       path: "/admin/promo",
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: Settings,
+      path: "/admin/settings",
     },
   ];
 

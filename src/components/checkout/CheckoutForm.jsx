@@ -389,8 +389,7 @@ export default function CheckoutForm() {
         });
         setValidationErrors(errors);
         toast.error(
-          "Validation Error: " + errors[Object.keys(errors)[0]] ||
-            "Please fix the errors in the form"
+          errors[Object.keys(errors)[0]] || "Please fix the errors in the form"
         );
       } else {
         toast.error(
