@@ -89,10 +89,12 @@ export default function CourseDetailsPage() {
       } else {
         console.error("Course not found");
         setCourse(null);
+        navigate("/courses");
       }
     } catch (error) {
       console.error("Error fetching course details:", error);
       setCourse(null);
+      navigate("/courses");
     } finally {
       setIsLoadingCourse(false);
     }
