@@ -107,11 +107,10 @@ const studentStore = {
         actions.setError(response.data?.message || "Failed to load user");
       }
     } catch (err) {
-      actions.setError(
-        err.response?.data?.errors[0]?.message ||
-          err.response?.data?.message ||
-          "Failed to load user"
-      );
+      const errMsg = Array.isArray(err.response?.data?.errors)
+        ? err.response?.data?.errors[0]?.message
+        : err.response?.data?.message;
+      actions.setError(errMsg || "Failed to load user");
     } finally {
       actions.setLoading(false);
       actions.setFetched(true);

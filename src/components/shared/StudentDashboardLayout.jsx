@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useStoreActions, useStoreState } from "easy-peasy";
 import { ArrowLeft, LogOut, User, X } from "lucide-react";
 import { useEffect } from "react";
@@ -79,7 +80,12 @@ const StudentDashboardLayout = ({ children, container = true }) => {
 
       {/* Error Message */}
       {error && (
-        <div className="px-4 pb-4">
+        <div
+          className={cn(
+            "px-4 pb-4",
+            location.pathname === "/dashboard" && "mt-4"
+          )}
+        >
           <div className="relative">
             <PinMessage variant="invalid" message={`Error: ${error}`} />
             <Button
