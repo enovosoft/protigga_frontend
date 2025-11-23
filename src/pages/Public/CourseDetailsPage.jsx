@@ -24,6 +24,7 @@ import {
 import { motion } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
+import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 
 const RelatedBooksSection = ({ books }) => {
@@ -87,11 +88,12 @@ export default function CourseDetailsPage() {
 
         setCourse(courseInfo);
       } else {
-        console.error("Course not found");
+        toast.error("Course not found");
         setCourse(null);
         navigate("/courses");
       }
     } catch (error) {
+      toast.error("Error fetching course details");
       console.error("Error fetching course details:", error);
       setCourse(null);
       navigate("/courses");
