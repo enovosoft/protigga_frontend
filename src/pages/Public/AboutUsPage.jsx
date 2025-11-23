@@ -4,10 +4,29 @@ import ScrollToTop from "@/components/shared/ScrollToTop";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CONTACT, TEAM } from "@/config/data";
 import { Building, MapPin } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 
 export default function AboutUsPage() {
   return (
     <>
+      <Helmet>
+        <title>আমাদের সম্পর্কে - প্রতিজ্ঞা | About Us</title>
+        <meta
+          name="description"
+          content="প্রতিজ্ঞা শিক্ষা প্ল্যাটফর্ম সম্পর্কে জানুন। আমাদের মিশন, ভিশন, টিম এবং বাংলাদেশের শীর্ষস্থানীয় অনলাইন শিক্ষা প্রদানকারী হিসেবে আমাদের যাত্রা।"
+        />
+        <meta
+          property="og:title"
+          content="আমাদের সম্পর্কে - প্রতিজ্ঞা | About Us"
+        />
+        <meta
+          property="og:description"
+          content="প্রতিজ্ঞা শিক্ষা প্ল্যাটফর্ম সম্পর্কে জানুন।"
+        />
+        <meta property="og:image" content="/logo.png" />
+        <meta property="og:url" content="https://www.protigya.com/about-us" />
+        <link rel="canonical" href="https://www.protigya.com/about-us" />
+      </Helmet>
       <Navbar />
       <main className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 sm:py-12">

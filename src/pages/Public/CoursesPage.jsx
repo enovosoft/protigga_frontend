@@ -8,6 +8,7 @@ import api from "@/lib/api";
 import { BookOpen, Search } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
 export default function CoursesPage() {
   const [courses, setCourses] = useState([]);
@@ -124,151 +125,171 @@ export default function CoursesPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+    <>
+      <Helmet>
+        <title>কোর্সসমূহ - প্রতিজ্ঞা | অনলাইন শিক্ষা কোর্স</title>
+        <meta
+          name="description"
+          content="প্রতিজ্ঞার সকল অনলাইন শিক্ষা কোর্স দেখুন। HSC, SSC এবং বিভিন্ন প্রতিযোগিতামূলক পরীক্ষার জন্য মানসম্পন্ন কোর্স। লাইভ ক্লাস, ভিডিও লেকচার এবং স্টাডি ম্যাটেরিয়ালস।"
+        />
+        <meta
+          property="og:title"
+          content="কোর্সসমূহ - প্রতিজ্ঞা | অনলাইন শিক্ষা কোর্স"
+        />
+        <meta
+          property="og:description"
+          content="প্রতিজ্ঞার সকল অনলাইন শিক্ষা কোর্স দেখুন। HSC, SSC এবং বিভিন্ন প্রতিযোগিতামূলক পরীক্ষার জন্য মানসম্পন্ন কোর্স।"
+        />
+        <meta property="og:image" content="/logo.png" />
+        <meta property="og:url" content="https://www.protigya.com/courses" />
+        <link rel="canonical" href="https://www.protigya.com/courses" />
+      </Helmet>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
 
-      <motion.main
-        className="flex-1 container mx-auto px-4 py-12"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            className="text-center mb-12"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className="text-4xl font-bold text-foreground mb-4">
-              Explore Our Courses
-            </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Discover a wide range of courses designed to help you achieve your
-              learning goals
-            </p>
-          </motion.div>
-
-          {/* Search and Filter */}
-          {courses.length > 0 && (
+        <motion.main
+          className="flex-1 container mx-auto px-4 py-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="max-w-7xl mx-auto">
             <motion.div
-              className="space-y-8 mb-12"
+              className="text-center mb-12"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.6 }}
             >
-              {/* Enhanced Search Bar */}
-              <div className="flex justify-center">
-                <div className="relative w-full max-w-lg">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                    <Search className="w-5 h-5 text-primary/80" />
-                  </div>
-                  <Input
-                    placeholder="Search courses by title or batch..."
-                    value={searchTerm}
-                    onChange={(e) => handleSearchChange(e.target.value)}
-                    className="pl-12 pr-4 py-3 h-12 text-base bg-card border-1 border-accent/30 rounded-xl shadow-sm focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all duration-200 placeholder:text-muted-foreground/60"
-                  />
-                  {searchTerm && (
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                      <button
-                        onClick={() => handleSearchChange("")}
-                        className="p-1 hover:bg-accent rounded-full transition-colors"
-                      >
-                        <span className="sr-only">Clear search</span>
-                        <svg
-                          className="w-4 h-4 text-muted-foreground"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <h1 className="text-4xl font-bold text-foreground mb-4">
+                Explore Our Courses
+              </h1>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                Discover a wide range of courses designed to help you achieve
+                your learning goals
+              </p>
+            </motion.div>
 
-              {/* Filter Buttons */}
-              <div className="flex justify-center gap-2 sm:gap-3 flex-wrap max-w-3xl mx-auto">
-                <Button
-                  variant={activeFilter === "all" ? "default" : "outline"}
-                  onClick={() => handleFilterChange("all")}
-                  className="min-w-[100px] h-10 rounded-lg font-medium transition-all duration-200"
-                >
-                  All Courses
-                </Button>
-                {batches.map((batch) => (
+            {/* Search and Filter */}
+            {courses.length > 0 && (
+              <motion.div
+                className="space-y-8 mb-12"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                {/* Enhanced Search Bar */}
+                <div className="flex justify-center">
+                  <div className="relative w-full max-w-lg">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                      <Search className="w-5 h-5 text-primary/80" />
+                    </div>
+                    <Input
+                      placeholder="Search courses by title or batch..."
+                      value={searchTerm}
+                      onChange={(e) => handleSearchChange(e.target.value)}
+                      className="pl-12 pr-4 py-3 h-12 text-base bg-card border-1 border-accent/30 rounded-xl shadow-sm focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all duration-200 placeholder:text-muted-foreground/60"
+                    />
+                    {searchTerm && (
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <button
+                          onClick={() => handleSearchChange("")}
+                          className="p-1 hover:bg-accent rounded-full transition-colors"
+                        >
+                          <span className="sr-only">Clear search</span>
+                          <svg
+                            className="w-4 h-4 text-muted-foreground"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Filter Buttons */}
+                <div className="flex justify-center gap-2 sm:gap-3 flex-wrap max-w-3xl mx-auto">
                   <Button
-                    key={batch}
-                    variant={activeFilter === batch ? "default" : "outline"}
-                    onClick={() => handleFilterChange(batch)}
+                    variant={activeFilter === "all" ? "default" : "outline"}
+                    onClick={() => handleFilterChange("all")}
                     className="min-w-[100px] h-10 rounded-lg font-medium transition-all duration-200"
                   >
-                    {batch}
+                    All Courses
                   </Button>
-                ))}
+                  {batches.map((batch) => (
+                    <Button
+                      key={batch}
+                      variant={activeFilter === batch ? "default" : "outline"}
+                      onClick={() => handleFilterChange(batch)}
+                      className="min-w-[100px] h-10 rounded-lg font-medium transition-all duration-200"
+                    >
+                      {batch}
+                    </Button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {courses.length === 0 ? (
+              <div className="text-center py-16">
+                <BookOpen className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground text-lg">
+                  No courses available at the moment
+                </p>
               </div>
-            </motion.div>
-          )}
+            ) : filteredCourses.length === 0 ? (
+              <div className="text-center py-16">
+                <BookOpen className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground text-lg">
+                  No courses found matching your search criteria
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-12">
+                {Object.entries(groupedCourses).map(
+                  ([batch, batchCourses], index) => (
+                    <motion.div
+                      key={batch}
+                      className="space-y-6"
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <h2 className="text-2xl font-bold text-primary">
+                          <span className="text-secondary">{batch}</span> Batch
+                        </h2>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                        {batchCourses.map((course) => (
+                          <CourseCard
+                            key={course.course_id || course.id}
+                            course={course}
+                            className="transition-transform duration-200 hover:-translate-y-1 select-none cursor-pointer"
+                          />
+                        ))}
+                      </div>
+                    </motion.div>
+                  )
+                )}
+              </div>
+            )}
+          </div>
+        </motion.main>
 
-          {courses.length === 0 ? (
-            <div className="text-center py-16">
-              <BookOpen className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground text-lg">
-                No courses available at the moment
-              </p>
-            </div>
-          ) : filteredCourses.length === 0 ? (
-            <div className="text-center py-16">
-              <BookOpen className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground text-lg">
-                No courses found matching your search criteria
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-12">
-              {Object.entries(groupedCourses).map(
-                ([batch, batchCourses], index) => (
-                  <motion.div
-                    key={batch}
-                    className="space-y-6"
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <h2 className="text-2xl font-bold text-primary">
-                        <span className="text-secondary">{batch}</span> Batch
-                      </h2>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                      {batchCourses.map((course) => (
-                        <CourseCard
-                          key={course.course_id || course.id}
-                          course={course}
-                          className="transition-transform duration-200 hover:-translate-y-1 select-none cursor-pointer"
-                        />
-                      ))}
-                    </div>
-                  </motion.div>
-                )
-              )}
-            </div>
-          )}
-        </div>
-      </motion.main>
-
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </>
   );
 }

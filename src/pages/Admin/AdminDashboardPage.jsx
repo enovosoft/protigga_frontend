@@ -33,6 +33,7 @@ import {
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
 import {
   CartesianGrid,
@@ -254,408 +255,456 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        <div className="mb-6">
-          <h2 className="text-3xl font-bold text-foreground">
-            Admin Dashboard
-          </h2>
-        </div>
+    <>
+      <Helmet>
+        <title>অ্যাডমিন ড্যাশবোর্ড - Protigya </title>
+        <meta
+          name="description"
+          content="Protigya অ্যাডমিন ড্যাশবোর্ড - ব্যবহারকারী, কোর্স, বই এবং সিস্টেম পরিচালনা করুন। বাংলাদেশের শীর্ষ অনলাইন শিক্ষা প্ল্যাটফর্মের অ্যাডমিন পোর্টাল।"
+        />
+        <meta
+          name="keywords"
+          content="অ্যাডমিন ড্যাশবোর্ড, Protigya, পরিচালনা প্যানেল, অনলাইন শিক্ষা, বাংলাদেশ"
+        />
+        <meta
+          property="og:title"
+          content="অ্যাডমিন ড্যাশবোর্ড - Protigya | পরিচালনা প্যানেল"
+        />
+        <meta
+          property="og:description"
+          content="Protigya অ্যাডমিন ড্যাশবোর্ড - ব্যবহারকারী, কোর্স, বই এবং সিস্টেম পরিচালনা করুন।"
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:site_name" content="Protigya" />
+        <meta property="og:locale" content="bn_BD" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="অ্যাডমিন ড্যাশবোর্ড - Protigya | পরিচালনা প্যানেল"
+        />
+        <meta
+          name="twitter:description"
+          content="Protigya অ্যাডমিন ড্যাশবোর্ড - ব্যবহারকারী, কোর্স, বই এবং সিস্টেম পরিচালনা করুন।"
+        />
+        <link rel="canonical" href={window.location.href} />
+      </Helmet>
+      <AdminLayout>
+        <div className="space-y-6">
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold text-foreground">
+              Admin Dashboard
+            </h2>
+          </div>
 
-        {/* Search Form */}
-        <div className="bg-card rounded-lg border p-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-end justify-center">
-            <div className="flex-1 mx-auto w-full">
-              <Label
-                htmlFor="search_start_date"
-                className="text-sm font-medium"
-              >
-                Start Date
-              </Label>
-              <Input
-                id="search_start_date"
-                type="date"
-                value={searchForm.start_date}
-                onChange={(e) =>
-                  handleSearchChange("start_date", e.target.value)
-                }
-                className="mt-1"
-              />
-            </div>
-            <div className="flex-1 mx-auto w-full">
-              <Label htmlFor="search_end_date" className="text-sm font-medium">
-                End Date
-              </Label>
-              <Input
-                id="search_end_date"
-                type="date"
-                value={searchForm.end_date}
-                onChange={(e) => handleSearchChange("end_date", e.target.value)}
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Button
-                onClick={handleSearch}
-                disabled={searching}
-                className="flex items-center gap-2"
-              >
-                {searching ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Searching...
-                  </>
-                ) : (
-                  <>
-                    <Search className="w-4 h-4" />
-                    Search
-                  </>
-                )}
-              </Button>
+          {/* Search Form */}
+          <div className="bg-card rounded-lg border p-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 items-end justify-center">
+              <div className="flex-1 mx-auto w-full">
+                <Label
+                  htmlFor="search_start_date"
+                  className="text-sm font-medium"
+                >
+                  Start Date
+                </Label>
+                <Input
+                  id="search_start_date"
+                  type="date"
+                  value={searchForm.start_date}
+                  onChange={(e) =>
+                    handleSearchChange("start_date", e.target.value)
+                  }
+                  className="mt-1"
+                />
+              </div>
+              <div className="flex-1 mx-auto w-full">
+                <Label
+                  htmlFor="search_end_date"
+                  className="text-sm font-medium"
+                >
+                  End Date
+                </Label>
+                <Input
+                  id="search_end_date"
+                  type="date"
+                  value={searchForm.end_date}
+                  onChange={(e) =>
+                    handleSearchChange("end_date", e.target.value)
+                  }
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Button
+                  onClick={handleSearch}
+                  disabled={searching}
+                  className="flex items-center gap-2"
+                >
+                  {searching ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Searching...
+                    </>
+                  ) : (
+                    <>
+                      <Search className="w-4 h-4" />
+                      Search
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Metrics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {loading
-            ? // Skeleton loaders for metrics
-              Array.from({ length: 6 }).map((_, index) => (
-                <Card key={index}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-4 w-4" />
-                  </CardHeader>
-                  <CardContent>
-                    <Skeleton className="h-8 w-16 mb-2" />
-                    <Skeleton className="h-3 w-32" />
-                  </CardContent>
-                </Card>
-              ))
-            : // Actual metrics
-              metrics.map((metric, index) => (
-                <Card key={index}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      {metric.title}
-                    </CardTitle>
-                    <metric.icon className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{metric.value}</div>
-                    <p className="text-xs text-muted-foreground">
-                      {metric.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-        </div>
+          {/* Metrics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {loading
+              ? // Skeleton loaders for metrics
+                Array.from({ length: 6 }).map((_, index) => (
+                  <Card key={index}>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-4" />
+                    </CardHeader>
+                    <CardContent>
+                      <Skeleton className="h-8 w-16 mb-2" />
+                      <Skeleton className="h-3 w-32" />
+                    </CardContent>
+                  </Card>
+                ))
+              : // Actual metrics
+                metrics.map((metric, index) => (
+                  <Card key={index}>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        {metric.title}
+                      </CardTitle>
+                      <metric.icon className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{metric.value}</div>
+                      <p className="text-xs text-muted-foreground">
+                        {metric.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
+          </div>
 
-        {/* Sales Overview */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Book Sales Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" />
-                Book Sales Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {loading ? (
-                  // Skeleton loaders for book sales
-                  Array.from({ length: 5 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex-1 space-y-2">
-                        <Skeleton className="h-4 w-32" />
-                        <Skeleton className="h-3 w-16" />
-                      </div>
-                      <Skeleton className="h-4 w-16" />
-                    </div>
-                  ))
-                ) : (
-                  <>
-                    {financeData?.book_sales?.slice(0, 5).map((book) => (
+          {/* Sales Overview */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Book Sales Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5" />
+                  Book Sales Overview
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {loading ? (
+                    // Skeleton loaders for book sales
+                    Array.from({ length: 5 }).map((_, index) => (
                       <div
-                        key={book.book_id}
-                        className="flex items-center justify-between "
-                      >
-                        <div className="flex-1 truncate">
-                          <p className="text-sm font-medium truncate">
-                            {book.book_name}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {book.total_orders} orders
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium">
-                            {formatPrice(book.total_amount)}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-full">
-                          <Eye className="w-4 h-4 mr-2" />
-                          View All Books
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl">
-                        <DialogHeader>
-                          <DialogTitle>Book Sales Details</DialogTitle>
-                        </DialogHeader>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Book Name</TableHead>
-                              <TableHead>Total Orders</TableHead>
-                              <TableHead>Total Amount</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {financeData?.book_sales?.map((book) => (
-                              <TableRow key={book.book_id}>
-                                <TableCell className="font-medium truncate">
-                                  {book.book_name}
-                                </TableCell>
-                                <TableCell>{book.total_orders}</TableCell>
-                                <TableCell>
-                                  {formatPrice(book.total_amount)}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </DialogContent>
-                    </Dialog>
-                  </>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Course Sales Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" />
-                Course Sales Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {loading ? (
-                  // Skeleton loaders for course sales
-                  Array.from({ length: 5 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex-1 space-y-2">
-                        <Skeleton className="h-4 w-32" />
-                        <Skeleton className="h-3 w-16" />
-                      </div>
-                      <Skeleton className="h-4 w-16" />
-                    </div>
-                  ))
-                ) : (
-                  <>
-                    {financeData?.course_sales?.slice(0, 5).map((course) => (
-                      <div
-                        key={course.course_id}
+                        key={index}
                         className="flex items-center justify-between"
                       >
-                        <div className="flex-1 truncate">
-                          <p className="text-sm font-medium truncate">
-                            {course.course_name}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {course.total_orders} orders
-                          </p>
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-3 w-16" />
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium">
-                            {formatPrice(course.total_amount)}
-                          </p>
-                        </div>
+                        <Skeleton className="h-4 w-16" />
                       </div>
-                    ))}
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-full">
-                          <Eye className="w-4 h-4 mr-2" />
-                          View All Courses
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl">
-                        <DialogHeader>
-                          <DialogTitle>Course Sales Details</DialogTitle>
-                        </DialogHeader>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Course Name</TableHead>
-                              <TableHead>Total Orders</TableHead>
-                              <TableHead>Total Amount</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {financeData?.course_sales?.map((course) => (
-                              <TableRow key={course.course_id}>
-                                <TableCell className="font-medium truncate">
-                                  {course.course_name}
-                                </TableCell>
-                                <TableCell>{course.total_orders}</TableCell>
-                                <TableCell>
-                                  {formatPrice(course.total_amount)}
-                                </TableCell>
+                    ))
+                  ) : (
+                    <>
+                      {financeData?.book_sales?.slice(0, 5).map((book) => (
+                        <div
+                          key={book.book_id}
+                          className="flex items-center justify-between "
+                        >
+                          <div className="flex-1 truncate">
+                            <p className="text-sm font-medium truncate">
+                              {book.book_name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {book.total_orders} orders
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-medium">
+                              {formatPrice(book.total_amount)}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            View All Books
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl">
+                          <DialogHeader>
+                            <DialogTitle>Book Sales Details</DialogTitle>
+                          </DialogHeader>
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Book Name</TableHead>
+                                <TableHead>Total Orders</TableHead>
+                                <TableHead>Total Amount</TableHead>
                               </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </DialogContent>
-                    </Dialog>
-                  </>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                            </TableHeader>
+                            <TableBody>
+                              {financeData?.book_sales?.map((book) => (
+                                <TableRow key={book.book_id}>
+                                  <TableCell className="font-medium truncate">
+                                    {book.book_name}
+                                  </TableCell>
+                                  <TableCell>{book.total_orders}</TableCell>
+                                  <TableCell>
+                                    {formatPrice(book.total_amount)}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </DialogContent>
+                      </Dialog>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Course Sales Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5" />
+                  Course Sales Overview
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {loading ? (
+                    // Skeleton loaders for course sales
+                    Array.from({ length: 5 }).map((_, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-3 w-16" />
+                        </div>
+                        <Skeleton className="h-4 w-16" />
+                      </div>
+                    ))
+                  ) : (
+                    <>
+                      {financeData?.course_sales?.slice(0, 5).map((course) => (
+                        <div
+                          key={course.course_id}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex-1 truncate">
+                            <p className="text-sm font-medium truncate">
+                              {course.course_name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {course.total_orders} orders
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-medium">
+                              {formatPrice(course.total_amount)}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            View All Courses
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl">
+                          <DialogHeader>
+                            <DialogTitle>Course Sales Details</DialogTitle>
+                          </DialogHeader>
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Course Name</TableHead>
+                                <TableHead>Total Orders</TableHead>
+                                <TableHead>Total Amount</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {financeData?.course_sales?.map((course) => (
+                                <TableRow key={course.course_id}>
+                                  <TableCell className="font-medium truncate">
+                                    {course.course_name}
+                                  </TableCell>
+                                  <TableCell>{course.total_orders}</TableCell>
+                                  <TableCell>
+                                    {formatPrice(course.total_amount)}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </DialogContent>
+                      </Dialog>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sales Trends */}
+          <div className="space-y-6">
+            <h3 className="text-2xl font-bold text-foreground">Sales Trends</h3>
+
+            {/* Daily Sales */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5" />
+                  Daily Sales Trends
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart
+                    data={processSalesData(
+                      financeData?.daily_book_sales,
+                      financeData?.daily_course_sales,
+                      "day"
+                    )}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="books"
+                      stroke="#8884d8"
+                      strokeWidth={2}
+                      name="Book Sales"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="courses"
+                      stroke="#82ca9d"
+                      strokeWidth={2}
+                      name="Course Sales"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            {/* Weekly Sales */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5" />
+                  Weekly Sales Trends
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart
+                    data={processSalesData(
+                      financeData?.weekly_book_sales,
+                      financeData?.weekly_course_sales,
+                      "week"
+                    )}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="week" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="books"
+                      stroke="#ffc658"
+                      strokeWidth={2}
+                      name="Book Sales"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="courses"
+                      stroke="#ff7300"
+                      strokeWidth={2}
+                      name="Course Sales"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            {/* Monthly Sales */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5" />
+                  Monthly Sales Trends
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart
+                    data={processSalesData(
+                      financeData?.monthly_book_sales,
+                      financeData?.monthly_course_sales,
+                      "month"
+                    )}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="books"
+                      stroke="#8dd1e1"
+                      strokeWidth={2}
+                      name="Book Sales"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="courses"
+                      stroke="#d084d0"
+                      strokeWidth={2}
+                      name="Course Sales"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-
-        {/* Sales Trends */}
-        <div className="space-y-6">
-          <h3 className="text-2xl font-bold text-foreground">Sales Trends</h3>
-
-          {/* Daily Sales */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" />
-                Daily Sales Trends
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart
-                  data={processSalesData(
-                    financeData?.daily_book_sales,
-                    financeData?.daily_course_sales,
-                    "day"
-                  )}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="books"
-                    stroke="#8884d8"
-                    strokeWidth={2}
-                    name="Book Sales"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="courses"
-                    stroke="#82ca9d"
-                    strokeWidth={2}
-                    name="Course Sales"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Weekly Sales */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" />
-                Weekly Sales Trends
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart
-                  data={processSalesData(
-                    financeData?.weekly_book_sales,
-                    financeData?.weekly_course_sales,
-                    "week"
-                  )}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="week" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="books"
-                    stroke="#ffc658"
-                    strokeWidth={2}
-                    name="Book Sales"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="courses"
-                    stroke="#ff7300"
-                    strokeWidth={2}
-                    name="Course Sales"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Monthly Sales */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" />
-                Monthly Sales Trends
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart
-                  data={processSalesData(
-                    financeData?.monthly_book_sales,
-                    financeData?.monthly_course_sales,
-                    "month"
-                  )}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="books"
-                    stroke="#8dd1e1"
-                    strokeWidth={2}
-                    name="Book Sales"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="courses"
-                    stroke="#d084d0"
-                    strokeWidth={2}
-                    name="Course Sales"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </AdminLayout>
+      </AdminLayout>
+    </>
   );
 }

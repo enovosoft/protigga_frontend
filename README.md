@@ -61,7 +61,7 @@
 ## 3. Project Structure
 
 ```
-protigga-frontend/
+Protigya-frontend/
 │
 ├── public/                          # Static assets
 │   ├── favicon.ico

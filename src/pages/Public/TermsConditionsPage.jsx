@@ -2,10 +2,35 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import ScrollToTop from "@/components/shared/ScrollToTop";
 import { Card, CardContent } from "@/components/ui/card";
+import { Helmet } from "react-helmet-async";
 
 export default function TermsConditionsPage() {
   return (
     <>
+      <Helmet>
+        <title>শর্তাবলী - প্রতিজ্ঞা | Terms & Conditions</title>
+        <meta
+          name="description"
+          content="প্রতিজ্ঞা শিক্ষা প্ল্যাটফর্মের ব্যবহারের শর্তাবলী এবং নিয়মাবলী। কোর্স এবং বই কেনার আগে শর্তাবলী পড়ুন।"
+        />
+        <meta
+          property="og:title"
+          content="শর্তাবলী - প্রতিজ্ঞা | Terms & Conditions"
+        />
+        <meta
+          property="og:description"
+          content="প্রতিজ্ঞা শিক্ষা প্ল্যাটফর্মের ব্যবহারের শর্তাবলী এবং নিয়মাবলী।"
+        />
+        <meta property="og:image" content="/logo.png" />
+        <meta
+          property="og:url"
+          content="https://www.protigya.com/terms-conditions"
+        />
+        <link
+          rel="canonical"
+          href="https://www.protigya.com/terms-conditions"
+        />
+      </Helmet>
       <Navbar />
       <main className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 sm:py-12">

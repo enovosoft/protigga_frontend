@@ -2,10 +2,32 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import ScrollToTop from "@/components/shared/ScrollToTop";
 import { Card, CardContent } from "@/components/ui/card";
+import { Helmet } from "react-helmet-async";
 
 export default function PrivacyPolicyPage() {
   return (
     <>
+      <Helmet>
+        <title>গোপনীয়তা নীতি - প্রতিজ্ঞা | Privacy Policy</title>
+        <meta
+          name="description"
+          content="প্রতিজ্ঞা শিক্ষা প্ল্যাটফর্মের গোপনীয়তা নীতি। আপনার ব্যক্তিগত তথ্য কীভাবে সংরক্ষণ এবং ব্যবহার করা হয় তা জানুন।"
+        />
+        <meta
+          property="og:title"
+          content="গোপনীয়তা নীতি - প্রতিজ্ঞা | Privacy Policy"
+        />
+        <meta
+          property="og:description"
+          content="প্রতিজ্ঞা শিক্ষা প্ল্যাটফর্মের গোপনীয়তা নীতি।"
+        />
+        <meta property="og:image" content="/logo.png" />
+        <meta
+          property="og:url"
+          content="https://www.protigya.com/privacy-policy"
+        />
+        <link rel="canonical" href="https://www.protigya.com/privacy-policy" />
+      </Helmet>
       <Navbar />
       <main className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 sm:py-12">
