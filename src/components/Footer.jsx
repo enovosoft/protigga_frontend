@@ -1,6 +1,13 @@
 import { CONTACT } from "@/config/data";
 import { cn } from "@/lib/utils";
-import { Facebook, Instagram, Mail, MapPin, Phone, Youtube } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  Mail,
+  MapPin,
+  Phone,
+  Youtube,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Footer({ className }) {
@@ -170,7 +177,7 @@ export default function Footer({ className }) {
             <div className="flex flex-col items-center justify-center w-full">
               <div className="flex items-center justify-center gap-2">
                 <img
-                  src="/Payment3.png"
+                  src="/payment0.png"
                   alt="Payment Methods"
                   className="block sm:hidden  object-contain"
                 />
