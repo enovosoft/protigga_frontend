@@ -21,11 +21,11 @@ export default function CourseCard({ course, className }) {
       )}
     >
       <Link
-        className="w-full flex flex-col h-full min-h-[340px] lg:min-h-[380px]"
+        className="w-full flex flex-col h-full min-h-[380px] lg:min-h-[400px]"
         to={`/courses/${slug}`}
       >
         <CardHeader className="p-0">
-          <div className="relative w-full h-40 md:h-48 overflow-hidden bg-muted">
+          <div className="relative w-full aspect-square overflow-hidden bg-muted">
             <ImageFallback
               src={thumbnail}
               alt={course_title}
@@ -34,19 +34,19 @@ export default function CourseCard({ course, className }) {
               text="Course Thumbnail"
             />
             {/* Batch Tag */}
-            {batch && (
+            {/* {batch && (
               <div className="absolute top-3 right-3">
-                <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg ">
                   <BookOpen className="w-3 h-3" />
                   {batch}
                 </span>
               </div>
-            )}
+            )} */}
           </div>
         </CardHeader>
 
         <CardContent className="p-4 flex flex-col flex-1 ">
-          <h3 className="text-base lg:text-lg font-medium text-foreground line-clamp-2">
+          <h3 className="text-base lg:text-lg font-medium text-foreground line-clamp-2 relative">
             {course_title}
           </h3>
 

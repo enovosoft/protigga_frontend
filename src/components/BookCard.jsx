@@ -21,11 +21,11 @@ export default function BookCard({ book, className }) {
       )}
     >
       <Link
-        className="w-full flex flex-col h-full min-h-[340px] lg:min-h-[380px]"
+        className="w-full flex flex-col h-full min-h-[380px] lg:min-h-[380px]"
         to={stock === 0 ? "#" : `/books/${slug}`}
       >
         <CardHeader className="p-0">
-          <div className="relative w-full h-40 md:h-48 overflow-hidden bg-muted">
+          <div className="relative w-full aspect-square overflow-hidden bg-muted">
             <ImageFallback
               src={book_image}
               alt={title}

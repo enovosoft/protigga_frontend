@@ -18,7 +18,6 @@ import {
   Shield,
   Ticket,
   User,
-  Users,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -116,10 +115,10 @@ const AdminLayout = ({ children }) => {
     },
 
     {
-      id: "users",
-      label: "Users",
-      icon: Users,
-      path: "/admin/users",
+      id: "instructors",
+      label: "Instructors",
+      icon: User,
+      path: "/admin/instructors",
     },
     {
       id: "exams",

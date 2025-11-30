@@ -1,11 +1,11 @@
 import BookCard from "@/components/BookCard";
 import Footer from "@/components/Footer";
+import InstructorCard from "@/components/InstructorCard";
 import Navbar from "@/components/Navbar";
 import ImageFallback from "@/components/shared/ImageFallback";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { INSTRUCTORS } from "@/config/data";
 import api from "@/lib/api";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -84,6 +84,7 @@ export default function CourseDetailsPage() {
           academy_name: courseData.course_details?.academy_name || "",
           curriculum: courseData.chapters || [],
           related_books: courseData.related_books || [],
+          instructors: courseData.instractors || [],
         };
 
         setCourse(courseInfo);
@@ -257,14 +258,14 @@ export default function CourseDetailsPage() {
                           className="min-h-60 duration-300 hover:scale-110 cursor-zoom-in"
                         />
                         {/* Batch Tag */}
-                        {course.batch && (
+                        {/* {course.batch && (
                           <div className="absolute top-3 right-3">
                             <span className="inline-flex items-center gap-1 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg">
                               <BookOpen className="w-3 h-3" />
                               {course.batch}
                             </span>
                           </div>
-                        )}
+                        )} */}
                       </div>
                     </CardHeader>
 
@@ -287,7 +288,15 @@ export default function CourseDetailsPage() {
                         <h3 className="font-semibold text-foreground mb-3">
                           Course Information
                         </h3>
-
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground flex items-center gap-2">
+                            <Award className="w-4 h-4" />
+                            Batch
+                          </span>
+                          <span className="font-medium text-foreground">
+                            {course.batch || "N/A"}
+                          </span>
+                        </div>
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-muted-foreground flex items-center gap-2">
                             <BookOpen className="w-4 h-4" />
@@ -388,7 +397,7 @@ export default function CourseDetailsPage() {
                           : "border-transparent text-muted-foreground hover:text-foreground"
                       }`}
                     >
-                      Instructor
+                      Instructors
                     </button>
                   </div>
                 </div>
@@ -474,50 +483,21 @@ export default function CourseDetailsPage() {
                     <div className="space-y-6">
                       {/* Instructor Grid */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {INSTRUCTORS.map((instructor) => (
-                          <Card
-                            key={instructor.id}
-                            className="group hover:shadow-xl transition-all duration-300 hover:border-secondary/50 overflow-hidden"
-                          >
-                            <CardContent className="p-6">
-                              {/* Instructor Image */}
-                              <div className="mb-4">
-                                <div className="relative w-24 h-24 mx-auto">
-                                  <ImageFallback
-                                    src={instructor.image}
-                                    alt={instructor.name}
-                                    className="rounded-full"
-                                  />
-                                </div>
-                              </div>
-
-                              {/* Instructor Info */}
-                              <div className="text-center space-y-3">
-                                <div>
-                                  <h4 className="font-semibold text-lg text-foreground group-hover:text-secondary transition-colors">
-                                    {instructor.name}
-                                  </h4>
-                                  <p className="text-secondary font-medium">
-                                    {instructor.subject}
-                                  </p>
-                                </div>
-
-                                <div className="space-y-2 pt-3 border-t border-border">
-                                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                                    <Award className="w-4 h-4 text-secondary" />
-                                    <span>
-                                      {instructor.experience} experience
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                                    <BookOpen className="w-4 h-4 text-secondary" />
-                                    <span>{instructor.students}+ students</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
+                        {course.instructors && course.instructors.length > 0 ? (
+                          course.instructors.map((instructor) => (
+                            <InstructorCard
+                              key={instructor.instractor_id}
+                              instructor={instructor}
+                            />
+                          ))
+                        ) : (
+                          <div className="col-span-full text-center py-8 px-4">
+                            <Award className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                            <p className="text-muted-foreground text-sm sm:text-base">
+                              No instructors assigned to this course yet.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

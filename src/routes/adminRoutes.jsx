@@ -1,3 +1,4 @@
+import LiveClassesPage from "@/pages/Admin/LiveClassesPage";
 import { Route } from "react-router-dom";
 import { ProtectedRoute } from "../components/routing/ProtectedRoute";
 import AdminDashboardPage from "../pages/Admin/AdminDashboardPage";
@@ -9,14 +10,13 @@ import AdminCoursesPage from "../pages/Admin/CoursesPage";
 import EnrollmentDetailsPage from "../pages/Admin/Enrollments/EnrollmentDetailsPage";
 import AdminEnrollmentsPage from "../pages/Admin/EnrollmentsPage";
 import ExamsPage from "../pages/Admin/ExamsPage";
-import LiveClassesPage from "../pages/Admin/LiveClassesPage";
+import AdminInstructorsPage from "../pages/Admin/InstructorsPage";
 import AdminNotesPage from "../pages/Admin/NotesPage";
 import OrderDetailsPage from "../pages/Admin/Orders/OrderDetailsPage";
 import AdminOrdersPage from "../pages/Admin/OrdersPage";
 import AdminPromoPage from "../pages/Admin/PromoPage";
 import UserDetailsPage from "../pages/Admin/Users/UserDetailsPage";
 import AdminUsersPage from "../pages/Admin/UsersPage";
-
 export const adminRoutes = (
   <>
     {/* Admin Routes - Protected by role */}
@@ -129,6 +129,14 @@ export const adminRoutes = (
       element={
         <ProtectedRoute roles={["admin"]}>
           <LiveClassesPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/admin/instructors"
+      element={
+        <ProtectedRoute roles={["admin"]}>
+          <AdminInstructorsPage />
         </ProtectedRoute>
       }
     />

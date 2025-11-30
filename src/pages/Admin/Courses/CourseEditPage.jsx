@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -104,7 +105,11 @@ export default function CourseEditPage() {
   const [chapters, setChapters] = useState([]);
   const [expandedChapters, setExpandedChapters] = useState(new Set());
   const books = useStoreState((state) => state.admin.books);
+  const instructors = useStoreState((state) => state.admin.instructors);
   const fetchCourses = useStoreActions((actions) => actions.admin.fetchCourses);
+  const fetchInstructors = useStoreActions(
+    (actions) => actions.admin.fetchInstructors
+  );
   // Loading states for chapter and topic operations
   const [savingChapter, setSavingChapter] = useState(false);
   const [savingTopic, setSavingTopic] = useState(false);
@@ -114,6 +119,8 @@ export default function CourseEditPage() {
 
   const [relatedBooksDialogOpen, setRelatedBooksDialogOpen] = useState(false);
   const [bookSearchQuery, setBookSearchQuery] = useState("");
+  const [instructorsDialogOpen, setInstructorsDialogOpen] = useState(false);
+  const [instructorSearchQuery, setInstructorSearchQuery] = useState("");
 
   // Dialog states
   const [chapterDialogOpen, setChapterDialogOpen] = useState(false);
@@ -132,6 +139,7 @@ export default function CourseEditPage() {
     academy_name: "",
     description: "",
     related_books: [],
+    instructors: [],
     quiz_count: "",
     assessment: false,
     skill_level: "",
@@ -175,6 +183,9 @@ export default function CourseEditPage() {
                 return matchingBook ? matchingBook.book_id : null;
               })
               .filter(Boolean),
+            instructors: (courseData.instractors || [])
+              .map((instructor) => instructor.instractor_id)
+              .filter(Boolean),
             quiz_count: courseData.course_details?.quiz_count || "",
             assessment: courseData.course_details?.assessment || false,
             skill_level: courseData.course_details?.skill_level || "",
@@ -210,6 +221,7 @@ export default function CourseEditPage() {
         academy_name: "",
         description: "",
         related_books: [],
+        instructors: [],
         quiz_count: "",
         assessment: false,
         skill_level: "",
@@ -221,7 +233,11 @@ export default function CourseEditPage() {
       // For editing, fetch course data
       fetchCourse();
     }
-  }, [isCreating, slug, fetchCourse]);
+    // Ensure instructors are loaded
+    if (instructors.length === 0) {
+      fetchInstructors();
+    }
+  }, [isCreating, slug, fetchCourse, instructors.length, fetchInstructors]);
 
   // Handle course form changes
   const handleCourseChange = (e) => {
@@ -261,6 +277,7 @@ export default function CourseEditPage() {
         ...courseForm,
         expired_date: `${courseForm.expired_date}T00:00:00.000Z`,
         related_books: courseForm.related_books,
+        instractors: courseForm.instructors,
         quiz_count:
           courseForm.quiz_count === "" || courseForm.quiz_count === undefined
             ? null
@@ -806,6 +823,23 @@ export default function CourseEditPage() {
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="instructors">Instructors</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setInstructorsDialogOpen(true)}
+                  className="w-full justify-between"
+                >
+                  <span>
+                    {courseForm.instructors.length > 0
+                      ? `${courseForm.instructors.length} instructor(s) selected`
+                      : "Select instructors"}
+                  </span>
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -1313,6 +1347,150 @@ export default function CourseEditPage() {
                 onClick={() => {
                   setRelatedBooksDialogOpen(false);
                   setBookSearchQuery("");
+                }}
+              >
+                Done
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Instructors Selection Dialog */}
+        <Dialog
+          open={instructorsDialogOpen}
+          onOpenChange={setInstructorsDialogOpen}
+        >
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Select Instructors</DialogTitle>
+              <DialogDescription>
+                Choose instructors for this course. You can select multiple
+                instructors.
+              </DialogDescription>
+            </DialogHeader>
+
+            {/* Search Input */}
+            <div className="space-y-4">
+              <div className="relative">
+                <Input
+                  placeholder="Search instructors..."
+                  value={instructorSearchQuery}
+                  onChange={(e) => setInstructorSearchQuery(e.target.value)}
+                  className="pl-8"
+                />
+                <svg
+                  className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+
+              {/* Instructors List */}
+              <div className="max-h-96 overflow-y-auto border rounded-md p-3 space-y-2">
+                {instructors.length > 0 ? (
+                  instructors
+                    .filter((instructor) =>
+                      instructor.name
+                        .toLowerCase()
+                        .trim()
+                        .includes(instructorSearchQuery.toLowerCase())
+                    )
+                    .map((instructor) => (
+                      <div
+                        key={instructor.instractor_id}
+                        className="flex items-center space-x-3 p-2 hover:bg-muted/50 rounded-md"
+                      >
+                        <Checkbox
+                          id={`dialog-instructor-${instructor.instractor_id}`}
+                          checked={courseForm.instructors.includes(
+                            instructor.instractor_id
+                          )}
+                          onCheckedChange={(checked) => {
+                            setCourseForm((prev) => ({
+                              ...prev,
+                              instructors: checked
+                                ? [
+                                    ...prev.instructors,
+                                    instructor.instractor_id,
+                                  ]
+                                : prev.instructors.filter(
+                                    (id) => id !== instructor.instractor_id
+                                  ),
+                            }));
+                          }}
+                        />
+
+                        <Label
+                          htmlFor={`dialog-instructor-${instructor.instractor_id}`}
+                          className="text-sm cursor-pointer flex-1 flex gap-2"
+                        >
+                          <Avatar className="size-10 lg:size-12 xl:size-14">
+                            <AvatarImage
+                              src={instructor.image}
+                              alt={instructor.name}
+                            />
+                            <AvatarFallback>
+                              {instructor.name?.charAt(0)?.toUpperCase() || "I"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-medium">{instructor.name}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {instructor.designation} •{" "}
+                              {instructor.teaching_experience} years experience
+                            </div>
+                          </div>
+                        </Label>
+                      </div>
+                    ))
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No instructors available
+                  </p>
+                )}
+                {instructors.length > 0 &&
+                  instructors.filter((instructor) =>
+                    instructor.name
+                      .toLowerCase()
+                      .includes(instructorSearchQuery.toLowerCase())
+                  ).length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      No instructors match your search
+                    </p>
+                  )}
+              </div>
+
+              {/* Selection Summary */}
+              <div className="text-sm text-muted-foreground flex justify-between items-center px-2">
+                <span>
+                  {courseForm.instructors.length} instructor(s) selected
+                </span>
+                <span>{instructors.length} instructor(s) total</span>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setInstructorsDialogOpen(false);
+                  setInstructorSearchQuery("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  setInstructorsDialogOpen(false);
+                  setInstructorSearchQuery("");
                 }}
               >
                 Done

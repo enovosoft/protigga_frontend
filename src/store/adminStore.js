@@ -4,6 +4,7 @@ import { action, thunk } from "easy-peasy";
 const adminStore = {
   courses: [],
   books: [],
+  instructors: [],
 
   loading: false,
   error: null,
@@ -29,14 +30,20 @@ const adminStore = {
     state.books = payload;
   }),
 
+  setInstructors: action((state, payload) => {
+    state.instructors = payload;
+  }),
+
   fetchData: thunk(async (actions) => {
     actions.setLoading(true);
     actions.setError(null);
     try {
-      const [coursesResponse, booksResponse] = await Promise.all([
-        api.get("/courses"),
-        api.get("/books"),
-      ]);
+      const [coursesResponse, booksResponse, instructorsResponse] =
+        await Promise.all([
+          api.get("/courses"),
+          api.get("/books"),
+          api.get("/intructors"),
+        ]);
 
       if (coursesResponse.data.success) {
         let courses = coursesResponse.data?.courses || [];
@@ -48,6 +55,14 @@ const adminStore = {
         let books = booksResponse.data?.books || [];
         books.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         actions.setBooks(books);
+      }
+
+      if (instructorsResponse.data.success) {
+        let instructors = instructorsResponse.data?.instructors || [];
+        instructors.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        actions.setInstructors(instructors);
       }
 
       actions.setInitialFetch(true);
@@ -90,6 +105,27 @@ const adminStore = {
     } catch (error) {
       actions.setError(
         error.response?.data?.message || "Failed to fetch books"
+      );
+    } finally {
+      actions.setLoading(false);
+    }
+  }),
+
+  fetchInstructors: thunk(async (actions) => {
+    actions.setLoading(true);
+    actions.setError(null);
+    try {
+      const response = await api.get("/intructors");
+      if (response.data.success) {
+        let instructors = response.data?.instructors || [];
+        instructors.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        actions.setInstructors(instructors);
+      }
+    } catch (error) {
+      actions.setError(
+        error.response?.data?.message || "Failed to fetch instructors"
       );
     } finally {
       actions.setLoading(false);
