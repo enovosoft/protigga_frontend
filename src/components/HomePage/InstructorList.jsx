@@ -13,7 +13,7 @@ export default function InstructorList() {
     const fetchInstructors = async () => {
       try {
         setLoading(true);
-        const response = await api.get("/intructors");
+        const response = await api.get("/instructors");
         if (response.data.success) {
           setInstructors(response.data.instructors || []);
         }

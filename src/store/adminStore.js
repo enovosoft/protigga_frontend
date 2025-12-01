@@ -42,7 +42,7 @@ const adminStore = {
         await Promise.all([
           api.get("/courses"),
           api.get("/books"),
-          api.get("/intructors"),
+          api.get("/instructors"),
         ]);
 
       if (coursesResponse.data.success) {
@@ -115,7 +115,7 @@ const adminStore = {
     actions.setLoading(true);
     actions.setError(null);
     try {
-      const response = await api.get("/intructors");
+      const response = await api.get("/instructors");
       if (response.data.success) {
         let instructors = response.data?.instructors || [];
         instructors.sort(
