@@ -18,36 +18,10 @@ export default function OrderSummary({
   onApplyPromo = () => {},
   paymentType = "cod",
   isBook = false,
+  calculateSubtotal = () => 0,
+  calculateDiscount = () => 0,
+  calculateTotal = () => 0,
 }) {
-  const calculateSubtotal = () => {
-    return (product?.price || 0) * Math.min(Math.max(quantity || 1, 1), 10000);
-  };
-
-  const calculateDiscount = () => {
-    if (!promoApplied || !promoData) return 0;
-
-    let discountAmount = 0;
-    if (promoData.Discount_type === "percentage") {
-      discountAmount = (calculateSubtotal() * promoData.Discount) / 100;
-    } else {
-      discountAmount = promoData.Discount;
-    }
-
-    // Apply max discount limit
-    if (
-      promoData.Max_discount_amount &&
-      discountAmount > promoData.Max_discount_amount
-    ) {
-      discountAmount = promoData.Max_discount_amount;
-    }
-
-    return discountAmount;
-  };
-
-  const calculateTotal = () => {
-    return calculateSubtotal() - calculateDiscount() + deliveryFee;
-  };
-
   return (
     <Card className="border-border bg-card shadow-sm">
       <CardHeader className="pb-3 sm:pb-4">
@@ -190,6 +164,21 @@ export default function OrderSummary({
             </div>
           </div>
         </div>
+
+        {paymentType === "cod" && (
+          <>
+            <div className="flex justify-between text-sm sm:text-base ">
+              <span className="text-foreground">Pay Now:</span>
+              <span className="font-medium text-success">৳{200}</span>
+            </div>
+            <div className="flex justify-between text-sm sm:text-base ">
+              <span className="text-foreground">Due:</span>
+              <span className="font-medium text-destructive">
+                ৳{calculateTotal() - 200 < 0 ? 0 : calculateTotal() - 200}
+              </span>
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );

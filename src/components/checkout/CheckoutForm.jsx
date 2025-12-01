@@ -556,6 +556,9 @@ export default function CheckoutForm() {
             onApplyPromo={checkPromoCode}
             paymentType={paymentType}
             isBook={isBook}
+            calculateSubtotal={calculateSubtotal}
+            calculateDiscount={calculateDiscount}
+            calculateTotal={calculateTotal}
           />
 
           {/* Customer Information */}

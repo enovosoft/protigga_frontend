@@ -14,6 +14,7 @@ import {
   MessageSquare,
   Package,
   PlayCircle,
+  School,
   Settings,
   Shield,
   Ticket,
@@ -113,12 +114,11 @@ const AdminLayout = ({ children }) => {
       icon: Book,
       path: "/admin/books",
     },
-
     {
-      id: "instructors",
-      label: "Instructors",
+      id: "users",
+      label: "Users",
       icon: User,
-      path: "/admin/instructors",
+      path: "/admin/users",
     },
     {
       id: "exams",
@@ -149,6 +149,12 @@ const AdminLayout = ({ children }) => {
       label: "Promo Codes",
       icon: Ticket,
       path: "/admin/promo",
+    },
+    {
+      id: "instructors",
+      label: "Instructors",
+      icon: School,
+      path: "/admin/instructors",
     },
     {
       id: "settings",
